@@ -1,0 +1,36 @@
+server:
+  port: 3003
+
+spring:
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKER:kafka:29092}
+    topic:
+      historico-success: historico-success
+      historico-fail: historico-fail
+    consumer:
+      group-id: historico-group
+      auto-offset-reset: latest
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://historico-db:5432/historico
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+  level:
+    org.apache.kafka: INFO
+    org.hibernate: DEBUG

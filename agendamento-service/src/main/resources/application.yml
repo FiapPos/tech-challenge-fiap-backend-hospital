@@ -1,0 +1,38 @@
+server:
+  port: 3000
+
+spring:
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKER:kafka:29092}
+    topic:
+      agendamento-success: agendamento-success
+      agendamento-fail: agendamento-fail
+    consumer:
+      group-id: agendamento-group
+      auto-offset-reset: latest
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URI:jdbc:postgresql://agendamento-db:5432/agendamentos}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+  level:
+    org.apache.kafka: INFO
+    org.hibernate: DEBUG

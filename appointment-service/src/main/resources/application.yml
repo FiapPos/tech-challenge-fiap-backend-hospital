@@ -1,0 +1,36 @@
+server:
+  port: 3002
+
+spring:
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKER:kafka:29092}
+    topic:
+      appointment-success: appointment-success
+      appointment-fail: appointment-fail
+    consumer:
+      group-id: appointment-group
+      auto-offset-reset: latest
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://appointment-db:5432/appointment
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+
+logging:
+  level:
+    org.apache.kafka: INFO
+    org.hibernate: DEBUG

@@ -1,0 +1,179 @@
+version: '3'
+
+services:
+  appointment-db:
+    image: postgres:latest
+    container_name: appointment-db
+    networks:
+      - orchestrator-saga
+    environment:
+      - POSTGRES_DB=appointments
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5432:5432
+
+  usuario-db:
+    image: postgres:latest
+    container_name: usuario-db
+    networks:
+      - orchestrator-saga
+    environment:
+      - POSTGRES_DB=usuarios
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5433:5432
+
+  agendamento-db:
+    image: postgres:latest
+    container_name: agendamento-db
+    networks:
+      - orchestrator-saga
+    environment:
+      - POSTGRES_DB=agendamentos
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5434:5432
+
+  historico-db:
+    image: postgres:latest
+    container_name: historico-db
+    networks:
+      - orchestrator-saga
+    environment:
+      - POSTGRES_DB=historico
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5435:5432
+
+  kafka:
+    container_name: kafka
+    image: obsidiandynamics/kafka
+    restart: "no"
+    ports:
+      - "2181:2181"
+      - "9092:9092"
+    networks:
+      - orchestrator-saga
+    environment:
+      KAFKA_LISTENERS: "INTERNAL://:29092,EXTERNAL://:9092"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:29092,EXTERNAL://localhost:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT: "6000"
+      KAFKA_RESTART_ATTEMPTS: "10"
+      KAFKA_RESTART_DELAY: "5"
+      ZOOKEEPER_AUTOPURGE_PURGE_INTERVAL: "0"
+    volumes:
+      - ./data/kafka/data:/var/lib/kafka/data
+
+  redpanda-console:
+    container_name: redpanda
+    image: docker.redpanda.com/vectorized/console:latest
+    restart: on-failure
+    entrypoint: /bin/sh
+    command: -c "echo \"$$CONSOLE_CONFIG_FILE\" > /tmp/config.yml; /app/console"
+    ports:
+      - "8081:8080"
+    networks:
+      - orchestrator-saga
+    environment:
+      CONFIG_FILEPATH: /tmp/config.yml
+      CONSOLE_CONFIG_FILE: |
+        kafka:
+          brokers: ["kafka:29092"]
+    depends_on:
+      - "kafka"
+
+  appointment-service:
+    build: './appointment-service'
+    container_name: appointment-service
+    depends_on:
+      - appointment-db
+      - kafka
+    networks:
+      - orchestrator-saga
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://appointment-db:5432/appointments
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_CLOUD_CONFIG_ENABLED=false
+      - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
+    ports:
+      - 3000:3002
+
+  usuario-service:
+    build: './usuario-service'
+    container_name: usuario-service
+    depends_on:
+      - usuario-db
+      - kafka
+    networks:
+      - orchestrator-saga
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://usuario-db:5432/usuarios
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_CLOUD_CONFIG_ENABLED=false
+      - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
+    ports:
+      - 3001:3000
+
+  agendamento-service:
+    build: './agendamento-service'
+    container_name: agendamento-service
+    depends_on:
+      - agendamento-db
+      - kafka
+    networks:
+      - orchestrator-saga
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://agendamento-db:5432/agendamentos
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_CLOUD_CONFIG_ENABLED=false
+      - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
+    ports:
+      - 3002:3000
+
+  historico-service:
+    build: './historico-service'
+    container_name: historico-service
+    depends_on:
+      - historico-db
+      - kafka
+    networks:
+      - orchestrator-saga
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://historico-db:5432/historico
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_CLOUD_CONFIG_ENABLED=false
+      - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
+    ports:
+      - 3003:8080
+
+  notificacao-service:
+    build: './notificacao-service'
+    container_name: notificacao-service
+    depends_on:
+      - kafka
+    networks:
+      - orchestrator-saga
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SPRING_CLOUD_CONFIG_ENABLED=false
+      - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
+    ports:
+      - 3004:3000
+
+networks:
+  orchestrator-saga:
+    driver: bridge

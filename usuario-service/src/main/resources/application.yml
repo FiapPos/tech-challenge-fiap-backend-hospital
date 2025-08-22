@@ -1,0 +1,32 @@
+server:
+  port: 3000
+
+spring:
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKER:kafka:29092}
+    topic:
+      orchestrator: orchestrator
+      usuario-success: usuario-success
+      usuario-fail: usuario-fail
+    consumer:
+      group-id: usuario-group
+      auto-offset-reset: latest
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URI:jdbc:postgresql://usuario-db:5432/usuarios}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
