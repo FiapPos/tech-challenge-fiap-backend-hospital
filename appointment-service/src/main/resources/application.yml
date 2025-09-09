@@ -19,7 +19,7 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://appointment-db:5432/appointment
+    url: jdbc:postgresql://appointment-db:5432/appointments
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
 

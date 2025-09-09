@@ -1,13 +1,7 @@
 server:
-  port: 3004
+  port: 3000
 
 spring:
-  cloud:
-    config:
-      enabled: false
-      import-check:
-        enabled: false
-
   kafka:
     bootstrap-servers: ${KAFKA_BROKER:kafka:29092}
     topic:
@@ -17,20 +11,6 @@ spring:
       group-id: notificacao-group
       auto-offset-reset: latest
 
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://notificacao-db:5432/notificacao
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:postgres}
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
-
 logging:
   level:
     org.apache.kafka: INFO
-    org.hibernate: DEBUG
