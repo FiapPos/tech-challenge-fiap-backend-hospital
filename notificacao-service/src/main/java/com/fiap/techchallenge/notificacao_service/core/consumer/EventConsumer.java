@@ -12,7 +12,7 @@ public class EventConsumer {
 
     private final Logger logger = LoggerFactory.getLogger(EventConsumer.class);
 
-    @KafkaListener(topics = "notificacao", groupId = "notificacao-group")
+    @KafkaListener(topics = "${spring.kafka.topic.notificacao-success}", groupId = "${spring.kafka.consumer.group-id}")
     public void consumirNotificacao(NotificacaoAgendamento notificacaoAgendamento, Acknowledgment acknowledgement) {
         try {
             logger.info(notificacaoAgendamento.getTemplateDeMensagem());
