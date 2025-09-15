@@ -15,7 +15,7 @@ public class EventConsumer {
     @KafkaListener(topics = "notificacao", groupId = "notificacao-group")
     public void consumirNotificacao(NotificacaoAgendamento notificacaoAgendamento, Acknowledgment acknowledgement) {
         try {
-            logger.info("Notificacao recebida: {}", notificacaoAgendamento);
+            logger.info(notificacaoAgendamento.getTemplateDeMensagem());
             acknowledgement.acknowledge();
         } catch (Exception e) {
             logger.error("Erro ao processar notificacao: {}", e.getMessage());
