@@ -1,6 +1,6 @@
-package com.fiap.techchallenge.notificacao_service.configuration;
+package com.fiap.techchallenge.notificacao_service.configuration.kafka;
 
-import com.fiap.techchallenge.notificacao_service.dto.NotificacaoService;
+import com.fiap.techchallenge.notificacao_service.core.dto.NotificacaoAgendamento;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -31,12 +31,12 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<String, NotificacaoService> producerFactory() {
+    public ProducerFactory<String, NotificacaoAgendamento> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
-    public KafkaTemplate<String, NotificacaoService> kafkaTemplate() {
+    public KafkaTemplate<String, NotificacaoAgendamento> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
@@ -53,13 +53,13 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, NotificacaoService> consumerFactory() {
+    public ConsumerFactory<String, NotificacaoAgendamento> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfigs());
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, NotificacaoService> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, NotificacaoService> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, NotificacaoAgendamento> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, NotificacaoAgendamento> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
