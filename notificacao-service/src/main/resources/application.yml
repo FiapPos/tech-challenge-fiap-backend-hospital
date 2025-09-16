@@ -3,9 +3,10 @@ server:
 
 spring:
   kafka:
-    bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
+    bootstrap-servers: ${KAFKA_BROKER:kafka:29092}
     topic:
-      notificacao-success: notificacao
+      agendamento-criado: agendamento-criado
+      agendamento-editado: agendamento-editado
     consumer:
       group-id: notificacao-group
       auto-offset-reset: latest

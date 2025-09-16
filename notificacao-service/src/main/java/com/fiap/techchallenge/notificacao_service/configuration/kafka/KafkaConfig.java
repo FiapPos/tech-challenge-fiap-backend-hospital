@@ -1,22 +1,21 @@
 package com.fiap.techchallenge.notificacao_service.configuration.kafka;
 
-import com.fiap.techchallenge.notificacao_service.core.dto.NotificacaoAgendamento;
+import com.fiap.techchallenge.notificacao_service.core.dto.AgendamentoCriadoEvento;
+import com.fiap.techchallenge.notificacao_service.core.dto.AgendamentoEditadoEvento;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.*;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,64 +37,71 @@ public class KafkaConfig {
     @Value("${spring.kafka.consumer.auto-offset-reset}")
     private String autoOffSetReset;
 
-    @Value("${spring.kafka.topic.notificacao-success}")
-    private String topicoNotificacaoSucesso;
+    @Value("${spring.kafka.topic.agendamento-criado}")
+    private String topicoAgendamentoCriado;
 
-    @Bean
-    public Map<String, Object> producerConfigs() {
-        Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        return props;
-    }
+    @Value("${spring.kafka.topic.agendamento-editado}")
+    private String topicoAgendamentoEditado;
 
-    @Bean
-    public ProducerFactory<String, NotificacaoAgendamento> producerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfigs());
-    }
-
-    @Bean
-    public KafkaTemplate<String, NotificacaoAgendamento> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
-    }
-
-    @Bean
-    public Map<String, Object> consumerConfigs() {
+    private Map<String, Object> baseConsumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoOffSetReset);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*" );
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        props.put(JsonDeserializer.USE_TYPE_INFO_HEADERS, false);
+        props.put(JsonDeserializer.REMOVE_TYPE_INFO_HEADERS, true);
         return props;
     }
 
     @Bean
-    public ConsumerFactory<String, NotificacaoAgendamento> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs());
+    public ConsumerFactory<String, AgendamentoCriadoEvento> agendamentoCriadoConsumerFactory() {
+        Map<String, Object> props = baseConsumerConfigs();
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, AgendamentoCriadoEvento.class);
+        return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, NotificacaoAgendamento> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, NotificacaoAgendamento> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
+    public ConsumerFactory<String, AgendamentoEditadoEvento> agendamentoEditadoConsumerFactory() {
+        Map<String, Object> props = baseConsumerConfigs();
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, AgendamentoEditadoEvento.class);
+        return new DefaultKafkaConsumerFactory<>(props);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, AgendamentoCriadoEvento> agendamentoCriadoKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, AgendamentoCriadoEvento> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(agendamentoCriadoConsumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
     }
 
-    private NewTopic criaTopico(String name) {
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, AgendamentoEditadoEvento> agendamentoEditadoKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, AgendamentoEditadoEvento> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(agendamentoEditadoConsumerFactory());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
+        return factory;
+    }
+
+    private NewTopic buildTopic(String name) {
         return TopicBuilder
                 .name(name)
-                .replicas(CONTAGEM_REPLICA)
-                .partitions(CONTAGEM_PARTICAO)
+                .replicas(CONTAGEM_PARTICAO)
+                .partitions(CONTAGEM_REPLICA)
                 .build();
 
     }
 
     @Bean
-    public NewTopic criaTopicoNotificacao() {
-        return criaTopico(topicoNotificacaoSucesso);
+    public NewTopic criaTopicoDeAgendamentoCriado() {
+        return buildTopic(topicoAgendamentoCriado);
+    }
+
+    @Bean
+    public NewTopic criaTopicoDeAgendamentoEditado() {
+        return buildTopic(topicoAgendamentoEditado);
     }
 }
