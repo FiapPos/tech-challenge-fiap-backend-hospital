@@ -16,7 +16,7 @@ public class EventConsumer {
 
     private final Logger logger = LoggerFactory.getLogger(EventConsumer.class);
 
-    private CriaNotificacaoService criaNotificacaoService;
+    private final CriaNotificacaoService criaNotificacaoService;
 
     public EventConsumer(CriaNotificacaoService criaNotificacaoService) {
         this.criaNotificacaoService = criaNotificacaoService;
