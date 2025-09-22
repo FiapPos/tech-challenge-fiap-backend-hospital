@@ -9,13 +9,25 @@ spring:
         enabled: false
 
   kafka:
-    bootstrap-servers: ${KAFKA_BROKER:kafka:29092}
+    bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
     topic:
-      agendamento-success: agendamento-success
-      agendamento-fail: agendamento-fail
+      agendamento-criado: agendamento-criado
+      agendamento-editado: agendamento-editado
     consumer:
       group-id: agendamento-group
       auto-offset-reset: latest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.use.type.headers: false
+        spring.json.add.type.headers: false
+
+  # Desabilita JPA/Hibernate para testes apenas com Kafka
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
   datasource:
     driver-class-name: org.postgresql.Driver
