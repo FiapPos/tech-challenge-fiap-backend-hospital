@@ -1,0 +1,179 @@
+{
+  "info": {
+    "_postman_id": "hospital-usuario-service-api",
+    "name": "Hospital - Usuario Service API",
+    "description": "Coleção completa de endpoints do Usuario Service para testes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": " Usuários",
+      "item": [
+        {
+          "name": "Criar Usuário",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"João Silva\",\n  \"cpf\": \"12345678901\",\n  \"dataNascimento\": \"1990-05-10\",\n  \"email\": \"joao@email.com\",\n  \"senha\": \"123456\",\n  \"login\": \"joao.silva\",\n  \"perfilId\": 1,\n  \"telefone\": \"11999999999\"\n}" },
+            "url": { "raw": "{{base_url}}/usuarios", "host": ["{{base_url}}"], "path": ["usuarios"] },
+            "description": "Criar novo usuário"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Usuários",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/usuarios", "host": ["{{base_url}}"], "path": ["usuarios"] },
+            "description": "Listar usuários"
+          },
+          "event": [],
+          "response": []
+        },
+        {
+          "name": "Listar Usuários por Especialidade",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/usuarios/por-especialidade/{{especialidade_id}}", "host": ["{{base_url}}"], "path": ["usuarios","por-especialidade","{{especialidade_id}}"] },
+            "description": "Listar usuários por ID de especialidade"
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Usuário",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"João Silva Atualizado\",\n  \"email\": \"joao.novo@email.com\",\n  \"telefone\": \"11888888888\"\n}" },
+            "url": { "raw": "{{base_url}}/usuarios/{{usuario_id}}", "host": ["{{base_url}}"], "path": ["usuarios","{{usuario_id}}"] },
+            "description": "Atualizar usuário (próprio usuário)"
+          },
+          "response": []
+        },
+        {
+          "name": "Desativar Usuário",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{base_url}}/usuarios/{{usuario_id}}", "host": ["{{base_url}}"], "path": ["usuarios","{{usuario_id}}"] },
+            "description": "Desativar usuário (Admin)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🏥 Especialidades",
+      "item": [
+        {
+          "name": "Criar Especialidade",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"novoNome\": \"Cardiologia\",\n  \"novaDescricao\": \"Especialidade médica focada no sistema cardiovascular\"\n}" },
+            "url": { "raw": "{{base_url}}/especialidades", "host": ["{{base_url}}"], "path": ["especialidades"] },
+            "description": "Criar especialidade (Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Especialidades",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/especialidades", "host": ["{{base_url}}"], "path": ["especialidades"] }, "description": "Listar especialidades (Público)" },
+          "response": []
+        },
+        {
+          "name": "Atualizar Especialidade",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"novoNome\": \"Cardiologia Avançada\",\n  \"novaDescricao\": \"Especialidade médica focada no sistema cardiovascular com técnicas avançadas\"\n}" },
+            "url": { "raw": "{{base_url}}/especialidades/{{especialidade_id}}", "host": ["{{base_url}}"], "path": ["especialidades","{{especialidade_id}}"] },
+            "description": "Atualizar especialidade (Admin)"
+          },
+          "response": []
+        },
+        {
+          "name": "Inativar Especialidade",
+          "request": { "method": "PATCH", "header": [], "url": { "raw": "{{base_url}}/especialidades/{{especialidade_id}}/inativar", "host": ["{{base_url}}"], "path": ["especialidades","{{especialidade_id}}","inativar"] }, "description": "Inativar especialidade (Admin)" },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "👨‍⚕️ Especialidades do Médico",
+      "item": [
+        {
+          "name": "Associar Especialidade ao Médico",
+          "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/medicos/{{medico_id}}/especialidades/{{especialidade_id}}", "host": ["{{base_url}}"], "path": ["medicos","{{medico_id}}","especialidades","{{especialidade_id}}"] }, "description": "Associar especialidade ao médico" },
+          "response": []
+        },
+        {
+          "name": "Listar Especialidades do Médico",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/medicos/{{medico_id}}/especialidades", "host": ["{{base_url}}"], "path": ["medicos","{{medico_id}}","especialidades"] }, "description": "Listar especialidades do médico" },
+          "response": []
+        },
+        {
+          "name": "Desassociar Especialidade do Médico",
+          "request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/medicos/{{medico_id}}/especialidades/{{especialidade_id}}", "host": ["{{base_url}}"], "path": ["medicos","{{medico_id}}","especialidades","{{especialidade_id}}"] }, "description": "Desassociar especialidade do médico" },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🏠 Endereços",
+      "item": [
+        {
+          "name": "Criar Endereço",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"usuarioId\": {{usuario_id}},\n  \"cep\": \"01234567\",\n  \"rua\": \"Rua das Flores\",\n  \"numero\": \"123\",\n  \"complemento\": \"Apt 45\",\n  \"bairro\": \"Centro\",\n  \"cidade\": \"São Paulo\",\n  \"estado\": \"SP\"\n}" },
+            "url": { "raw": "{{base_url}}/enderecos", "host": ["{{base_url}}"], "path": ["enderecos"] },
+            "description": "Criar endereço (próprio usuário)"
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Endereço",
+          "request": {
+            "method": "PUT",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"usuarioId\": {{usuario_id}},\n  \"cep\": \"01234567\",\n  \"rua\": \"Rua das Flores Atualizada\",\n  \"numero\": \"456\",\n  \"complemento\": \"Apt 78\",\n  \"bairro\": \"Centro\",\n  \"cidade\": \"São Paulo\",\n  \"estado\": \"SP\"\n}" },
+            "url": { "raw": "{{base_url}}/enderecos/{{endereco_id}}", "host": ["{{base_url}}"], "path": ["enderecos","{{endereco_id}}"] },
+            "description": "Atualizar endereço (próprio usuário)"
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Endereço",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"usuarioId\": {{usuario_id}},\n  \"enderecoId\": {{endereco_id}}\n}" },
+            "url": { "raw": "{{base_url}}/enderecos", "host": ["{{base_url}}"], "path": ["enderecos"] },
+            "description": "Deletar endereço (próprio usuário)"
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Endereços do Usuário",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/enderecos/usuario/{{usuario_id}}", "host": ["{{base_url}}"], "path": ["enderecos","usuario","{{usuario_id}}"] }, "description": "Listar endereços do usuário (próprio usuário)" },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    { "listen": "prerequest", "script": { "type": "text/javascript", "exec": [ "" ] } },
+    { "listen": "test", "script": { "type": "text/javascript", "exec": [ "" ] } }
+  ],
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3001", "type": "string" },
+    { "key": "usuario_id", "value": "1", "type": "string" },
+    { "key": "medico_id", "value": "1", "type": "string" },
+    { "key": "especialidade_id", "value": "1", "type": "string" },
+    { "key": "endereco_id", "value": "1", "type": "string" }
+  ]
+}
