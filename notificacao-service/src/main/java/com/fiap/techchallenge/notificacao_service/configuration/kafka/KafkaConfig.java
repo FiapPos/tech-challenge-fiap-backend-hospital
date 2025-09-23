@@ -43,6 +43,9 @@ public class KafkaConfig {
     @Value("${spring.kafka.topic.agendamento-editado}")
     private String topicoAgendamentoEditado;
 
+    @Value("${spring.kafka.topic.orquestrador}")
+    private String topicoOrquestrador;
+
     private Map<String, Object> baseConsumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -103,5 +106,10 @@ public class KafkaConfig {
     @Bean
     public NewTopic criaTopicoDeAgendamentoEditado() {
         return buildTopic(topicoAgendamentoEditado);
+    }
+
+    @Bean
+    public NewTopic criaTopicoDeOrquestrador() {
+        return buildTopic(topicoOrquestrador);
     }
 }

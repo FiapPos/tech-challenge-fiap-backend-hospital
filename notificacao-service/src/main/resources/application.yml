@@ -5,6 +5,7 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
     topic:
+      orquestrador: orquestrador
       agendamento-criado: agendamento-criado
       agendamento-editado: agendamento-editado
     consumer:

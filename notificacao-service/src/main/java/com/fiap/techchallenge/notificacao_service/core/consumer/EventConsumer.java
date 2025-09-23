@@ -2,8 +2,6 @@ package com.fiap.techchallenge.notificacao_service.core.consumer;
 
 import com.fiap.techchallenge.notificacao_service.core.dto.AgendamentoCriadoEvento;
 import com.fiap.techchallenge.notificacao_service.core.dto.AgendamentoEditadoEvento;
-import com.fiap.techchallenge.notificacao_service.core.dto.NotificacaoAgendamentoCriacao;
-import com.fiap.techchallenge.notificacao_service.core.dto.NotificacaoAgendamentoEdicao;
 import com.fiap.techchallenge.notificacao_service.core.service.CriaNotificacaoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +27,7 @@ public class EventConsumer {
         try {
             logger.info("Processando evento de agendamento criado: {}", agendamentoCriado);
  
-            NotificacaoAgendamentoCriacao notificacao = criaNotificacaoService.execute(agendamentoCriado);
-            logger.info("Notificação de criação: {}", notificacao.getTemplateDeMensagem());
-            
+            criaNotificacaoService.execute(agendamentoCriado);
             acknowledgement.acknowledge();
         } catch (Exception e) {
             logger.error("Erro ao processar agendamento criado: {}", e.getMessage(), e);
@@ -45,9 +41,7 @@ public class EventConsumer {
         try {
             logger.info("Processando evento de agendamento editado: {}", agendamentoEditado);
  
-            NotificacaoAgendamentoEdicao notificacao = criaNotificacaoService.execute(agendamentoEditado);
-            logger.info("Notificação de edição: {}", notificacao.getTemplateDeMensagem());
-            
+            criaNotificacaoService.execute(agendamentoEditado);
             acknowledgement.acknowledge();
         } catch (Exception e) {
             logger.error("Erro ao processar agendamento editado: {}", e.getMessage(), e);

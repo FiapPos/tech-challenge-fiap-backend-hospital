@@ -34,6 +34,9 @@ public class KafkaConfig {
     @Value("${spring.kafka.topic.agendamento-editado}")
     private String topicoAgendamentoEditado;
 
+    @Value("${spring.kafka.topic.orquestrador}")
+    private String topicoOrquestrador;
+
     @Bean
     public Map<String, Object> producerConfigs() {
         Map<String, Object> props = new HashMap<>();
@@ -70,5 +73,10 @@ public class KafkaConfig {
     @Bean
     public NewTopic criaTopicoDeAgendamentoEditado() {
         return buildTopic(topicoAgendamentoEditado);
+    }
+
+    @Bean
+    public NewTopic criaTopicoDeOrquestrador() {
+        return buildTopic(topicoOrquestrador);
     }
 }
