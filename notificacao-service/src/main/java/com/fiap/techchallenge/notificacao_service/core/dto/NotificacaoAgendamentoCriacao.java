@@ -1,12 +1,9 @@
 package com.fiap.techchallenge.notificacao_service.core.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 public class NotificacaoAgendamentoCriacao extends NotificacaoAgendamento {
 
-    public NotificacaoAgendamentoCriacao(String nome, LocalDateTime dataHora, String especializacao, BigDecimal valor) {
-        super(nome, dataHora, especializacao, valor);
+    public NotificacaoAgendamentoCriacao(NotificacaoParaAgendamento agendamento) {
+        super(agendamento);
     }
 
     @Override

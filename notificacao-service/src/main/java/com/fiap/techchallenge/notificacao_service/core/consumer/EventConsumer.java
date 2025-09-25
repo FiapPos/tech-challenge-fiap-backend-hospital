@@ -1,7 +1,6 @@
 package com.fiap.techchallenge.notificacao_service.core.consumer;
 
-import com.fiap.techchallenge.notificacao_service.core.dto.AgendamentoCriadoEvento;
-import com.fiap.techchallenge.notificacao_service.core.dto.AgendamentoEditadoEvento;
+import com.fiap.techchallenge.notificacao_service.core.dto.NotificacaoParaAgendamento;
 import com.fiap.techchallenge.notificacao_service.core.service.CriaNotificacaoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,31 +19,17 @@ public class EventConsumer {
         this.criaNotificacaoService = criaNotificacaoService;
     }
 
-    @KafkaListener(topics = "${spring.kafka.topic.agendamento-criado}",
+    @KafkaListener(topics = "${spring.kafka.topic.notificacao-sucesso}",
                    groupId = "${spring.kafka.consumer.group-id}",
                    containerFactory = "agendamentoCriadoKafkaListenerContainerFactory")
-    public void consumirAgendamentoCriado(AgendamentoCriadoEvento agendamentoCriado, Acknowledgment acknowledgement) {
+    public void consumirAgendamento(NotificacaoParaAgendamento notificacaoParaAgendamento, Acknowledgment acknowledgement) {
         try {
-            logger.info("Processando evento de agendamento criado: {}", agendamentoCriado);
+            logger.info("Processando evento de agendamento: {}", notificacaoParaAgendamento);
  
-            criaNotificacaoService.execute(agendamentoCriado);
+            criaNotificacaoService.processarNotificacao(notificacaoParaAgendamento);
             acknowledgement.acknowledge();
         } catch (Exception e) {
-            logger.error("Erro ao processar agendamento criado: {}", e.getMessage(), e);
-        }
-    }
-
-    @KafkaListener(topics = "${spring.kafka.topic.agendamento-editado}", 
-                   groupId = "${spring.kafka.consumer.group-id}",
-                   containerFactory = "agendamentoEditadoKafkaListenerContainerFactory")
-    public void consumirAgendamentoEditado(AgendamentoEditadoEvento agendamentoEditado, Acknowledgment acknowledgement) {
-        try {
-            logger.info("Processando evento de agendamento editado: {}", agendamentoEditado);
- 
-            criaNotificacaoService.execute(agendamentoEditado);
-            acknowledgement.acknowledge();
-        } catch (Exception e) {
-            logger.error("Erro ao processar agendamento editado: {}", e.getMessage(), e);
+            logger.error("Erro ao processar agendamento: {}", e.getMessage(), e);
         }
     }
 

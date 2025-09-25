@@ -1,4 +1,4 @@
-package com.fiap.techchallenge.agendamento_service.configuration.kafka;
+package com.fiap.techchallenge.historico_service.configuration.kafka;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -28,11 +28,11 @@ public class KafkaConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    @Value("${spring.kafka.topic.agendamento-sucesso}")
-    private String topicoAgendamentoComSucesso;
+    @Value("${spring.kafka.topic.agendamento-criado}")
+    private String topicoAgendamentoCriado;
 
-    @Value("${spring.kafka.topic.agendamento-falha}")
-    private String topicoAgendamentoComFalha;
+    @Value("${spring.kafka.topic.agendamento-editado}")
+    private String topicoAgendamentoEditado;
 
     @Value("${spring.kafka.topic.orquestrador}")
     private String topicoOrquestrador;
@@ -66,13 +66,13 @@ public class KafkaConfig {
     }
 
     @Bean
-    public NewTopic criaTopicoDeAgendamentoComSucesso() {
-        return buildTopic(topicoAgendamentoComSucesso);
+    public NewTopic criaTopicoDeAgendamentoCriado() {
+        return buildTopic(topicoAgendamentoCriado);
     }
 
     @Bean
-    public NewTopic criaTopicoDeAgendamentoComFalha() {
-        return buildTopic(topicoAgendamentoComFalha);
+    public NewTopic criaTopicoDeAgendamentoEditado() {
+        return buildTopic(topicoAgendamentoEditado);
     }
 
     @Bean

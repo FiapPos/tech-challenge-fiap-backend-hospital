@@ -4,15 +4,16 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class AgendamentoCriado implements Serializable {
+public class Agendamento implements Serializable {
     private final String id;
     private final String nomePaciente;
     private final LocalDateTime dataHora;
     private final String especializacao;
     private final BigDecimal valor;
-    private final LocalDateTime criadoEm;
+    private LocalDateTime criadoEm;
+    private LocalDateTime atualizadoEm;
 
-    public AgendamentoCriado(String id, String nomePaciente, LocalDateTime dataHora, String especializacao, BigDecimal valor) {
+    public Agendamento(String id, String nomePaciente, LocalDateTime dataHora, String especializacao, BigDecimal valor) {
         this.id = id;
         this.nomePaciente = nomePaciente;
         this.dataHora = dataHora;
@@ -43,5 +44,13 @@ public class AgendamentoCriado implements Serializable {
 
     public LocalDateTime getCriadoEm() {
         return criadoEm;
+    }
+
+    public LocalDateTime getAtualizadoEm() {
+        return atualizadoEm;
+    }
+
+    public void setAtualizadoEm(LocalDateTime atualizadoEm) {
+        this.atualizadoEm = atualizadoEm;
     }
 }

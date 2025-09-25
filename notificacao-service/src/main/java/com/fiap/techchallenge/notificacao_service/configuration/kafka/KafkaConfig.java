@@ -1,7 +1,6 @@
 package com.fiap.techchallenge.notificacao_service.configuration.kafka;
 
-import com.fiap.techchallenge.notificacao_service.core.dto.AgendamentoCriadoEvento;
-import com.fiap.techchallenge.notificacao_service.core.dto.AgendamentoEditadoEvento;
+import com.fiap.techchallenge.notificacao_service.core.dto.NotificacaoParaAgendamento;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -37,11 +36,8 @@ public class KafkaConfig {
     @Value("${spring.kafka.consumer.auto-offset-reset}")
     private String autoOffSetReset;
 
-    @Value("${spring.kafka.topic.agendamento-criado}")
-    private String topicoAgendamentoCriado;
-
-    @Value("${spring.kafka.topic.agendamento-editado}")
-    private String topicoAgendamentoEditado;
+    @Value("${spring.kafka.topic.notificacao-sucesso}")
+    private String topicoNotificacaoSucesso;
 
     @Value("${spring.kafka.topic.orquestrador}")
     private String topicoOrquestrador;
@@ -60,31 +56,16 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, AgendamentoCriadoEvento> agendamentoCriadoConsumerFactory() {
+    public ConsumerFactory<String, NotificacaoParaAgendamento> agendamentoCriadoConsumerFactory() {
         Map<String, Object> props = baseConsumerConfigs();
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, AgendamentoCriadoEvento.class);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, NotificacaoParaAgendamento.class);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConsumerFactory<String, AgendamentoEditadoEvento> agendamentoEditadoConsumerFactory() {
-        Map<String, Object> props = baseConsumerConfigs();
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, AgendamentoEditadoEvento.class);
-        return new DefaultKafkaConsumerFactory<>(props);
-    }
-
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, AgendamentoCriadoEvento> agendamentoCriadoKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, AgendamentoCriadoEvento> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, NotificacaoParaAgendamento> agendamentoCriadoKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, NotificacaoParaAgendamento> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(agendamentoCriadoConsumerFactory());
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
-        return factory;
-    }
-
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, AgendamentoEditadoEvento> agendamentoEditadoKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, AgendamentoEditadoEvento> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(agendamentoEditadoConsumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
     }
@@ -95,17 +76,11 @@ public class KafkaConfig {
                 .replicas(CONTAGEM_PARTICAO)
                 .partitions(CONTAGEM_REPLICA)
                 .build();
-
     }
 
     @Bean
-    public NewTopic criaTopicoDeAgendamentoCriado() {
-        return buildTopic(topicoAgendamentoCriado);
-    }
-
-    @Bean
-    public NewTopic criaTopicoDeAgendamentoEditado() {
-        return buildTopic(topicoAgendamentoEditado);
+    public NewTopic criaTopicoNotificacaoSucesso() {
+        return buildTopic(topicoNotificacaoSucesso);
     }
 
     @Bean

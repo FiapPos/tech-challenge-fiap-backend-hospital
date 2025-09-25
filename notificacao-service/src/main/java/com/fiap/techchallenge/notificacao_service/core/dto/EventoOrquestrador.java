@@ -1,15 +1,9 @@
 package com.fiap.techchallenge.notificacao_service.core.dto;
 
 import com.fiap.techchallenge.notificacao_service.core.enums.ESagaStatus;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 
-import static com.fiap.techchallenge.notificacao_service.core.enums.ESagaStatus.*;
-
-@Setter
-@Getter
 public class EventoOrquestrador implements Serializable {
 
     private String fonte = "NOTIFICACAO_SERVICE";
@@ -20,7 +14,19 @@ public class EventoOrquestrador implements Serializable {
         this.status = status;
     }
 
-    public static EventoOrquestrador constroiEventoSucesso() {
-        return new EventoOrquestrador(SUCCESS);
+    public String getFonte() {
+        return fonte;
+    }
+
+    public void setFonte(String fonte) {
+        this.fonte = fonte;
+    }
+
+    public ESagaStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ESagaStatus status) {
+        this.status = status;
     }
 }
