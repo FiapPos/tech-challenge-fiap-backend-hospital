@@ -23,7 +23,7 @@ public class KafkaProducer {
 
     public void sendEvent(EventoOrquestrador eventoOrquestrador) {
         try {
-            logger.info("Enviando evento para o tópico {} com os dados {}", topicoOrquestrador, eventoOrquestrador);
+            logger.info("Enviando evento para o tópico {} com os dados {}", topicoOrquestrador, eventoOrquestrador.toString());
             kafkaTemplate.send(topicoOrquestrador, eventoOrquestrador);
         } catch (Exception ex) {
             logger.info("Erro ao tentar enviar evento para o tópico {} com os dados {}", topicoOrquestrador, eventoOrquestrador, ex);

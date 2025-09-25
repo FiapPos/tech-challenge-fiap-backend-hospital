@@ -29,4 +29,12 @@ public class EventoOrquestrador implements Serializable {
     public void setStatus(ESagaStatus status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "fonte='" + fonte + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

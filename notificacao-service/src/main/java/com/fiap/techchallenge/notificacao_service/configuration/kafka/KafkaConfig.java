@@ -56,16 +56,16 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, NotificacaoParaAgendamento> agendamentoCriadoConsumerFactory() {
+    public ConsumerFactory<String, NotificacaoParaAgendamento> notificacaoConsumerFactory() {
         Map<String, Object> props = baseConsumerConfigs();
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, NotificacaoParaAgendamento.class);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, NotificacaoParaAgendamento> agendamentoCriadoKafkaListenerContainerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<String, NotificacaoParaAgendamento> notificacaoKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, NotificacaoParaAgendamento> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(agendamentoCriadoConsumerFactory());
+        factory.setConsumerFactory(notificacaoConsumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
     }

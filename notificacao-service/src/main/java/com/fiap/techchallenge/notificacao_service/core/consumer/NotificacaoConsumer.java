@@ -9,20 +9,20 @@ import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EventConsumer {
+public class NotificacaoConsumer {
 
-    private final Logger logger = LoggerFactory.getLogger(EventConsumer.class);
+    private final Logger logger = LoggerFactory.getLogger(NotificacaoConsumer.class);
 
     private final CriaNotificacaoService criaNotificacaoService;
 
-    public EventConsumer(CriaNotificacaoService criaNotificacaoService) {
+    public NotificacaoConsumer(CriaNotificacaoService criaNotificacaoService) {
         this.criaNotificacaoService = criaNotificacaoService;
     }
 
     @KafkaListener(topics = "${spring.kafka.topic.notificacao-sucesso}",
                    groupId = "${spring.kafka.consumer.group-id}",
-                   containerFactory = "agendamentoCriadoKafkaListenerContainerFactory")
-    public void consumirAgendamento(NotificacaoParaAgendamento notificacaoParaAgendamento, Acknowledgment acknowledgement) {
+                   containerFactory = "notificacaoKafkaListenerContainerFactory")
+    public void consumirEventoSucesso(NotificacaoParaAgendamento notificacaoParaAgendamento, Acknowledgment acknowledgement) {
         try {
             logger.info("Processando evento de agendamento: {}", notificacaoParaAgendamento);
  

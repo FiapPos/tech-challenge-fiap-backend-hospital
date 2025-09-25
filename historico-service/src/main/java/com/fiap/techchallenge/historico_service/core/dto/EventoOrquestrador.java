@@ -1,15 +1,15 @@
-package com.fiap.techchallenge.agendamento_service.core.dto;
+package com.fiap.techchallenge.historico_service.core.dto;
 
-import com.fiap.techchallenge.agendamento_service.core.enums.ESagaStatus;
+import com.fiap.techchallenge.historico_service.core.enums.ESagaStatus;
 
 import java.io.Serializable;
 
-import static com.fiap.techchallenge.agendamento_service.core.enums.ESagaStatus.FAIL;
-import static com.fiap.techchallenge.agendamento_service.core.enums.ESagaStatus.SUCCESS;
+import static com.fiap.techchallenge.historico_service.core.enums.ESagaStatus.FAIL;
+import static com.fiap.techchallenge.historico_service.core.enums.ESagaStatus.SUCCESS;
 
 public class EventoOrquestrador implements Serializable {
 
-    private String fonte = "AGENDAMENTO_SERVICE";
+    private String fonte = "HISTORICO_SERVICE";
 
     private ESagaStatus status;
 
