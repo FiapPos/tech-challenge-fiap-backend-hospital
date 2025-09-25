@@ -1,0 +1,49 @@
+server:
+  port: 3000
+
+spring:
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
+    topic:
+      agendamento-criado: agendamento-criado
+      agendamento-editado: agendamento-editado
+    consumer:
+      group-id: hospital-group
+      auto-offset-reset: latest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.use.type.headers: false
+        spring.json.add.type.headers: false
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URI:jdbc:postgresql://hospital-db:5432/hospitais}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+        format_sql: true
+    show-sql: true
+
+logging:
+  level:
+    org.apache.kafka: INFO
+    org.hibernate: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
