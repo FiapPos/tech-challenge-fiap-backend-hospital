@@ -58,6 +58,18 @@ Sistema de gerenciamento hospitalar desenvolvido com arquitetura de microserviç
 1. **Porta:** O serviço roda na porta `3001`
 2. **Banco de Dados:** PostgreSQL na porta `5433`
 
+#### Mapeamento de Portas (Interna vs Externa)
+| Serviço | Porta Externa (Host) | Porta Interna (Container/App) | Observação |
+|---------|----------------------|-------------------------------|------------|
+| usuario-service | 3001 | 3000 | `server.port=3000` em `application.yml`; exposta como 3001 no host |
+| appointment-service | 3000 | 3002 | App interno usa 3002 (ver docker-compose) |
+| agendamento-service | 3002 | 3000 | |
+| historico-service | 3003 | 8080 | |
+| notificacao-service | 3004 | 3000 | |
+| PostgreSQL (usuarios) | 5433 | 5432 | Container `usuario-db` |
+
+Se rodar o `usuario-service` localmente via Maven (sem Docker), acesse em `http://localhost:3000`. Via Docker Compose, use `http://localhost:3001`.
+
 ---
 ### Pré-requisitos:
 - Java 17+
