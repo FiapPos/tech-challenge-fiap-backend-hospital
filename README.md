@@ -14,6 +14,8 @@ Sistema de gerenciamento hospitalar desenvolvido com arquitetura de microserviç
 |--------|-----|-----------|-------------|
 | `POST` | `/usuarios` | Criar novo usuário | - |
 | `GET` | `/usuarios` | Listar usuários | Validação de permissão |
+| `GET` | `/usuarios/por-especialidade/{especialidadeId}` | Listar usuários por especialidade | Público |
+| `GET` | `/usuarios/por-login/{login}` | Buscar usuário por login | Público |
 | `PUT` | `/usuarios/{id}` | Atualizar usuário | Próprio usuário |
 | `DELETE` | `/usuarios/{id}` | Desativar usuário | Admin |
 
@@ -76,7 +78,7 @@ Sistema de gerenciamento hospitalar desenvolvido com arquitetura de microserviç
    ```
 
 3. **O sistema estará disponível em:**
-   - API: `http://localhost:3000`
+   - API: `http://localhost:3001`
    - Database: `localhost:5433`
 
 ---

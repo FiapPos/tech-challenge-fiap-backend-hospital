@@ -42,6 +42,16 @@
           "response": []
         },
         {
+          "name": "Buscar Usuário por Login",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/usuarios/por-login/{{login}}", "host": ["{{base_url}}"], "path": ["usuarios","por-login","{{login}}"] },
+            "description": "Buscar um usuário único pelo login"
+          },
+          "response": []
+        },
+        {
           "name": "Atualizar Usuário",
           "request": {
             "method": "PUT",
@@ -175,5 +185,6 @@
     { "key": "medico_id", "value": "1", "type": "string" },
     { "key": "especialidade_id", "value": "1", "type": "string" },
     { "key": "endereco_id", "value": "1", "type": "string" }
+    ,{ "key": "login", "value": "joao.silva", "type": "string" }
   ]
 }
