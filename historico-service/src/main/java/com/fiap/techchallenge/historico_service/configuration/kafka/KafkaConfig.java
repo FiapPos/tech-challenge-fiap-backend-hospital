@@ -1,20 +1,21 @@
-package com.fiap.techchallenge.notificacao_service.configuration.kafka;
+package com.fiap.techchallenge.historico_service.configuration.kafka;
 
-import com.fiap.techchallenge.notificacao_service.core.dto.NotificacaoParaAgendamento;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,8 +37,11 @@ public class KafkaConfig {
     @Value("${spring.kafka.consumer.auto-offset-reset}")
     private String autoOffSetReset;
 
-    @Value("${spring.kafka.topic.notificacao-sucesso}")
-    private String topicoNotificacaoSucesso;
+    @Value("${spring.kafka.topic.historico-successo}")
+    private String topicoHistoricoSucesso;
+
+    @Value("${spring.kafka.topic.historico-falha}")
+    private String topicoHistoricoFail;
 
     @Value("${spring.kafka.topic.orquestrador}")
     private String topicoOrquestrador;
@@ -55,19 +59,40 @@ public class KafkaConfig {
         return props;
     }
 
+//TODO implementar o DTOParaReceberDadosHistorico do jeito que for mais adequado, com os dados e nomes necessários para processar o agendamento
+/*
     @Bean
-    public ConsumerFactory<String, NotificacaoParaAgendamento> notificacaoConsumerFactory() {
+    public ConsumerFactory<String, DTOParaReceberDadosHistorico> historicoConsumerFactory() {
         Map<String, Object> props = baseConsumerConfigs();
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, NotificacaoParaAgendamento.class);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, DTOParaReceberDadosHistorico.class);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, NotificacaoParaAgendamento> notificacaoKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, NotificacaoParaAgendamento> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(notificacaoConsumerFactory());
+    public ConcurrentKafkaListenerContainerFactory<String, DTOParaReceberDadosHistorico> historicoListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, DTOParaReceberDadosHistorico> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(historicoConsumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
+    }*/
+
+    @Bean
+    public Map<String, Object> producerConfigs() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        return props;
+    }
+
+    @Bean
+    public ProducerFactory<String, Object> producerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfigs());
+    }
+
+    @Bean
+    public KafkaTemplate<String, Object> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
     }
 
     private NewTopic buildTopic(String name) {
@@ -76,11 +101,17 @@ public class KafkaConfig {
                 .replicas(CONTAGEM_PARTICAO)
                 .partitions(CONTAGEM_REPLICA)
                 .build();
+
     }
 
     @Bean
-    public NewTopic criaTopicoNotificacaoSucesso() {
-        return buildTopic(topicoNotificacaoSucesso);
+    public NewTopic criaTopicoDeHistoricoSucesso() {
+        return buildTopic(topicoHistoricoSucesso);
+    }
+
+    @Bean
+    public NewTopic criaTopicoDeHistoricoFail() {
+        return buildTopic(topicoHistoricoFail);
     }
 
     @Bean

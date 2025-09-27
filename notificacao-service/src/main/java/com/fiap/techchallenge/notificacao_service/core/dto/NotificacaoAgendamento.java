@@ -11,13 +11,15 @@ public abstract class NotificacaoAgendamento implements Serializable {
     private final String especializacao;
     private final BigDecimal valor;
     private LocalDateTime criadoEm;
+    private LocalDateTime atualizadoEm;
 
-    public NotificacaoAgendamento(String nome, LocalDateTime dataHora, String especializacao, BigDecimal valor) {
-        this.nome = nome;
-        this.dataHora = dataHora;
-        this.especializacao = especializacao;
-        this.valor = valor;
-        this.criadoEm = LocalDateTime.now();
+    public NotificacaoAgendamento(NotificacaoParaAgendamento agendamento) {
+        this.nome = agendamento.getNomePaciente();
+        this.dataHora = agendamento.getDataHora();
+        this.especializacao = agendamento.getEspecializacao();
+        this.valor = agendamento.getValor();
+        this.criadoEm = agendamento.getCriadoEm();
+        this.atualizadoEm = agendamento.getAtualizadoEm();
     }
 
     public String getNome() {
@@ -45,4 +47,8 @@ public abstract class NotificacaoAgendamento implements Serializable {
     }
 
     public abstract String getTemplateDeMensagem();
+
+    public LocalDateTime getAtualizadoEm() {
+        return atualizadoEm;
+    }
 }

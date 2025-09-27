@@ -11,8 +11,9 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
     topic:
-      historico-success: historico-success
-      historico-fail: historico-fail
+      orquestrador: orquestrador
+      historico-successo: historico-successo
+      historico-falha: historico-falha
     consumer:
       group-id: historico-group
       auto-offset-reset: latest
