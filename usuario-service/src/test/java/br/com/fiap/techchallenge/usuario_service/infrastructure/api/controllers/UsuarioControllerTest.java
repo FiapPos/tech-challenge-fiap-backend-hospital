@@ -8,6 +8,7 @@ import br.com.fiap.techchallenge.core.dtos.usuario.AtualizarUsuarioComandoDto;
 import br.com.fiap.techchallenge.core.dtos.usuario.CriarUsuarioComandoDto;
 import br.com.fiap.techchallenge.core.domain.entities.Usuario;
 import br.com.fiap.techchallenge.core.queries.usuario.ListarUsuariosQuery;
+import br.com.fiap.techchallenge.core.queries.usuario.ListarUsuarioPorLoginQuery;
 import br.com.fiap.techchallenge.core.queries.params.ListarUsuariosParams;
 import br.com.fiap.techchallenge.core.queries.resultadoItem.usuario.ListarUsuariosResultadoItem;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,8 @@ class UsuarioControllerTest {
     private CriarUsuarioComando criarUsuarioComando;
     @Mock
     private ListarUsuariosQuery listarUsuariosQuery;
+    @Mock
+    private ListarUsuarioPorLoginQuery listarUsuarioPorLoginQuery;
     @Mock
     private AtualizarUsuarioComando atualizarUsuarioComando;
     @Mock
@@ -112,5 +115,20 @@ class UsuarioControllerTest {
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(desativarUsuarioComando).execute(id);
+    }
+
+    @Test
+    void deveListarUsuarioPorLogin() {
+        String login = "loginTeste";
+        ListarUsuariosResultadoItem item = new ListarUsuariosResultadoItem();
+        item.setId(2L);
+        item.setLogin(login);
+        when(listarUsuarioPorLoginQuery.execute(login)).thenReturn(item);
+
+        ResponseEntity<ListarUsuariosResultadoItem> response = usuarioController.listarUsuarioPorLogin(login);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(login, response.getBody().getLogin());
+        verify(listarUsuarioPorLoginQuery).execute(login);
     }
 }

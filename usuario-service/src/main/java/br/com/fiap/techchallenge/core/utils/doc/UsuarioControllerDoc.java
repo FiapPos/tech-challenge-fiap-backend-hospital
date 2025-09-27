@@ -43,6 +43,12 @@ public interface UsuarioControllerDoc {
         ResponseEntity<List<ListarUsuariosResultadoItem>> listarUsuariosPorEspecialidade(
                         @PathVariable Long especialidadeId);
 
+        @Operation(summary = "Buscar usuário por login.", description = "Retorna um usuário único correspondente ao login informado.", responses = {
+                        @ApiResponse(responseCode = "200", description = "Usuário encontrado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ListarUsuariosResultadoItem.class))),
+                        @ApiResponse(responseCode = "404", description = "Usuário não encontrado.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class)))
+        })
+        ResponseEntity<ListarUsuariosResultadoItem> listarUsuarioPorLogin(@PathVariable String login);
+
         @Operation(summary = "Atualizar o usuário.", description = "Recurso para atualizar os dados de um usuário.", responses = {
                         @ApiResponse(responseCode = "200", description = "Recurso atualizado com sucesso.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AtualizarUsuarioComandoDto.class))),
                         @ApiResponse(responseCode = "403", description = "Acesso negado - usuário não tem permissão para alterar este usuário.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = BadRequestException.class))),

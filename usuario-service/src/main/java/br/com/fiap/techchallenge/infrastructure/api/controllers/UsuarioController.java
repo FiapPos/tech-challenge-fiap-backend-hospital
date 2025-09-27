@@ -7,6 +7,7 @@ import br.com.fiap.techchallenge.core.dtos.usuario.AtualizarUsuarioComandoDto;
 import br.com.fiap.techchallenge.core.dtos.usuario.CriarUsuarioComandoDto;
 import br.com.fiap.techchallenge.core.queries.usuario.ListarUsuariosQuery;
 import br.com.fiap.techchallenge.core.queries.usuario.ListarUsuariosPorIdEspecialidadeQuery;
+import br.com.fiap.techchallenge.core.queries.usuario.ListarUsuarioPorLoginQuery;
 import br.com.fiap.techchallenge.core.queries.params.ListarUsuariosParams;
 import br.com.fiap.techchallenge.core.queries.resultadoItem.usuario.ListarUsuariosResultadoItem;
 import br.com.fiap.techchallenge.core.utils.doc.UsuarioControllerDoc;
@@ -28,6 +29,7 @@ public class UsuarioController implements UsuarioControllerDoc {
         private final AtualizarUsuarioComando atualizarUsuarioComando;
         private final DesativarUsuarioComando desativarUsuarioComando;
         private final ListarUsuariosPorIdEspecialidadeQuery listarUsuariosPorIdEspecialidadeQuery;
+        private final ListarUsuarioPorLoginQuery listarUsuarioPorLoginQuery;
 
         @PostMapping
         public ResponseEntity<Void> criarUsuario(@RequestBody @Valid CriarUsuarioComandoDto criarUsuarioComandoDto) {
@@ -66,5 +68,11 @@ public class UsuarioController implements UsuarioControllerDoc {
         public ResponseEntity<Void> desativarUsuario(@PathVariable Long id) {
                 desativarUsuarioComando.execute(id);
                 return ResponseEntity.ok().build();
+        }
+
+        @GetMapping("/por-login/{login}")
+        public ResponseEntity<ListarUsuariosResultadoItem> listarUsuarioPorLogin(@PathVariable String login) {
+                var item = listarUsuarioPorLoginQuery.execute(login);
+                return ResponseEntity.ok(item);
         }
 }
