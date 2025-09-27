@@ -55,6 +55,20 @@ services:
     volumes:
       - historico-db-data:/var/lib/postgresql/data # Volume para persistência
 
+  hospital-db:
+    image: postgres:16-alpine
+    container_name: hospital-db
+    networks:
+      - orchestrator-saga
+    environment:
+      - POSTGRES_DB=hospitais
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5436:5432
+    volumes:
+      - hospital-db-data:/var/lib/postgresql/data
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper
@@ -197,6 +211,24 @@ services:
     ports:
       - 3004:3000
 
+  hospital-service:
+    build: './hospital-service'
+    container_name: hospital-service
+    depends_on:
+      - hospital-db
+      - kafka
+    networks:
+      - orchestrator-saga
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://hospital-db:5432/hospitais
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_CLOUD_CONFIG_ENABLED=false
+      - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
+    ports:
+      - 3005:3000
+
 networks:
   orchestrator-saga:
     driver: bridge
@@ -207,6 +239,7 @@ volumes:
   usuario-db-data:
   agendamento-db-data:
   historico-db-data:
+  hospital-db-data:
   zookeeper-data:
   zookeeper-log:
   kafka-data:
