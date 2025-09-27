@@ -1,0 +1,29 @@
+package br.com.fiap.techchallenge.infrastructure.data.repositories;
+
+import br.com.fiap.techchallenge.infrastructure.data.entities.UsuarioEntity;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.EntityGraph;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface UsuarioJpaRepository extends JpaRepository<UsuarioEntity, Long> {
+
+    boolean existsByEmail(String email);
+
+    boolean existsByLogin(String login);
+
+    boolean existsByCpf(String cpf);
+
+    List<UsuarioEntity> findByAtivo(boolean ativo, Sort sort);
+
+    @EntityGraph(attributePaths = { "perfil", "especialidades" })
+    Optional<UsuarioEntity> findByLogin(String login);
+
+    List<UsuarioEntity> findByEspecialidadesNome(String nome);
+
+    Optional<UsuarioEntity> findByIdAndEspecialidadesNome(Long id, String nome);
+}
