@@ -11,8 +11,9 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
     topic:
-      agendamento-criado: agendamento-criado
-      agendamento-editado: agendamento-editado
+      orquestrador: orquestrador
+      agendamento-sucesso: agendamento-sucesso
+      agendamento-falha: agendamento-falha
     consumer:
       group-id: agendamento-group
       auto-offset-reset: latest
