@@ -12,4 +12,6 @@ public class CompartilhadoService {
     public LocalDateTime getCurrentDateTime() {
         return LocalDateTime.now();
     }
+
+    public static final String FONTE_ATUAL = "USUARIO_SERVICE";
 }
