@@ -1,7 +1,6 @@
-package com.fiap.techchallenge.agendamento_service.core.producer;
+package com.fiap.techchallenge.historico_service.core.producer;
 
-import com.fiap.techchallenge.agendamento_service.core.dto.Agendamento;
-import com.fiap.techchallenge.agendamento_service.core.dto.EventoOrquestrador;
+import com.fiap.techchallenge.historico_service.core.dto.EventoOrquestrador;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

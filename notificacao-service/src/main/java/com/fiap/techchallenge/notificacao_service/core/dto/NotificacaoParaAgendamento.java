@@ -10,7 +10,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Setter
-public class AgendamentoEditadoEvento implements Serializable {
+public class NotificacaoParaAgendamento implements Serializable {
+
     @NotNull
     private String id;
 
@@ -29,26 +30,22 @@ public class AgendamentoEditadoEvento implements Serializable {
     @NotNull
     private LocalDateTime criadoEm;
 
-    @NotNull
-    private LocalDateTime editadoEm;
+    private LocalDateTime atualizadoEm;
 
-    // Construtor padrão para deserialização
-    public AgendamentoEditadoEvento() {}
+    public NotificacaoParaAgendamento() {}
 
-    public AgendamentoEditadoEvento(@NotNull String id,
-                                    String nomePaciente,
-                                    LocalDateTime dataHora,
-                                    String especializacao,
-                                    @NotNull BigDecimal valor,
-                                    @NotNull LocalDateTime criadoEm,
-                                    @NotNull LocalDateTime editadoEm) {
+    public NotificacaoParaAgendamento(@NotNull String id,
+                                      String nomePaciente,
+                                      LocalDateTime dataHora,
+                                      String especializacao,
+                                      @NotNull BigDecimal valor,
+                                      @NotNull LocalDateTime criadoEm) {
         this.id = id;
         this.nomePaciente = nomePaciente;
         this.dataHora = dataHora;
         this.especializacao = especializacao;
         this.valor = valor;
         this.criadoEm = criadoEm;
-        this.editadoEm = editadoEm;
     }
 
     public @NotNull String getId() {
@@ -75,19 +72,19 @@ public class AgendamentoEditadoEvento implements Serializable {
         return criadoEm;
     }
 
-    public @NotNull LocalDateTime getEditadoEm() {
-        return editadoEm;
+    public LocalDateTime getAtualizadoEm() {
+        return atualizadoEm;
     }
 
     @Override
     public String toString() {
-        return "AgendamentoEditadoEvento{" +
+        return "AgendamentoCriadoEvento{" +
                 "id='" + id + '\'' +
                 ", nomePaciente='" + nomePaciente + '\'' +
                 ", dataHora=" + dataHora +
                 ", especializacao='" + especializacao + '\'' +
                 ", valor=" + valor +
-                ", editadoEm=" + editadoEm +
+                ", criadoEm=" + criadoEm +
                 '}';
     }
 }

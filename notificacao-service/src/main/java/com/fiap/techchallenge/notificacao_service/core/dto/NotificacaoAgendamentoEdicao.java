@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 
 public class NotificacaoAgendamentoEdicao extends NotificacaoAgendamento {
 
-    public NotificacaoAgendamentoEdicao(String nome, LocalDateTime dataHora, String especializacao, BigDecimal valor) {
-        super(nome, dataHora, especializacao, valor);
+    public NotificacaoAgendamentoEdicao(NotificacaoParaAgendamento agendamento) {
+        super(agendamento);
     }
 
     @Override

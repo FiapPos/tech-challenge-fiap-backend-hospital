@@ -5,11 +5,17 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
     topic:
-      agendamento-criado: agendamento-criado
-      agendamento-editado: agendamento-editado
+      orquestrador: orquestrador
+      notificacao-sucesso: notificacao-sucesso
     consumer:
       group-id: notificacao-group
       auto-offset-reset: latest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.use.type.headers: false
+        spring.json.add.type.headers: false
 
 logging:
   level:
