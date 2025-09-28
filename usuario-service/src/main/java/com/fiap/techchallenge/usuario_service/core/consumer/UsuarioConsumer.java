@@ -19,11 +19,11 @@ public class UsuarioConsumer {
             containerFactory = "appointmentKafkaListenerContainerFactory")
     public void consumirEventoSucesso(Evento dtoAgendamento, Acknowledgment acknowledgement) {
         try {
-            logger.info("Processando evento de sucesso de agendamento: {}", dtoAgendamento);
+            logger.info("Processando evento de sucesso de usuario: {}", dtoAgendamento);
 
             acknowledgement.acknowledge();
         } catch (Exception e) {
-            logger.error("Erro ao processar sucesso de agendamento: {}", e.getMessage(), e);
+            logger.error("Erro ao processar sucesso de usuario: {}", e.getMessage(), e);
         }
     }
 
@@ -32,11 +32,11 @@ public class UsuarioConsumer {
             containerFactory = "appointmentKafkaListenerContainerFactory")
     public void consumirEventoFalha(Evento dtoAgendamento, Acknowledgment acknowledgement) {
         try {
-            logger.info("Processando evento de falha de agendamento: {}", dtoAgendamento);
+            logger.info("Processando evento de falha de usuario: {}", dtoAgendamento);
 
             acknowledgement.acknowledge();
         } catch (Exception e) {
-            logger.error("Erro ao processar falha de agendamento: {}", e.getMessage(), e);
+            logger.error("Erro ao processar falha de usuario: {}", e.getMessage(), e);
         }
     }
 

@@ -19,11 +19,11 @@ public class HistoricoConsumer {
             containerFactory = "appointmentKafkaListenerContainerFactory")
     public void consumirEventoSucesso(Evento evento, Acknowledgment acknowledgement) {
         try {
-            logger.info("Processando evento de sucesso de agendamento: {}", evento);
+            logger.info("Processando evento de sucesso de historico: {}", evento);
 
             acknowledgement.acknowledge();
         } catch (Exception e) {
-            logger.error("Erro ao processar sucesso de agendamento: {}", e.getMessage(), e);
+            logger.error("Erro ao processar sucesso de historico: {}", e.getMessage(), e);
         }
     }
 
@@ -32,11 +32,11 @@ public class HistoricoConsumer {
             containerFactory = "appointmentKafkaListenerContainerFactory")
     public void consumirEventoFalha(Evento evento, Acknowledgment acknowledgement) {
         try {
-            logger.info("Processando evento de falha de agendamento: {}", evento);
+            logger.info("Processando evento de falha de historico: {}", evento);
 
             acknowledgement.acknowledge();
         } catch (Exception e) {
-            logger.error("Erro ao processar falha de agendamento: {}", e.getMessage(), e);
+            logger.error("Erro ao processar falha de historico: {}", e.getMessage(), e);
         }
     }
 

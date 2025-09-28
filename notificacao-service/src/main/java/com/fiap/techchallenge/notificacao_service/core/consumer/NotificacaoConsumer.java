@@ -25,13 +25,13 @@ public class NotificacaoConsumer {
                    containerFactory = "appointmentKafkaListenerContainerFactory")
     public void consumirEventoSucesso(Evento evento, Acknowledgment acknowledgement) {
         try {
-            logger.info("Processando evento de agendamento: {}", evento);
+            logger.info("Processando evento de notificacao: {}", evento);
 
             DadosAgendamento dados = evento.getDados();
             criaNotificacaoService.processarNotificacao(dados);
             acknowledgement.acknowledge();
         } catch (Exception e) {
-            logger.error("Erro ao processar agendamento: {}", e.getMessage(), e);
+            logger.error("Erro ao processar notificacao: {}", e.getMessage(), e);
         }
     }
 
