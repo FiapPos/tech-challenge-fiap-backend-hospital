@@ -1,22 +1,21 @@
 package com.fiap.techchallenge.notificacao_service.core.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 public class NotificacaoAgendamentoEdicao extends NotificacaoAgendamento {
 
-    public NotificacaoAgendamentoEdicao(NotificacaoParaAgendamento agendamento) {
+    public NotificacaoAgendamentoEdicao(DadosAgendamento agendamento) {
         super(agendamento);
     }
 
     @Override
     public String getTemplateDeMensagem() {
         return String.format(
-            "Olá, %s! Seu agendamento foi atualizado para %s na especialidade %s. Valor: R$ %.2f",
-            getNome(),
-            getDataHoraFormatada(),
+                "Olá, %s. Seu agendamento foi atualizado! Seguem as novas informações: Consulta com %s na especialidade %s em %s, no endereço %s em %s.",
+            getNomePaciente(),
+            getNomeMedico(),
             getEspecializacao(),
-            getValor()
+            getNomeHospital(),
+            getEnderecoHospital(),
+            getDataHoraFormatada()
         );
     }
 }
