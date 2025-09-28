@@ -1,5 +1,6 @@
 package com.fiap.techchallenge.historico_service.configuration.kafka;
 
+import com.fiap.techchallenge.historico_service.core.dto.Evento;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -37,11 +38,11 @@ public class KafkaConfig {
     @Value("${spring.kafka.consumer.auto-offset-reset}")
     private String autoOffSetReset;
 
-    @Value("${spring.kafka.topic.historico-successo}")
+    @Value("${spring.kafka.topic.historico-sucesso}")
     private String topicoHistoricoSucesso;
 
     @Value("${spring.kafka.topic.historico-falha}")
-    private String topicoHistoricoFail;
+    private String topicoHistoricoFalha;
 
     @Value("${spring.kafka.topic.orquestrador}")
     private String topicoOrquestrador;
@@ -59,22 +60,20 @@ public class KafkaConfig {
         return props;
     }
 
-//TODO implementar o DTOParaReceberDadosHistorico do jeito que for mais adequado, com os dados e nomes necessários para processar o agendamento
-/*
     @Bean
-    public ConsumerFactory<String, DTOParaReceberDadosHistorico> historicoConsumerFactory() {
+    public ConsumerFactory<String, Evento> appointmentConsumerFactory() {
         Map<String, Object> props = baseConsumerConfigs();
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, DTOParaReceberDadosHistorico.class);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, Evento.class);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, DTOParaReceberDadosHistorico> historicoListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, DTOParaReceberDadosHistorico> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(historicoConsumerFactory());
+    public ConcurrentKafkaListenerContainerFactory<String, Evento> appointmentKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Evento> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(appointmentConsumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
-    }*/
+    }
 
     @Bean
     public Map<String, Object> producerConfigs() {
@@ -111,7 +110,7 @@ public class KafkaConfig {
 
     @Bean
     public NewTopic criaTopicoDeHistoricoFail() {
-        return buildTopic(topicoHistoricoFail);
+        return buildTopic(topicoHistoricoFalha);
     }
 
     @Bean

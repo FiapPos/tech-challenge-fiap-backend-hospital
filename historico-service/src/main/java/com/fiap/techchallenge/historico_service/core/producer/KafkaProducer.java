@@ -1,6 +1,6 @@
 package com.fiap.techchallenge.historico_service.core.producer;
 
-import com.fiap.techchallenge.historico_service.core.dto.EventoOrquestrador;
+import com.fiap.techchallenge.historico_service.core.dto.Evento;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,12 +21,12 @@ public class KafkaProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendEvent(EventoOrquestrador eventoOrquestrador) {
+    public void sendEvent(Evento evento) {
         try {
-            logger.info("Enviando evento para o tópico {} com os dados {}", topicoOrquestrador, eventoOrquestrador.toString());
-            kafkaTemplate.send(topicoOrquestrador, eventoOrquestrador);
+            logger.info("Enviando evento para o tópico {} com os dados {}", topicoOrquestrador, evento.toString());
+            kafkaTemplate.send(topicoOrquestrador, evento);
         } catch (Exception ex) {
-            logger.info("Erro ao tentar enviar evento para o tópico {} com os dados {}", topicoOrquestrador, eventoOrquestrador, ex);
+            logger.info("Erro ao tentar enviar evento para o tópico {} com os dados {}", topicoOrquestrador, evento, ex);
         }
     }
 }
