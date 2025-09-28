@@ -1,7 +1,6 @@
 package com.fiap.techchallenge.usuario_service.infrastructure.api.controllers;
 
 import com.fiap.techchallenge.usuario_service.core.domain.entities.Especialidade;
-import br.com.fiap.techchallenge.core.domain.usecases.especialidade.*;
 import com.fiap.techchallenge.usuario_service.core.domain.usecases.especialidade.AtualizarEspecialidadeComando;
 import com.fiap.techchallenge.usuario_service.core.domain.usecases.especialidade.CriarEspecialidadeComando;
 import com.fiap.techchallenge.usuario_service.core.domain.usecases.especialidade.InativarEspecialidadeComando;
