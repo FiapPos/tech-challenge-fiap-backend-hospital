@@ -1,5 +1,6 @@
 package com.fiap.techchallenge.agendamento_service.configuration.kafka;
 
+import com.fiap.techchallenge.agendamento_service.core.dto.Evento;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -59,22 +60,20 @@ public class KafkaConfig {
         return props;
     }
 
-//TODO implementar o DTOParaReceberDadosAgendamento do jeito que for mais adequado, com os dados e nomes necessários para processar o agendamento
-
-/*    @Bean
-    public ConsumerFactory<String, DTOParaReceberDadosAgendamento> agendamentoConsumerFactory() {
+    @Bean
+    public ConsumerFactory<String, Evento> appointmentConsumerFactory() {
         Map<String, Object> props = baseConsumerConfigs();
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, DTOParaReceberDadosAgendamento.class);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, Evento.class);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, DTOParaReceberDadosAgendamento> agendamentoKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, DTOParaReceberDadosAgendamento> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(agendamentoConsumerFactory());
+    public ConcurrentKafkaListenerContainerFactory<String, Evento> appointmentKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Evento> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(appointmentConsumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
-    }*/
+    }
 
     @Bean
     public Map<String, Object> producerConfigs() {
