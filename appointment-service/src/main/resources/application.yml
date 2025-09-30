@@ -11,8 +11,8 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
     topic:
-      appointment-success: appointment-success
-      appointment-fail: appointment-fail
+      comeca-saga: comeca-saga
+      notifica-fim: notifica-fim
     consumer:
       group-id: appointment-group
       auto-offset-reset: latest

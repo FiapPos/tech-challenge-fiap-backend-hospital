@@ -1,6 +1,6 @@
 package com.fiap.techchallenge.notificacao_service.configuration.kafka;
 
-import com.fiap.techchallenge.notificacao_service.core.dto.NotificacaoParaAgendamento;
+import com.fiap.techchallenge.notificacao_service.core.dto.Evento;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -39,9 +39,6 @@ public class KafkaConfig {
     @Value("${spring.kafka.topic.notificacao-sucesso}")
     private String topicoNotificacaoSucesso;
 
-    @Value("${spring.kafka.topic.orquestrador}")
-    private String topicoOrquestrador;
-
     private Map<String, Object> baseConsumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -56,16 +53,16 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, NotificacaoParaAgendamento> notificacaoConsumerFactory() {
+    public ConsumerFactory<String, Evento> appointmentConsumerFactory() {
         Map<String, Object> props = baseConsumerConfigs();
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, NotificacaoParaAgendamento.class);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, Evento.class);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, NotificacaoParaAgendamento> notificacaoKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, NotificacaoParaAgendamento> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(notificacaoConsumerFactory());
+    public ConcurrentKafkaListenerContainerFactory<String, Evento> appointmentKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Evento> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(appointmentConsumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
     }
@@ -81,10 +78,5 @@ public class KafkaConfig {
     @Bean
     public NewTopic criaTopicoNotificacaoSucesso() {
         return buildTopic(topicoNotificacaoSucesso);
-    }
-
-    @Bean
-    public NewTopic criaTopicoDeOrquestrador() {
-        return buildTopic(topicoOrquestrador);
     }
 }

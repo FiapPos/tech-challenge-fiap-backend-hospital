@@ -1,6 +1,6 @@
 package com.fiap.techchallenge.notificacao_service.core.strategy;
 
-import com.fiap.techchallenge.notificacao_service.core.dto.NotificacaoParaAgendamento;
+import com.fiap.techchallenge.notificacao_service.core.dto.DadosAgendamento;
 
 /**
  * Interface que define a estratégia para processamento de notificações.
@@ -14,7 +14,7 @@ public interface NotificacaoStrategy {
      * @param agendamento dados do agendamento
      * @return mensagem da notificação processada
      */
-    String processar(NotificacaoParaAgendamento agendamento);
+    String processar(DadosAgendamento agendamento);
     
     /**
      * Verifica se esta estratégia é aplicável para o agendamento fornecido.
@@ -22,5 +22,5 @@ public interface NotificacaoStrategy {
      * @param agendamento dados do agendamento
      * @return true se a estratégia é aplicável
      */
-    boolean isAplicavel(NotificacaoParaAgendamento agendamento);
+    boolean isAplicavel(DadosAgendamento agendamento);
 }

@@ -1,52 +1,66 @@
 package com.fiap.techchallenge.notificacao_service.core.dto;
 
+import lombok.Setter;
+
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Setter
 public abstract class NotificacaoAgendamento implements Serializable {
-    private final String nome;
-    private final LocalDateTime dataHora;
-    private final String especializacao;
-    private final BigDecimal valor;
+    private String nomePaciente;
+    private String nomeMedico;
+    private String nomeHospital;
+    private String enderecoHospital;
+    private String especializacao;
+    private LocalDateTime dataHoraAgendamento;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
 
-    public NotificacaoAgendamento(NotificacaoParaAgendamento agendamento) {
-        this.nome = agendamento.getNomePaciente();
-        this.dataHora = agendamento.getDataHora();
+    public NotificacaoAgendamento(DadosAgendamento agendamento) {
+        this.nomePaciente = agendamento.getNomePaciente();
+        this.nomeMedico = agendamento.getNomeMedico();
+        this.nomeHospital = agendamento.getNomeHospital();
+        this.enderecoHospital = agendamento.getEnderecoHospital();
         this.especializacao = agendamento.getEspecializacao();
-        this.valor = agendamento.getValor();
+        this.dataHoraAgendamento = agendamento.getDataHoraAgendamento();
         this.criadoEm = agendamento.getCriadoEm();
         this.atualizadoEm = agendamento.getAtualizadoEm();
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public LocalDateTime getDataHora() {
-        return dataHora;
-    }
-
     public String getDataHoraFormatada() {
-        return getDataHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+        return getDataHoraAgendamento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+    }
+
+    public abstract String getTemplateDeMensagem();
+
+    public String getNomePaciente() {
+        return nomePaciente;
+    }
+
+    public String getNomeMedico() {
+        return nomeMedico;
+    }
+
+    public String getNomeHospital() {
+        return nomeHospital;
+    }
+
+    public String getEnderecoHospital() {
+        return enderecoHospital;
     }
 
     public String getEspecializacao() {
         return especializacao;
     }
 
-    public BigDecimal getValor() {
-        return valor;
+    public LocalDateTime getDataHoraAgendamento() {
+        return dataHoraAgendamento;
     }
 
     public LocalDateTime getCriadoEm() {
         return criadoEm;
     }
-
-    public abstract String getTemplateDeMensagem();
 
     public LocalDateTime getAtualizadoEm() {
         return atualizadoEm;

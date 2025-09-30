@@ -12,7 +12,7 @@ spring:
     bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
     topic:
       orquestrador: orquestrador
-      historico-successo: historico-successo
+      historico-sucesso: historico-sucesso
       historico-falha: historico-falha
     consumer:
       group-id: historico-group

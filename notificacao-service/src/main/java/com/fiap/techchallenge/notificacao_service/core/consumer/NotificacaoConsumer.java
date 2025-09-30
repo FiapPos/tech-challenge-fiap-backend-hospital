@@ -1,6 +1,7 @@
 package com.fiap.techchallenge.notificacao_service.core.consumer;
 
-import com.fiap.techchallenge.notificacao_service.core.dto.NotificacaoParaAgendamento;
+import com.fiap.techchallenge.notificacao_service.core.dto.DadosAgendamento;
+import com.fiap.techchallenge.notificacao_service.core.dto.Evento;
 import com.fiap.techchallenge.notificacao_service.core.service.CriaNotificacaoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +22,16 @@ public class NotificacaoConsumer {
 
     @KafkaListener(topics = "${spring.kafka.topic.notificacao-sucesso}",
                    groupId = "${spring.kafka.consumer.group-id}",
-                   containerFactory = "notificacaoKafkaListenerContainerFactory")
-    public void consumirEventoSucesso(NotificacaoParaAgendamento notificacaoParaAgendamento, Acknowledgment acknowledgement) {
+                   containerFactory = "appointmentKafkaListenerContainerFactory")
+    public void consumirEventoSucesso(Evento evento, Acknowledgment acknowledgement) {
         try {
-            logger.info("Processando evento de agendamento: {}", notificacaoParaAgendamento);
- 
-            criaNotificacaoService.processarNotificacao(notificacaoParaAgendamento);
+            logger.info("Processando evento de notificacao: {}", evento);
+
+            DadosAgendamento dados = evento.getDados();
+            criaNotificacaoService.processarNotificacao(dados);
             acknowledgement.acknowledge();
         } catch (Exception e) {
-            logger.error("Erro ao processar agendamento: {}", e.getMessage(), e);
+            logger.error("Erro ao processar notificacao: {}", e.getMessage(), e);
         }
     }
 

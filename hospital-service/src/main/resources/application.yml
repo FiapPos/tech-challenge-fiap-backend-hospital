@@ -8,21 +8,6 @@ spring:
       import-check:
         enabled: false
 
-  kafka:
-    bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
-    topic:
-      agendamento-criado: agendamento-criado
-      agendamento-editado: agendamento-editado
-    consumer:
-      group-id: hospital-group
-      auto-offset-reset: latest
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      properties:
-        spring.json.use.type.headers: false
-        spring.json.add.type.headers: false
-
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DB_URI:jdbc:postgresql://hospital-db:5432/hospitais}

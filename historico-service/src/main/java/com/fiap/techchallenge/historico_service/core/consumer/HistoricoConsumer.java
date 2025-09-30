@@ -1,5 +1,6 @@
 package com.fiap.techchallenge.historico_service.core.consumer;
 
+import com.fiap.techchallenge.historico_service.core.dto.Evento;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,32 +14,30 @@ public class HistoricoConsumer {
 
     private final Logger logger = LoggerFactory.getLogger(HistoricoConsumer.class);
 
-    //TODO implementar o DTOParaReceberDadosHistorico do jeito que for mais adequado, com os dados e nomes necessários para processar o agendamento
-/*
-    @KafkaListener(topics = "${spring.kafka.topic.historico-successo}",
+    @KafkaListener(topics = "${spring.kafka.topic.historico-sucesso}",
             groupId = "${spring.kafka.consumer.group-id}",
-            containerFactory = "historicoListenerContainerFactory")
-    public void consumirEventoSucesso(DTOParaReceberDadosHistorico dtoAgendamento, Acknowledgment acknowledgement) {
+            containerFactory = "appointmentKafkaListenerContainerFactory")
+    public void consumirEventoSucesso(Evento evento, Acknowledgment acknowledgement) {
         try {
-            logger.info("Processando evento de sucesso de historico: {}", dtoAgendamento);
+            logger.info("Processando evento de sucesso de historico: {}", evento);
 
             acknowledgement.acknowledge();
         } catch (Exception e) {
-            logger.error("Erro ao processar sucesso de agendamento: {}", e.getMessage(), e);
+            logger.error("Erro ao processar sucesso de historico: {}", e.getMessage(), e);
         }
     }
 
     @KafkaListener(topics = "${spring.kafka.topic.historico-falha}",
             groupId = "${spring.kafka.consumer.group-id}",
-            containerFactory = "historicoListenerContainerFactory")
-    public void consumirEventoFalha(DTOParaReceberDadosHistorico dtoAgendamento, Acknowledgment acknowledgement) {
+            containerFactory = "appointmentKafkaListenerContainerFactory")
+    public void consumirEventoFalha(Evento evento, Acknowledgment acknowledgement) {
         try {
-            logger.info("Processando evento de falha de historico: {}", dtoAgendamento);
+            logger.info("Processando evento de falha de historico: {}", evento);
 
             acknowledgement.acknowledge();
         } catch (Exception e) {
-            logger.error("Erro ao processar falha de agendamento: {}", e.getMessage(), e);
+            logger.error("Erro ao processar falha de historico: {}", e.getMessage(), e);
         }
-    }*/
+    }
 
 }

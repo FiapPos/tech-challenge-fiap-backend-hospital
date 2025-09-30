@@ -16,11 +16,11 @@ spring:
         enabled: false
 
   kafka:
-    bootstrap-servers: ${KAFKA_BROKER:kafka:29092}
+    bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
     topic:
-      orchestrator: orchestrator
-      usuario-success: usuario-success
-      usuario-fail: usuario-fail
+      orquestrador: orquestrador
+      usuario-sucesso: usuario-sucesso
+      usuario-falha: usuario-falha
     consumer:
       group-id: usuario-group
       auto-offset-reset: latest
