@@ -1,8 +1,6 @@
-version: '3'
-
 services:
   appointment-db:
-    image: postgres:latest
+    image: postgres:16-alpine # Versão fixada para evitar quebras
     container_name: appointment-db
     networks:
       - orchestrator-saga
@@ -12,9 +10,11 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - 5432:5432
+    volumes:
+      - appointment-db-data:/var/lib/postgresql/data # Volume para persistência
 
   usuario-db:
-    image: postgres:latest
+    image: postgres:16-alpine # Versão fixada
     container_name: usuario-db
     networks:
       - orchestrator-saga
@@ -24,9 +24,11 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - 5433:5432
+    volumes:
+      - usuario-db-data:/var/lib/postgresql/data # Volume para persistência
 
   agendamento-db:
-    image: postgres:latest
+    image: postgres:16-alpine # Versão fixada
     container_name: agendamento-db
     networks:
       - orchestrator-saga
@@ -36,9 +38,11 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - 5434:5432
+    volumes:
+      - agendamento-db-data:/var/lib/postgresql/data # Volume para persistência
 
   historico-db:
-    image: postgres:latest
+    image: postgres:16-alpine # Versão fixada
     container_name: historico-db
     networks:
       - orchestrator-saga
@@ -48,45 +52,77 @@ services:
       - POSTGRES_PASSWORD=postgres
     ports:
       - 5435:5432
+    volumes:
+      - historico-db-data:/var/lib/postgresql/data # Volume para persistência
 
-  kafka:
-    container_name: kafka
-    image: obsidiandynamics/kafka
-    restart: "no"
-    ports:
-      - "2181:2181"
-      - "9092:9092"
+  hospital-db:
+    image: postgres:16-alpine
+    container_name: hospital-db
     networks:
       - orchestrator-saga
     environment:
+      - POSTGRES_DB=hospitais
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5436:5432
+    volumes:
+      - hospital-db-data:/var/lib/postgresql/data
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: zookeeper
+    networks:
+      - orchestrator-saga
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper-data:/var/lib/zookeeper/data   # Volume para dados
+      - zookeeper-log:/var/lib/zookeeper/log     # Volume para logs
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka
+    restart: "unless-stopped" # Alterado para reiniciar automaticamente
+    networks:
+      - orchestrator-saga
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
       KAFKA_LISTENERS: "INTERNAL://:29092,EXTERNAL://:9092"
       KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:29092,EXTERNAL://localhost:9092"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
       KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
-      KAFKA_ZOOKEEPER_SESSION_TIMEOUT: "6000"
-      KAFKA_RESTART_ATTEMPTS: "10"
-      KAFKA_RESTART_DELAY: "5"
-      ZOOKEEPER_AUTOPURGE_PURGE_INTERVAL: "0"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
     volumes:
-      - ./data/kafka/data:/var/lib/kafka/data
+      - kafka-data:/var/lib/kafka/data # Alterado para volume nomeado
 
   redpanda-console:
-    container_name: redpanda
-    image: docker.redpanda.com/vectorized/console:latest
+    image: redpandadata/console:latest
+    container_name: redpanda-console # Nome do container ajustado
     restart: on-failure
+    networks:
+      - orchestrator-saga
     entrypoint: /bin/sh
     command: -c "echo \"$$CONSOLE_CONFIG_FILE\" > /tmp/config.yml; /app/console"
     ports:
       - "8081:8080"
-    networks:
-      - orchestrator-saga
     environment:
       CONFIG_FILEPATH: /tmp/config.yml
       CONSOLE_CONFIG_FILE: |
         kafka:
           brokers: ["kafka:29092"]
     depends_on:
-      - "kafka"
+      - kafka
 
   appointment-service:
     build: './appointment-service'
@@ -104,16 +140,16 @@ services:
       - SPRING_CLOUD_CONFIG_ENABLED=false
       - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
     ports:
-      - 3000:3002
+      - 3005:3002
 
   usuario-service:
     build: './usuario-service'
     container_name: usuario-service
+    networks:
+      - orchestrator-saga
     depends_on:
       - usuario-db
       - kafka
-    networks:
-      - orchestrator-saga
     environment:
       - KAFKA_BROKER=kafka:29092
       - SPRING_DATASOURCE_URL=jdbc:postgresql://usuario-db:5432/usuarios
@@ -163,17 +199,47 @@ services:
   notificacao-service:
     build: './notificacao-service'
     container_name: notificacao-service
+    networks:
+      - orchestrator-saga
     depends_on:
+      - kafka
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SPRING_CLOUD_CONFIG_ENABLED=false
+      - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
+      - SPRING_AUTOCONFIGURE_EXCLUDE=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+    ports:
+      - 3004:3000
+
+  hospital-service:
+    build: './hospital-service'
+    container_name: hospital-service
+    depends_on:
+      - hospital-db
       - kafka
     networks:
       - orchestrator-saga
     environment:
       - KAFKA_BROKER=kafka:29092
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://hospital-db:5432/hospitais
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_CLOUD_CONFIG_ENABLED=false
       - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
     ports:
-      - 3004:3000
+      - 3006:3000
 
 networks:
   orchestrator-saga:
     driver: bridge
+
+  # Declaração de todos os volumes nomeados
+volumes:
+  appointment-db-data:
+  usuario-db-data:
+  agendamento-db-data:
+  historico-db-data:
+  hospital-db-data:
+  zookeeper-data:
+  zookeeper-log:
+  kafka-data:

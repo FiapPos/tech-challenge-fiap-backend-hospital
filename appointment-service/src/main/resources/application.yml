@@ -9,17 +9,17 @@ spring:
         enabled: false
 
   kafka:
-    bootstrap-servers: ${KAFKA_BROKER:kafka:29092}
+    bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
     topic:
-      appointment-success: appointment-success
-      appointment-fail: appointment-fail
+      comeca-saga: comeca-saga
+      notifica-fim: notifica-fim
     consumer:
       group-id: appointment-group
       auto-offset-reset: latest
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://appointment-db:5432/appointment
+    url: jdbc:postgresql://appointment-db:5432/appointments
     username: ${DB_USER:postgres}
     password: ${DB_PASSWORD:postgres}
 
