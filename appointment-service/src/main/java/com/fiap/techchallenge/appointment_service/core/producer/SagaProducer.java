@@ -1,6 +1,6 @@
 package com.fiap.techchallenge.appointment_service.core.producer;
 
-import com.fiap.techchallenge.appointment_service.core.dto.Evento;
+import com.fiap.techchallenge.appointment_service.core.dto.DadosAgendamento;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +20,7 @@ public class SagaProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendEvent(Evento evento) {
+    public void sendEvent(DadosAgendamento evento) {
         try {
             logger.info("Enviando evento para o tópico {} com os dados {}", comecaTopicoSaga, evento);
             kafkaTemplate.send(comecaTopicoSaga, evento);

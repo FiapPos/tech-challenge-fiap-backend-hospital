@@ -5,6 +5,9 @@ import com.fiap.techchallenge.usuario_service.core.domain.usecases.usuario.Criar
 import com.fiap.techchallenge.usuario_service.core.domain.usecases.usuario.DesativarUsuarioComando;
 import com.fiap.techchallenge.usuario_service.core.dtos.usuario.AtualizarUsuarioComandoDto;
 import com.fiap.techchallenge.usuario_service.core.dtos.usuario.CriarUsuarioComandoDto;
+import com.fiap.techchallenge.usuario_service.core.enums.Perfil;
+import com.fiap.techchallenge.usuario_service.core.queries.resultadoItem.usuario.EncontraUsuarioItem;
+import com.fiap.techchallenge.usuario_service.core.queries.usuario.BuscaUsuarioPorIdQuery;
 import com.fiap.techchallenge.usuario_service.core.queries.usuario.ListarUsuariosQuery;
 import com.fiap.techchallenge.usuario_service.core.queries.usuario.ListarUsuariosPorIdEspecialidadeQuery;
 import com.fiap.techchallenge.usuario_service.core.queries.usuario.ListarUsuarioPorLoginQuery;
@@ -18,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -30,6 +34,7 @@ public class UsuarioController implements UsuarioControllerDoc {
         private final DesativarUsuarioComando desativarUsuarioComando;
         private final ListarUsuariosPorIdEspecialidadeQuery listarUsuariosPorIdEspecialidadeQuery;
         private final ListarUsuarioPorLoginQuery listarUsuarioPorLoginQuery;
+        private final BuscaUsuarioPorIdQuery buscaUsuarioPorIdQuery;
 
         @PostMapping
         public ResponseEntity<Void> criarUsuario(@RequestBody @Valid CriarUsuarioComandoDto criarUsuarioComandoDto) {
@@ -74,5 +79,10 @@ public class UsuarioController implements UsuarioControllerDoc {
         public ResponseEntity<ListarUsuariosResultadoItem> listarUsuarioPorLogin(@PathVariable String login) {
                 var item = listarUsuarioPorLoginQuery.execute(login);
                 return ResponseEntity.ok(item);
+        }
+
+        @GetMapping("/{id}")
+        public ResponseEntity<EncontraUsuarioItem> buscaUsuario(@PathVariable Long id, @RequestParam Perfil perfil, @RequestParam Optional<Long> especialidadeId) {
+                return ResponseEntity.ok(buscaUsuarioPorIdQuery.execute(id, perfil, especialidadeId));
         }
 }

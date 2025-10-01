@@ -31,7 +31,7 @@ public class DadosAgendamento implements Serializable {
     private String especializacao;
     private EStatusAgendamento statusAgendamento;
     private LocalDateTime dataHoraAgendamento;
-    private LocalDateTime criadoEm;
+    private LocalDateTime criadoEm = LocalDateTime.now();
     private LocalDateTime atualizadoEm;
 
     public DadosAgendamento(Consulta consulta) {

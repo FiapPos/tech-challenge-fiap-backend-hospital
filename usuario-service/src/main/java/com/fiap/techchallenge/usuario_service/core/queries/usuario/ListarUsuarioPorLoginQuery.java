@@ -17,7 +17,7 @@ public class ListarUsuarioPorLoginQuery {
 
     public ListarUsuariosResultadoItem execute(String login) {
         Usuario usuario = usuarioRepository.findByLogin(login)
-                .orElseThrow(() -> new NotFoundException("usuario.nao.encontrado"));
+                .orElseThrow(() -> new NotFoundException("Usuario não encontrado"));
         return ListarUsuariosResultadoItem.builder()
                 .id(usuario.getId())
                 .nome(usuario.getNome())

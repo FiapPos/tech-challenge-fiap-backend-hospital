@@ -1,6 +1,7 @@
 package com.fiap.techchallenge.usuario_service.core.gateways;
 
 import com.fiap.techchallenge.usuario_service.core.domain.entities.Usuario;
+import com.fiap.techchallenge.usuario_service.core.enums.Perfil;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,4 +32,8 @@ public interface UsuarioRepository {
     Optional<Usuario> findByIdAndEspecialidadesNome(Long usuarioId, String nome);
 
     void deleteAll();
+
+    Optional<Usuario> findByIdAndPerfil(Long id, Perfil perfil);
+
+    Optional<Usuario> findByIdAndPerfilAndEspecialidadeId(Long id, Perfil perfil, Long especialidadeId);
 }

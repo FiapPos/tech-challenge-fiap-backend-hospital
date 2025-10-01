@@ -3,13 +3,15 @@ import com.fiap.techchallenge.orchestrator_service.client.AgendamentoServiceClie
 import com.fiap.techchallenge.orchestrator_service.client.HospitalServiceClient;
 import com.fiap.techchallenge.orchestrator_service.client.UsuarioServiceClient;
 import com.fiap.techchallenge.orchestrator_service.dto.*;
+import com.fiap.techchallenge.orchestrator_service.enums.Perfil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static com.fiap.techchallenge.orchestrator_service.enums.Perfil.MEDICO;
 
 @Slf4j
 @Service
@@ -33,27 +35,25 @@ public class AgendamentoSagaService {
         try {
             DadosAgendamento consultaPendente = new DadosAgendamento();
 
-            // Passo 1 e 2: Validar paciente, médico e hospital
+            // Validações
             log.info("SAGA - Passo 1: Validando paciente {}", request.getPacienteId());
-            //TODO busca por id
-            usuarioClient.buscaPor(request.getPacienteId());
+            UsuarioDTO paciente = usuarioClient.buscaPor(request.getPacienteId(), Perfil.PACIENTE);
             if (paciente == null) throw new SagaException("Paciente não encontrado.");
             consultaPendente.setPacienteId(paciente.getId());
             consultaPendente.setNomePaciente(paciente.getNome());
 
+            EspecialidadeDTO especialidade = usuarioClient.buscaPor(request.getEspecialidadeId());
+            if (especialidade == null) throw new SagaException("Paciente não encontrado.");
+
+
             log.info("SAGA - Passo 2: Validando médico {}", request.getMedicoId());
-            //TODO busca por id
-//            ListarUsuariosResultadoItem medico = usuarioClient.buscaPor(request.getMedicoId());
+            UsuarioDTO medico = usuarioClient.buscaPor(request.getMedicoId(), MEDICO, especialidade.getId());
             if (medico == null) throw new SagaException("Médico não encontrado.");
             consultaPendente.setMedicoId(medico.getId());
             consultaPendente.setNomeMedico(medico.getNome());
-
-
-            //TODO valida especialização por médico
             consultaPendente.setEspecializacao(especialidade.getNome());
 
-
-            HospitalResponse dadosHospital = hospitalServiceClient.buscaPor(request.getHospitalId());
+            HospitalDTO dadosHospital = hospitalServiceClient.buscaPor(request.getHospitalId());
             if (dadosHospital == null) throw new SagaException("Hospital não encontrado.");
             consultaPendente.setHospitalId(dadosHospital.getId());
             consultaPendente.setEnderecoHospital(dadosHospital.getEndereco());
@@ -84,22 +84,18 @@ public class AgendamentoSagaService {
 
         } catch (Exception e) {
             log.error("SAGA - FALHA: Ocorreu um erro durante a saga de agendamento.", e);
-            // Reverter a ordem das compensações para executar da última para a primeira
             Collections.reverse(compensations);
-            // Executar todas as compensações registradas
             compensations.forEach(compensation -> {
                 try {
                     compensation.accept(null);
                 } catch (Exception compEx) {
                     log.error("SAGA - FALHA CRÍTICA: Falha ao executar compensação.", compEx);
-                    // Aqui, você pode registrar a falha em um "dead letter queue" ou notificar administradores
                 }
             });
             return new SagaResponse(false, "Falha no processo de agendamento: " + e.getMessage(), consultaId);
         }
     }
 
-    // Classe auxiliar para exceções da Saga
     private static class SagaException extends RuntimeException {
         public SagaException(String message) {
             super(message);

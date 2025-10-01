@@ -1,6 +1,6 @@
 package com.fiap.techchallenge.usuario_service.infrastructure.kafka;
 
-import com.fiap.techchallenge.usuario_service.core.dtos.evento.Evento;
+import com.fiap.techchallenge.usuario_service.core.dtos.evento.DadosAgendamento;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -61,15 +61,15 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, Evento> appointmentConsumerFactory() {
+    public ConsumerFactory<String, DadosAgendamento> appointmentConsumerFactory() {
         Map<String, Object> props = baseConsumerConfigs();
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, Evento.class);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, DadosAgendamento.class);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Evento> appointmentKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Evento> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, DadosAgendamento> appointmentKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, DadosAgendamento> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(appointmentConsumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
