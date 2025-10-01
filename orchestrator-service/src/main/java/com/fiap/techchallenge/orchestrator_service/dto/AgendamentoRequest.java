@@ -11,6 +11,8 @@ public class AgendamentoRequest {
 
     private Long pacienteId;
     private Long medicoId;
+    private Long hospitalId;
+    private Long especialidadeId;
     private LocalDateTime dataHora;
 
 }

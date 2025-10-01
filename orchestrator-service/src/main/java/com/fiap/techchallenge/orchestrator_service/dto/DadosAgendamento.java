@@ -1,7 +1,7 @@
-package com.fiap.techchallenge.historico_service.core.dto;
+package com.fiap.techchallenge.orchestrator_service.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fiap.techchallenge.historico_service.core.enums.EStatusAgendamento;
+import com.fiap.techchallenge.orchestrator_service.enums.EStatusAgendamento;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,6 +32,30 @@ public class DadosAgendamento implements Serializable {
     private LocalDateTime dataHoraAgendamento;
     private LocalDateTime criadoEm;
     private LocalDateTime atualizadoEm;
+
+    public DadosAgendamento(long pacienteId,
+                            long hospitalId,
+                            long medicoId,
+                            long agendamentoId,
+                            String nomePaciente,
+                            String nomeMedico,
+                            String nomeHospital,
+                            String enderecoHospital,
+                            String especializacao,
+                            LocalDateTime dataHoraAgendamento,
+                            LocalDateTime criadoEm) {
+        this.pacienteId = pacienteId;
+        this.hospitalId = hospitalId;
+        this.medicoId = medicoId;
+        this.agendamentoId = agendamentoId;
+        this.nomePaciente = nomePaciente;
+        this.nomeMedico = nomeMedico;
+        this.nomeHospital = nomeHospital;
+        this.enderecoHospital = enderecoHospital;
+        this.especializacao = especializacao;
+        this.dataHoraAgendamento = dataHoraAgendamento;
+        this.criadoEm = criadoEm;
+    }
 
     public long getAgendamentoId() {
         return agendamentoId;

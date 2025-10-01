@@ -1,11 +1,8 @@
 package com.fiap.techchallenge.orchestrator_service.service;
 import com.fiap.techchallenge.orchestrator_service.client.AgendamentoServiceClient;
-import com.fiap.techchallenge.orchestrator_service.client.NotificacaoServiceClient;
+import com.fiap.techchallenge.orchestrator_service.client.HospitalServiceClient;
 import com.fiap.techchallenge.orchestrator_service.client.UsuarioServiceClient;
-import com.fiap.techchallenge.orchestrator_service.dto.AgendamentoRequest;
-import com.fiap.techchallenge.orchestrator_service.dto.ConsultaDTO;
-import com.fiap.techchallenge.orchestrator_service.dto.NotificacaoDTO;
-import com.fiap.techchallenge.orchestrator_service.dto.SagaResponse;
+import com.fiap.techchallenge.orchestrator_service.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,12 +15,15 @@ import java.util.function.Consumer;
 @Service
 public class AgendamentoSagaService {
 
-    @Autowired
-    private UsuarioServiceClient usuarioClient;
-    @Autowired
-    private AgendamentoServiceClient agendamentoClient;
-    @Autowired
-    private NotificacaoServiceClient notificacaoClient;
+    private final UsuarioServiceClient usuarioClient;
+    private final AgendamentoServiceClient agendamentoClient;
+    private final HospitalServiceClient hospitalServiceClient;
+
+    public AgendamentoSagaService(UsuarioServiceClient usuarioClient, AgendamentoServiceClient agendamentoClient, HospitalServiceClient hospitalServiceClient) {
+        this.usuarioClient = usuarioClient;
+        this.agendamentoClient = agendamentoClient;
+        this.hospitalServiceClient = hospitalServiceClient;
+    }
 
     public SagaResponse iniciarSaga(AgendamentoRequest request) {
         // Lista para armazenar as ações de compensação
@@ -31,39 +31,53 @@ public class AgendamentoSagaService {
         Long consultaId = null;
 
         try {
-            // Passo 1 e 2: Validar paciente e médico
+            DadosAgendamento consultaPendente = new DadosAgendamento();
+
+            // Passo 1 e 2: Validar paciente, médico e hospital
             log.info("SAGA - Passo 1: Validando paciente {}", request.getPacienteId());
-            if (!usuarioClient.existe(request.getPacienteId())) {
-                throw new SagaException("Paciente não encontrado.");
-            }
+            //TODO busca por id
+            usuarioClient.buscaPor(request.getPacienteId());
+            if (paciente == null) throw new SagaException("Paciente não encontrado.");
+            consultaPendente.setPacienteId(paciente.getId());
+            consultaPendente.setNomePaciente(paciente.getNome());
+
             log.info("SAGA - Passo 2: Validando médico {}", request.getMedicoId());
-            if (!usuarioClient.existe(request.getMedicoId())) {
-                throw new SagaException("Médico não encontrado.");
-            }
+            //TODO busca por id
+//            ListarUsuariosResultadoItem medico = usuarioClient.buscaPor(request.getMedicoId());
+            if (medico == null) throw new SagaException("Médico não encontrado.");
+            consultaPendente.setMedicoId(medico.getId());
+            consultaPendente.setNomeMedico(medico.getNome());
+
+
+            //TODO valida especialização por médico
+            consultaPendente.setEspecializacao(especialidade.getNome());
+
+
+            HospitalResponse dadosHospital = hospitalServiceClient.buscaPor(request.getHospitalId());
+            if (dadosHospital == null) throw new SagaException("Hospital não encontrado.");
+            consultaPendente.setHospitalId(dadosHospital.getId());
+            consultaPendente.setEnderecoHospital(dadosHospital.getEndereco());
+            consultaPendente.setNomeHospital(dadosHospital.getNome());
 
             // Passo 3: Criar consulta pendente
             log.info("SAGA - Passo 3: Criando consulta pendente...");
-            ConsultaDTO consultaPendente = new ConsultaDTO(request.getPacienteId(), request.getMedicoId(), request.getDataHora());
-            ConsultaDTO consultaCriada = agendamentoClient.criarConsultaPendente(consultaPendente);
-            consultaId = consultaCriada.getId();
+
+            consultaPendente.setDataHoraAgendamento(request.getDataHora());
+
+            DadosAgendamento consultaCriada = agendamentoClient.criarConsultaPendente(consultaPendente);
+            consultaId = consultaCriada.getAgendamentoId();
             log.info("SAGA - Consulta pendente criada com ID: {}", consultaId);
 
             // Adicionar compensação para o passo 3
             final Long finalConsultaId = consultaId;
             compensations.add(v -> {
-                log.warn("SAGA - COMPENSAÇÃO: Cancelando consulta ID: {}", finalConsultaId);
-                agendamentoClient.cancelarConsulta(finalConsultaId);
+                log.warn("SAGA - COMPENSAÇÃO: Cancelando consulta ID: {}", consultaCriada);
+                agendamentoClient.cancelarConsulta(consultaCriada);
             });
-
-            // Passo 4: Enviar notificação
-            log.info("SAGA - Passo 4: Solicitando envio de notificação...");
-            NotificacaoDTO notificacao = new NotificacaoDTO(request.getPacienteId(), "Sua consulta foi pré-agendada.");
-            notificacaoClient.enviarNotificacao(notificacao);
-            // (Opcional) Adicionar compensação para notificação, se aplicável
 
             // Passo 5: Confirmar a consulta
             log.info("SAGA - Passo 5: Confirmando consulta ID: {}", consultaId);
-            agendamentoClient.confirmarConsulta(consultaId);
+            agendamentoClient.confirmarConsulta(consultaCriada);
 
             log.info("SAGA - Concluída com sucesso!");
             return new SagaResponse(true, "Agendamento concluído com sucesso.", consultaId);

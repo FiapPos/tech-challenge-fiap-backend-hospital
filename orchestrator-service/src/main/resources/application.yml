@@ -2,6 +2,11 @@ server:
   port: 8080
 
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  
   cloud:
     config:
       enabled: false
@@ -19,6 +24,14 @@ spring:
     consumer:
       group-id: orchestrator-group
       auto-offset-reset: latest
+
+services:
+  usuario:
+    url: ${USUARIO_SERVICE_URL:http://usuario-service:3000}
+  agendamento:
+    url: ${AGENDAMENTO_SERVICE_URL:http://agendamento-service:3000}
+  hospital:
+    url: ${HOSPITAL_SERVICE_URL:http://hospital-service:3000}
 
 logging:
   level:
