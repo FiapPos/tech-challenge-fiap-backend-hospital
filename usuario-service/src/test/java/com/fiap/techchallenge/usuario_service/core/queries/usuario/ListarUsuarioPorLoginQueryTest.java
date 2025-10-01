@@ -25,9 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-/**
- * Testes unitários para {@link ListarUsuarioPorLoginQuery}.
- */
 class ListarUsuarioPorLoginQueryTest {
 
     @Mock
@@ -58,16 +55,16 @@ class ListarUsuarioPorLoginQueryTest {
         usuario.setDataNascimento(LocalDate.of(1990, 1, 1));
         usuario.setDataCriacao(LocalDateTime.now().minusDays(1));
         usuario.setDataAtualizacao(LocalDateTime.now());
-    PerfilDoUsuario perfilDoUsuario = new PerfilDoUsuario(1L, Perfil.ADMIN, usuario);
-    usuario.setPerfil(perfilDoUsuario);
+        PerfilDoUsuario perfilDoUsuario = new PerfilDoUsuario(1L, Perfil.ADMIN, usuario);
+        usuario.setPerfil(perfilDoUsuario);
 
         when(usuarioRepository.findByLogin("fulano")).thenReturn(Optional.of(usuario));
-    PerfilUsuarioResultItem perfilItem = PerfilUsuarioResultItem.builder()
-        .perfil(usuario.getPerfil().getPerfil())
-        .codigo(usuario.getPerfil().getPerfil().getCodigo())
-        .build();
-    when(listarPorPerfilUsuario.execute(any()))
-        .thenReturn(List.of(perfilItem));
+        PerfilUsuarioResultItem perfilItem = PerfilUsuarioResultItem.builder()
+                .perfil(usuario.getPerfil().getPerfil())
+                .codigo(usuario.getPerfil().getPerfil().getCodigo())
+                .build();
+        when(listarPorPerfilUsuario.execute(any()))
+                .thenReturn(List.of(perfilItem));
 
         // Act
         ListarUsuariosResultadoItem resultado = listarUsuarioPorLoginQuery.execute("fulano");
@@ -81,7 +78,7 @@ class ListarUsuarioPorLoginQueryTest {
         assertNotNull(resultado.getPerfil());
         assertEquals(1, resultado.getPerfil().size());
         verify(usuarioRepository).findByLogin("fulano");
-    verify(listarPorPerfilUsuario).execute(any());
+        verify(listarPorPerfilUsuario).execute(any());
     }
 
     @Test

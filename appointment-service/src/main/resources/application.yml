@@ -2,12 +2,13 @@ server:
   port: 3002
 
 spring:
+  application:
+    name: api-gateway-service
   cloud:
     config:
       enabled: false
       import-check:
         enabled: false
-
   kafka:
     bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
     topic:
@@ -17,20 +18,64 @@ spring:
       group-id: appointment-group
       auto-offset-reset: latest
 
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://appointment-db:5432/appointments
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:postgres}
+# Configuração JWT
+jwt:
+  secret: ${JWT_SECRET:mySecretKeyForHospitalGatewayService}
+  expiration: ${JWT_EXPIRATION:86400}
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
+# URL do orchestrator-service (único ponto de comunicação)
+orchestrator-service:
+  url: ${ORCHESTRATOR_SERVICE_URL:http://orchestrator-service:8080}
+
+services:
+  orchestrator-service:
+    url: ${ORCHESTRATOR_SERVICE_URL:http://orchestrator-service:8080}
 
 logging:
   level:
-    org.apache.kafka: INFO
-    org.hibernate: DEBUG
+    "[org.apache.kafka]": INFO
+    "[com.fiap.techchallenge.appointment_service]": DEBUG
+
+# Configuração do Feign Client (mantido para comunicação com orchestrator)
+feign:
+  client:
+    config:
+      default:
+        connect-timeout: 5000
+        read-timeout: 10000
+        logger-level: basic
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# Resilience4j configuration for orchestrator calls
+resilience4j:
+  retry:
+    instances:
+      orchestrator-find:
+        max-attempts: 3
+        wait-duration: 200ms
+      orchestrator-validate:
+        max-attempts: 3
+        wait-duration: 200ms
+
+  circuitbreaker:
+    instances:
+      orchestrator-find:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s
+      orchestrator-validate:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 5s
