@@ -1,5 +1,5 @@
-package com.fiap.techchallenge.agendamento_service.repository;
-import com.fiap.techchallenge.agendamento_service.entity.Consulta;
+package com.fiap.techchallenge.agendamento_service.core.repository;
+import com.fiap.techchallenge.agendamento_service.core.entity.Consulta;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

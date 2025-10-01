@@ -4,6 +4,8 @@ import com.fiap.techchallenge.notificacao_service.core.dto.DadosAgendamento;
 import com.fiap.techchallenge.notificacao_service.core.dto.NotificacaoAgendamentoCriacao;
 import org.springframework.stereotype.Component;
 
+import static com.fiap.techchallenge.notificacao_service.core.enums.EStatusAgendamento.CRIADA;
+
 @Component
 public class NotificacaoCriacaoStrategy implements NotificacaoStrategy {
 
@@ -15,6 +17,6 @@ public class NotificacaoCriacaoStrategy implements NotificacaoStrategy {
 
     @Override
     public boolean isAplicavel(DadosAgendamento agendamento) {
-        return agendamento.getAtualizadoEm() == null;
+        return agendamento.getAtualizadoEm() == null && CRIADA.equals(agendamento.getStatusAgendamento());
     }
 }

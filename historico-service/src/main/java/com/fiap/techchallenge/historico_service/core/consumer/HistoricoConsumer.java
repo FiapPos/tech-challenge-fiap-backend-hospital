@@ -1,6 +1,6 @@
 package com.fiap.techchallenge.historico_service.core.consumer;
 
-import com.fiap.techchallenge.historico_service.core.dto.Evento;
+import com.fiap.techchallenge.historico_service.core.dto.DadosAgendamento;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public class HistoricoConsumer {
     @KafkaListener(topics = "${spring.kafka.topic.historico-sucesso}",
             groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "appointmentKafkaListenerContainerFactory")
-    public void consumirEventoSucesso(Evento evento, Acknowledgment acknowledgement) {
+    public void consumirEventoSucesso(DadosAgendamento evento, Acknowledgment acknowledgement) {
         try {
             logger.info("Processando evento de sucesso de historico: {}", evento);
 
@@ -30,7 +30,7 @@ public class HistoricoConsumer {
     @KafkaListener(topics = "${spring.kafka.topic.historico-falha}",
             groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "appointmentKafkaListenerContainerFactory")
-    public void consumirEventoFalha(Evento evento, Acknowledgment acknowledgement) {
+    public void consumirEventoFalha(DadosAgendamento evento, Acknowledgment acknowledgement) {
         try {
             logger.info("Processando evento de falha de historico: {}", evento);
 

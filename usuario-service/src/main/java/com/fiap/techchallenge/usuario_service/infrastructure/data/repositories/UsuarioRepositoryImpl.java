@@ -1,6 +1,7 @@
 package com.fiap.techchallenge.usuario_service.infrastructure.data.repositories;
 
 import com.fiap.techchallenge.usuario_service.core.domain.entities.Usuario;
+import com.fiap.techchallenge.usuario_service.core.enums.Perfil;
 import com.fiap.techchallenge.usuario_service.core.gateways.UsuarioRepository;
 import com.fiap.techchallenge.usuario_service.infrastructure.data.entities.UsuarioEntity;
 import com.fiap.techchallenge.usuario_service.infrastructure.data.entities.EspecialidadeEntity;
@@ -109,5 +110,17 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     @Override
     public void deleteAll() {
         jpaRepository.deleteAll();
+    }
+
+    @Override
+    public Optional<Usuario> findByIdAndPerfil(Long id, Perfil perfil) {
+        return jpaRepository.findByIdAndPerfil_NomePerfil(id, perfil)
+                .map(UsuarioEntity::toDomain);
+    }
+
+    @Override
+    public Optional<Usuario> findByIdAndPerfilAndEspecialidadeId(Long id, Perfil perfil, Long especialidadeId) {
+        return jpaRepository.findByIdAndPerfil_NomePerfilAndEspecialidadeId(id, perfil, especialidadeId)
+                .map(UsuarioEntity::toDomain);
     }
 }

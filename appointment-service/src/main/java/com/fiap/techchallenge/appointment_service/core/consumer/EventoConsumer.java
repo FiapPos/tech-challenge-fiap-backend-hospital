@@ -1,6 +1,6 @@
 package com.fiap.techchallenge.appointment_service.core.consumer;
 
-import com.fiap.techchallenge.appointment_service.core.dto.Evento;
+import com.fiap.techchallenge.appointment_service.core.dto.DadosAgendamento;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public class EventoConsumer {
     @KafkaListener(topics = "${spring.kafka.topic.notifica-fim}",
             groupId = "${spring.kafka.consumer.group-id}",
             containerFactory = "appointmentKafkaListenerContainerFactory")
-    public void notificaFimSaga(Evento evento, Acknowledgment acknowledgement) {
+    public void notificaFimSaga(DadosAgendamento evento, Acknowledgment acknowledgement) {
         try {
             logger.info("Recebendo notificação de fim de evento {} do topico notifica-fim", evento);
 
