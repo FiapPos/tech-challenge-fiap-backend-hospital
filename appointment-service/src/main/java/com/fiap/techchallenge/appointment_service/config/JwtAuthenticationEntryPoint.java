@@ -10,12 +10,17 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+
+    private final com.fiap.techchallenge.appointment_service.core.util.FabricaCorpoErroAutenticacao bodyFactory;
+
+    public JwtAuthenticationEntryPoint(com.fiap.techchallenge.appointment_service.core.util.FabricaCorpoErroAutenticacao bodyFactory) {
+        this.bodyFactory = bodyFactory;
+    }
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
@@ -25,11 +30,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        final Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        body.put("error", "Unauthorized");
-        body.put("message", authException.getMessage());
-        body.put("path", request.getServletPath());
+    final Map<String, Object> body = bodyFactory.construirNaoAutorizado(request, authException);
 
         final ObjectMapper mapper = new ObjectMapper();
         mapper.writeValue(response.getOutputStream(), body);
