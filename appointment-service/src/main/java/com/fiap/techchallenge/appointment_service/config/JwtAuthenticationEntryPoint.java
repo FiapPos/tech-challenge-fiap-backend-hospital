@@ -17,9 +17,12 @@ import java.util.Map;
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final com.fiap.techchallenge.appointment_service.core.util.FabricaCorpoErroAutenticacao bodyFactory;
+    private final ObjectMapper objectMapper;
 
-    public JwtAuthenticationEntryPoint(com.fiap.techchallenge.appointment_service.core.util.FabricaCorpoErroAutenticacao bodyFactory) {
+    public JwtAuthenticationEntryPoint(com.fiap.techchallenge.appointment_service.core.util.FabricaCorpoErroAutenticacao bodyFactory,
+            ObjectMapper objectMapper) {
         this.bodyFactory = bodyFactory;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -32,7 +35,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     final Map<String, Object> body = bodyFactory.construirNaoAutorizado(request, authException);
 
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getOutputStream(), body);
+    objectMapper.writeValue(response.getOutputStream(), body);
     }
 }
