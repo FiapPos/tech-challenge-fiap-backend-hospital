@@ -60,26 +60,41 @@ public class JwtService {
     }
 
     public String getUsernameFromToken(String token) {
-        var claims = Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            var claims = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
 
-        return claims.getSubject();
+            return claims.getSubject();
+        } catch (ExpiredJwtException eje) {
+            var claims = eje.getClaims();
+            return claims == null ? null : claims.getSubject();
+        }
     }
 
     public LocalDateTime getExpirationFromToken(String token) {
-        var claims = Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            var claims = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
 
-        return claims.getExpiration()
-                .toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+            return claims.getExpiration()
+                    .toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+        } catch (ExpiredJwtException eje) {
+            var claims = eje.getClaims();
+            if (claims == null || claims.getExpiration() == null)
+                return null;
+            return claims.getExpiration()
+                    .toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+        }
     }
 
     public boolean validateToken(String token) {
@@ -89,6 +104,9 @@ public class JwtService {
                     .build()
                     .parseSignedClaims(token);
             return true;
+        } catch (ExpiredJwtException eje) {
+            log.debug("Token JWT expirado: {}", eje.getMessage());
+            return false;
         } catch (JwtException | IllegalArgumentException e) {
             log.error("Token JWT inválido: {}", e.getMessage());
             return false;
@@ -103,24 +121,10 @@ public class JwtService {
                     .parseSignedClaims(token)
                     .getPayload();
 
-            // 1) Tentar claim explícito 'perfil'
-            String perfil = claims.get("perfil", String.class);
-            if (perfil != null && !perfil.isBlank()) {
-                return perfil.trim();
-            }
-
-            // 2) Fallback para claim 'roles' (CSV) por compatibilidade
-            String roles = claims.get("roles", String.class);
-            if (roles != null && !roles.isEmpty()) {
-                String role = roles.split(",")[0].trim();
-                if (role.startsWith("ROLE_")) {
-                    return role.substring("ROLE_".length());
-                } else if (role.startsWith("PERFIL_")) {
-                    return role.substring("PERFIL_".length());
-                }
-                return role;
-            }
-            return null;
+            return extractPerfilFromClaims(claims);
+        } catch (ExpiredJwtException eje) {
+            var claims = eje.getClaims();
+            return extractPerfilFromClaims(claims);
         } catch (JwtException | IllegalArgumentException e) {
             log.error("Erro ao extrair perfil do token: {}", e.getMessage());
             return null;
@@ -136,8 +140,67 @@ public class JwtService {
                     .getPayload();
 
             return claims.get("roles", String.class);
+        } catch (ExpiredJwtException eje) {
+            var claims = eje.getClaims();
+            return claims == null ? null : claims.get("roles", String.class);
         } catch (JwtException | IllegalArgumentException e) {
             log.error("Erro ao extrair roles do token: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    public Long getUserIdFromToken(String token) {
+        try {
+            var claims = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            return extractUserIdFromClaims(claims);
+        } catch (ExpiredJwtException eje) {
+            var claims = eje.getClaims();
+            return extractUserIdFromClaims(claims);
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Erro ao extrair userId do token: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    private String extractPerfilFromClaims(Claims claims) {
+        if (claims == null)
+            return null;
+        String perfil = claims.get("perfil", String.class);
+        if (perfil != null && !perfil.isBlank()) {
+            return perfil.trim();
+        }
+
+        String roles = claims.get("roles", String.class);
+        if (roles != null && !roles.isEmpty()) {
+            String role = roles.split(",")[0].trim();
+            if (role.startsWith("ROLE_")) {
+                return role.substring("ROLE_".length());
+            } else if (role.startsWith("PERFIL_")) {
+                return role.substring("PERFIL_".length());
+            }
+            return role;
+        }
+        return null;
+    }
+
+    private Long extractUserIdFromClaims(Claims claims) {
+        if (claims == null)
+            return null;
+        Object userIdObj = claims.get("userId");
+        if (userIdObj == null)
+            return null;
+        if (userIdObj instanceof Number) {
+            return ((Number) userIdObj).longValue();
+        }
+        try {
+            return Long.parseLong(String.valueOf(userIdObj));
+        } catch (NumberFormatException ex) {
+            log.debug("Não foi possível converter userId do token: {}", ex.getMessage());
             return null;
         }
     }

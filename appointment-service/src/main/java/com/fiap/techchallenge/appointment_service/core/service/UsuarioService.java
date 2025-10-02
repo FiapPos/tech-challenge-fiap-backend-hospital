@@ -1,48 +1,32 @@
 package com.fiap.techchallenge.appointment_service.core.service;
 
 import com.fiap.techchallenge.appointment_service.core.client.OrchestratorClient;
-import com.fiap.techchallenge.appointment_service.core.dto.UsuarioResponse;
-import com.fiap.techchallenge.appointment_service.core.config.ResilienceProvider;
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
-import io.github.resilience4j.retry.Retry;
-import io.github.resilience4j.retry.RetryConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
-import java.util.function.Supplier;
+import org.springframework.http.ResponseEntity;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UsuarioService {
 
-    private final OrchestratorClient orchestratorClient;
-    private final ResilienceProvider resilienceProvider;
+        private final OrchestratorClient orchestratorClient;
 
-    public UsuarioResponse findUsuarioByLogin(String login) {
-        CircuitBreakerConfig cbConfigFind = CircuitBreakerConfig.custom()
-                .failureRateThreshold(50)
-                .slidingWindowSize(10)
-                .waitDurationInOpenState(Duration.ofSeconds(5))
-                .build();
-        CircuitBreaker cbFind = resilienceProvider.getOrCreateCircuitBreaker("orchestrator-find", cbConfigFind);
+        @SuppressWarnings({ "unchecked" })
+        public java.util.Map<String, Object> loginCredentials(java.util.Map<String, Object> credentials) {
+                ResponseEntity<Object> resp = orchestratorClient.loginOnUsuarioService(credentials);
+                if (resp == null || resp.getStatusCode().isError() || resp.getBody() == null) {
+                        throw new RuntimeException("Failed to login on usuario-service");
+                }
 
-        RetryConfig configFind = RetryConfig.custom()
-                .maxAttempts(3)
-                .waitDuration(Duration.ofMillis(200))
-                .build();
-        Retry retry = resilienceProvider.getOrCreateRetry("orchestrator-find", configFind);
+                Object body = resp.getBody();
+                if (body instanceof java.util.Map) {
+                        return (java.util.Map<String, Object>) body;
+                }
 
-        Supplier<UsuarioResponse> supplier = Retry.decorateSupplier(retry,
-                CircuitBreaker.decorateSupplier(cbFind,
-                        () -> orchestratorClient.findUsuarioByLogin(login)));
-
-        // Let any exception propagate to the caller (Auth service / controller) where
-        // it will be
-        // translated to a proper HTTP status by the global handlers.
-        return supplier.get();
-    }
+                ObjectMapper mapper = new ObjectMapper();
+                return mapper.convertValue(body, java.util.Map.class);
+        }
 }

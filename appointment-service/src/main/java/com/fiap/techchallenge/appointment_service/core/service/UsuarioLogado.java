@@ -1,9 +1,9 @@
 package com.fiap.techchallenge.appointment_service.core.service;
 
-import com.fiap.techchallenge.appointment_service.core.client.OrchestratorClient;
 import com.fiap.techchallenge.appointment_service.core.dto.UserDetailsImpl;
 import com.fiap.techchallenge.appointment_service.core.dto.UsuarioResponse;
 import com.fiap.techchallenge.appointment_service.config.exception.ValidationException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -18,7 +18,8 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequiredArgsConstructor
 public class UsuarioLogado {
 
-    private final OrchestratorClient orchestratorClient;
+    private final JwtService jwtService;
+    private final HttpServletRequest request;
 
     public Authentication getAutenticacaoAtual() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -39,14 +40,6 @@ public class UsuarioLogado {
         }
     }
 
-    public UsuarioResponse buscarUsuarioPorUsername(String username) {
-        UsuarioResponse usuario = orchestratorClient.findUsuarioByLogin(username);
-        if (usuario == null) {
-            throw new ValidationException("usuario.nao.encontrado");
-        }
-        return usuario;
-    }
-
     public UsuarioResponse getUsuarioLogado() {
         Authentication authentication = getAutenticacaoAtual();
 
@@ -54,8 +47,28 @@ public class UsuarioLogado {
             return userDetailsImpl.usuario();
         }
 
-        String username = extrairUsernameAutenticacao(authentication);
-        return buscarUsuarioPorUsername(username);
+        String bearer = request.getHeader("Authorization");
+        if (bearer != null && bearer.startsWith("Bearer ")) {
+            String token = bearer.substring(7);
+            try {
+                String username = jwtService.getUsernameFromToken(token);
+                Long userId = jwtService.getUserIdFromToken(token);
+                String perfilTipo = jwtService.getUserProfileFromToken(token);
+
+                UsuarioResponse u = new UsuarioResponse();
+                u.setId(userId);
+                u.setLogin(username);
+                if (perfilTipo != null) {
+                    u.setPerfil(com.fiap.techchallenge.appointment_service.core.dto.PerfilResponse.builder()
+                            .tipo(perfilTipo).build());
+                }
+                return u;
+            } catch (Exception ex) {
+                log.debug("Não foi possível extrair usuário do token: {}", ex.getMessage());
+            }
+        }
+
+        throw new ValidationException("usuario.nao.encontrado");
     }
 
     public boolean isUsuarioAutorizado(Long usuarioLogadoId, Long usuarioId) {

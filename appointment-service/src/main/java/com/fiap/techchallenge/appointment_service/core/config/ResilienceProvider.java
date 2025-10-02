@@ -16,18 +16,14 @@ public class ResilienceProvider {
 
     private final RetryRegistry retryRegistry;
     private final CircuitBreakerRegistry circuitBreakerRegistry;
-
-    // local caches to avoid repeated registry calls
     private final ConcurrentMap<String, Retry> retries = new ConcurrentHashMap<>();
     private final ConcurrentMap<String, CircuitBreaker> breakers = new ConcurrentHashMap<>();
 
-    // Default constructor for tests or simple instantiation
     public ResilienceProvider() {
         this.retryRegistry = RetryRegistry.ofDefaults();
         this.circuitBreakerRegistry = CircuitBreakerRegistry.ofDefaults();
     }
 
-    // Constructor for Spring injection of registries
     public ResilienceProvider(RetryRegistry retryRegistry, CircuitBreakerRegistry circuitBreakerRegistry) {
         this.retryRegistry = retryRegistry;
         this.circuitBreakerRegistry = circuitBreakerRegistry;

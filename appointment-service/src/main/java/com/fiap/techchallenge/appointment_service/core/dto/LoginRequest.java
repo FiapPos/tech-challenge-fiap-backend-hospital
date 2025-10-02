@@ -15,4 +15,6 @@ public class LoginRequest {
 
     @NotBlank(message = "Senha é obrigatória")
     private String senha;
+
+    private String perfil;
 }

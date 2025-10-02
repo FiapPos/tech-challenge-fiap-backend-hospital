@@ -8,6 +8,7 @@ import com.fiap.techchallenge.usuario_service.core.dtos.usuario.CriarUsuarioComa
 import com.fiap.techchallenge.usuario_service.core.queries.usuario.ListarUsuariosQuery;
 import com.fiap.techchallenge.usuario_service.core.queries.usuario.ListarUsuariosPorIdEspecialidadeQuery;
 import com.fiap.techchallenge.usuario_service.core.queries.usuario.ListarUsuarioPorLoginQuery;
+import com.fiap.techchallenge.usuario_service.core.queries.usuario.ExisteUsuarioQuery;
 import com.fiap.techchallenge.usuario_service.core.queries.params.ListarUsuariosParams;
 import com.fiap.techchallenge.usuario_service.core.queries.resultadoItem.usuario.ListarUsuariosResultadoItem;
 import com.fiap.techchallenge.usuario_service.core.utils.doc.UsuarioControllerDoc;
@@ -30,6 +31,7 @@ public class UsuarioController implements UsuarioControllerDoc {
         private final DesativarUsuarioComando desativarUsuarioComando;
         private final ListarUsuariosPorIdEspecialidadeQuery listarUsuariosPorIdEspecialidadeQuery;
         private final ListarUsuarioPorLoginQuery listarUsuarioPorLoginQuery;
+        private final ExisteUsuarioQuery existeUsuarioQuery;
 
         @PostMapping
         public ResponseEntity<Void> criarUsuario(@RequestBody @Valid CriarUsuarioComandoDto criarUsuarioComandoDto) {
@@ -74,5 +76,11 @@ public class UsuarioController implements UsuarioControllerDoc {
         public ResponseEntity<ListarUsuariosResultadoItem> listarUsuarioPorLogin(@PathVariable String login) {
                 var item = listarUsuarioPorLoginQuery.execute(login);
                 return ResponseEntity.ok(item);
+        }
+
+        @GetMapping("/existe/{usuarioId}")
+        public ResponseEntity<Boolean> existeUsuario(@PathVariable Long usuarioId) {
+                boolean existe = existeUsuarioQuery.execute(usuarioId);
+                return ResponseEntity.ok(existe);
         }
 }

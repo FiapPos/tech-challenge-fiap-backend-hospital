@@ -2,7 +2,6 @@ package com.fiap.techchallenge.usuario_service.core.queries.especialidade;
 
 import com.fiap.techchallenge.usuario_service.core.domain.entities.Especialidade;
 import com.fiap.techchallenge.usuario_service.core.domain.entities.Usuario;
-import com.fiap.techchallenge.usuario_service.core.gateways.UsuarioRepository;
 import com.fiap.techchallenge.usuario_service.core.queries.resultadoItem.especialidade.ListarEspecialidadePorResultadoItem;
 import com.fiap.techchallenge.usuario_service.core.utils.ValidarPerfilMedico;
 import com.fiap.techchallenge.usuario_service.infrastructure.services.ValidarUsuarioExistente;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ListarEspecialidadePorIdUsuario {
 
-    private final UsuarioRepository usuarioRepository;
     private final ValidarUsuarioExistente validarUsuarioExistente;
     private final ValidarPerfilMedico validarPerfilMedico;
 

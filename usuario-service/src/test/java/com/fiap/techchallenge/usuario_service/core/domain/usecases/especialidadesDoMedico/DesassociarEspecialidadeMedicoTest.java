@@ -2,7 +2,6 @@ package com.fiap.techchallenge.usuario_service.core.domain.usecases.especialidad
 
 import com.fiap.techchallenge.usuario_service.core.domain.entities.Especialidade;
 import com.fiap.techchallenge.usuario_service.core.domain.entities.Usuario;
-import com.fiap.techchallenge.usuario_service.core.domain.usecases.especialidadesDoMedico.DesassociarEspecialidadeMedico;
 import com.fiap.techchallenge.usuario_service.core.exceptions.BusinessException;
 import com.fiap.techchallenge.usuario_service.core.gateways.UsuarioRepository;
 import com.fiap.techchallenge.usuario_service.core.utils.ValidarPerfilMedico;
@@ -29,7 +28,7 @@ public class DesassociarEspecialidadeMedicoTest {
         usuarioRepository = mock(UsuarioRepository.class);
         validarUsuarioExistente = mock(ValidarUsuarioExistente.class);
         validarPerfilMedico = mock(ValidarPerfilMedico.class);
-        comando = new DesassociarEspecialidadeMedico(usuarioRepository, null, validarUsuarioExistente,
+        comando = new DesassociarEspecialidadeMedico(usuarioRepository, validarUsuarioExistente,
                 validarPerfilMedico);
     }
 

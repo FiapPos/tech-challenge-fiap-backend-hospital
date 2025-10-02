@@ -110,4 +110,9 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     public void deleteAll() {
         jpaRepository.deleteAll();
     }
+
+    @Override
+    public boolean existsById(Long id) {
+        return jpaRepository.existsById(id);
+    }
 }

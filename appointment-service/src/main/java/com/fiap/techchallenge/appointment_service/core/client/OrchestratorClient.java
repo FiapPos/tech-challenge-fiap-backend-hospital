@@ -1,6 +1,5 @@
 package com.fiap.techchallenge.appointment_service.core.client;
 
-import com.fiap.techchallenge.appointment_service.core.dto.UsuarioResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +20,9 @@ public class OrchestratorClient {
 
     @Value("${orchestrator-service.url:http://orchestrator-service:8080}")
     private String orchestratorBaseUrl;
+
+    @Value("${usuario-service.url:http://usuario-service:3000}")
+    private String usuarioServiceBaseUrl;
 
     private final RestTemplate restTemplate;
     private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
@@ -43,38 +45,8 @@ public class OrchestratorClient {
         this.retryRegistry = retryRegistry;
     }
 
-    public UsuarioResponse findUsuarioByLogin(String login) {
-        String url = orchestratorBaseUrl + "/api/orchestrator/usuario/login/{login}";
-        Supplier<ResponseEntity<UsuarioResponse>> call = () -> restTemplate.exchange(url, HttpMethod.GET, null,
-                UsuarioResponse.class, login);
-
-        UsuarioResponse usuario = invokeForBody("findUsuarioByLogin", call);
-        return sanitizeUsuarioResponse(usuario);
-    }
-
-    private UsuarioResponse sanitizeUsuarioResponse(UsuarioResponse original) {
-        if (original == null) {
-            return null;
-        }
-        // create a shallow copy without the senha field to avoid leaking password hashes
-        UsuarioResponse copy = UsuarioResponse.builder()
-                .id(original.getId())
-                .login(original.getLogin())
-                .senha(null)
-                .nome(original.getNome())
-                .email(original.getEmail())
-                .cpf(original.getCpf())
-                .ativo(original.isAtivo())
-                .createdAt(original.getCreatedAt())
-                .updatedAt(original.getUpdatedAt())
-                .perfil(original.getPerfil())
-                .build();
-
-        return copy;
-    }
-
-    public ResponseEntity<Object> createUsuario(Object payload) {
-        String url = orchestratorBaseUrl + "/api/usuario/criacao";
+    public ResponseEntity<Object> loginOnUsuarioService(Object payload) {
+        String url = usuarioServiceBaseUrl + "/login";
         Supplier<ResponseEntity<Object>> call = () -> {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -82,105 +54,21 @@ public class OrchestratorClient {
             return restTemplate.exchange(url, HttpMethod.POST, entity, Object.class);
         };
 
-        return invokeForResponse("createUsuario", call);
+        return invokeForResponse("loginUsuarioService", call);
     }
 
-    public ResponseEntity<Object> createUsuarioWithHeaders(Object payload, HttpHeaders incomingHeaders) {
-        String url = orchestratorBaseUrl + "/api/usuario/criacao";
+    public ResponseEntity<Object> createAgendamentoSaga(Object payload, HttpHeaders incomingHeaders) {
+        String url = orchestratorBaseUrl + "/api/saga/agendamentos";
         Supplier<ResponseEntity<Object>> call = () -> {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            // forward selected headers
-            if (incomingHeaders != null) {
-                if (incomingHeaders.containsKey("X-User-Profile")) {
-                    headers.put("X-User-Profile", incomingHeaders.get("X-User-Profile"));
-                }
-                if (incomingHeaders.containsKey("X-Username")) {
-                    headers.put("X-Username", incomingHeaders.get("X-Username"));
-                }
-                // also forward Authorization if present
-                if (incomingHeaders.containsKey(HttpHeaders.AUTHORIZATION)) {
-                    headers.put(HttpHeaders.AUTHORIZATION, incomingHeaders.get(HttpHeaders.AUTHORIZATION));
-                }
-            }
+            copyForwardingHeaders(incomingHeaders, headers);
 
             HttpEntity<Object> entity = new HttpEntity<>(payload, headers);
             return restTemplate.exchange(url, HttpMethod.POST, entity, Object.class);
         };
 
-        return invokeForResponse("createUsuario", call);
-    }
-
-    public ResponseEntity<Object> loginUsuarioWithHeaders(Object payload, HttpHeaders incomingHeaders) {
-        String url = orchestratorBaseUrl + "/api/usuario/login";
-        Supplier<ResponseEntity<Object>> call = () -> {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            if (incomingHeaders != null) {
-                if (incomingHeaders.containsKey("X-User-Profile")) {
-                    headers.put("X-User-Profile", incomingHeaders.get("X-User-Profile"));
-                }
-                if (incomingHeaders.containsKey("X-Username")) {
-                    headers.put("X-Username", incomingHeaders.get("X-Username"));
-                }
-                if (incomingHeaders.containsKey(HttpHeaders.AUTHORIZATION)) {
-                    headers.put(HttpHeaders.AUTHORIZATION, incomingHeaders.get(HttpHeaders.AUTHORIZATION));
-                }
-            }
-
-            HttpEntity<Object> entity = new HttpEntity<>(payload, headers);
-            return restTemplate.exchange(url, HttpMethod.POST, entity, Object.class);
-        };
-
-        return invokeForResponse("loginUsuario", call);
-    }
-
-    public ResponseEntity<Object> updateSenhaWithHeaders(Object payload, HttpHeaders incomingHeaders) {
-        String url = orchestratorBaseUrl + "/api/usuario/login/atualiza-senha";
-        Supplier<ResponseEntity<Object>> call = () -> {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            if (incomingHeaders != null) {
-                if (incomingHeaders.containsKey("X-User-Profile")) {
-                    headers.put("X-User-Profile", incomingHeaders.get("X-User-Profile"));
-                }
-                if (incomingHeaders.containsKey("X-Username")) {
-                    headers.put("X-Username", incomingHeaders.get("X-Username"));
-                }
-                if (incomingHeaders.containsKey(HttpHeaders.AUTHORIZATION)) {
-                    headers.put(HttpHeaders.AUTHORIZATION, incomingHeaders.get(HttpHeaders.AUTHORIZATION));
-                }
-            }
-
-            HttpEntity<Object> entity = new HttpEntity<>(payload, headers);
-            return restTemplate.exchange(url, HttpMethod.PUT, entity, Object.class);
-        };
-
-        return invokeForResponse("updateSenhaUsuario", call);
-    }
-
-    public ResponseEntity<Object> createAgendamentoWithHeaders(Object payload, HttpHeaders incomingHeaders) {
-        String url = orchestratorBaseUrl + "/api/agendamento/criacao";
-        Supplier<ResponseEntity<Object>> call = () -> {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            if (incomingHeaders != null) {
-                if (incomingHeaders.containsKey("X-User-Profile")) {
-                    headers.put("X-User-Profile", incomingHeaders.get("X-User-Profile"));
-                }
-                if (incomingHeaders.containsKey("X-Username")) {
-                    headers.put("X-Username", incomingHeaders.get("X-Username"));
-                }
-                if (incomingHeaders.containsKey(HttpHeaders.AUTHORIZATION)) {
-                    headers.put(HttpHeaders.AUTHORIZATION, incomingHeaders.get(HttpHeaders.AUTHORIZATION));
-                }
-            }
-
-            HttpEntity<Object> entity = new HttpEntity<>(payload, headers);
-            return restTemplate.exchange(url, HttpMethod.POST, entity, Object.class);
-        };
-
-        return invokeForResponse("createAgendamento", call);
+        return invokeForResponse("createAgendamentoSaga", call);
     }
 
     public ResponseEntity<Object> updateAgendamentoWithHeaders(Long id, Object payload, HttpHeaders incomingHeaders) {
@@ -188,46 +76,13 @@ public class OrchestratorClient {
         Supplier<ResponseEntity<Object>> call = () -> {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            if (incomingHeaders != null) {
-                if (incomingHeaders.containsKey("X-User-Profile")) {
-                    headers.put("X-User-Profile", incomingHeaders.get("X-User-Profile"));
-                }
-                if (incomingHeaders.containsKey("X-Username")) {
-                    headers.put("X-Username", incomingHeaders.get("X-Username"));
-                }
-                if (incomingHeaders.containsKey(HttpHeaders.AUTHORIZATION)) {
-                    headers.put(HttpHeaders.AUTHORIZATION, incomingHeaders.get(HttpHeaders.AUTHORIZATION));
-                }
-            }
+            copyForwardingHeaders(incomingHeaders, headers);
 
             HttpEntity<Object> entity = new HttpEntity<>(payload, headers);
             return restTemplate.exchange(url, HttpMethod.PUT, entity, Object.class, id);
         };
 
         return invokeForResponse("updateAgendamento", call);
-    }
-
-    private <T> T invokeForBody(String name, Supplier<ResponseEntity<T>> restCall) {
-        Supplier<T> supplier = () -> {
-            try {
-                ResponseEntity<T> resp = restCall.get();
-                return resp == null ? null : resp.getBody();
-            } catch (RestClientResponseException ex) {
-                org.springframework.http.HttpStatusCode statusCode = ex.getStatusCode();
-                HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-                if (statusCode != null) {
-                    try {
-                        status = HttpStatus.valueOf(statusCode.value());
-                    } catch (IllegalArgumentException ignored) {
-                        status = HttpStatus.INTERNAL_SERVER_ERROR;
-                    }
-                }
-                String body = ex.getResponseBodyAsString();
-                throw new OrchestratorException(status, body == null ? "" : body);
-            }
-        };
-
-        return executeWithResilience(name, supplier);
     }
 
     private ResponseEntity<Object> invokeForResponse(String name, Supplier<ResponseEntity<Object>> restCall) {
@@ -272,6 +127,17 @@ public class OrchestratorClient {
 
             throw new RuntimeException(throwable);
         });
+    }
+
+    private void copyForwardingHeaders(HttpHeaders source, HttpHeaders dest) {
+        if (source == null || dest == null)
+            return;
+        if (source.containsKey("X-User-Profile"))
+            dest.put("X-User-Profile", source.get("X-User-Profile"));
+        if (source.containsKey("X-Username"))
+            dest.put("X-Username", source.get("X-Username"));
+        if (source.containsKey(HttpHeaders.AUTHORIZATION))
+            dest.put(HttpHeaders.AUTHORIZATION, source.get(HttpHeaders.AUTHORIZATION));
     }
 
 }

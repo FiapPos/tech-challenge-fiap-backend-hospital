@@ -31,4 +31,6 @@ public interface UsuarioRepository {
     Optional<Usuario> findByIdAndEspecialidadesNome(Long usuarioId, String nome);
 
     void deleteAll();
+
+    boolean existsById(Long id);
 }

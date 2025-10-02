@@ -1,6 +1,5 @@
 package com.fiap.techchallenge.appointment_service.core.service;
 
-import com.fiap.techchallenge.appointment_service.core.document.AuthEvent;
 import com.fiap.techchallenge.appointment_service.core.dto.AuthResponse;
 import com.fiap.techchallenge.appointment_service.core.dto.LoginRequest;
 import com.fiap.techchallenge.appointment_service.core.dto.UserDetailsImpl;
@@ -22,51 +21,76 @@ public class AutorizacaoService {
 
     private final UsuarioService usuarioService;
     private final JwtService jwtService;
-    private final EventosAtenticacao eventosAutenticacao;
-    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     public AuthResponse authenticate(LoginRequest loginRequest) {
         log.debug("Iniciando autenticação para usuário: {}", loginRequest.getLogin());
 
-        UsuarioResponse usuario;
+        java.util.Map<String, Object> tokenResponse;
         try {
-            usuario = usuarioService.findUsuarioByLogin(loginRequest.getLogin());
+            java.util.Map<String, Object> credentials = new java.util.HashMap<>();
+            credentials.put("login", loginRequest.getLogin());
+            credentials.put("senha", loginRequest.getSenha());
+            if (loginRequest.getPerfil() != null && !loginRequest.getPerfil().isBlank()) {
+                credentials.put("perfil", loginRequest.getPerfil());
+            }
+            tokenResponse = usuarioService.loginCredentials(credentials);
         } catch (RuntimeException e) {
-            log.error("Erro ao consultar orquestrador para usuário '{}': {}", loginRequest.getLogin(), e.getMessage(),
-                    e);
-            throw new OrchestratorUnavailableException("Orchestrator unavailable", e);
+            log.error("Erro ao chamar usuario-service para login do usuário '{}': {}", loginRequest.getLogin(),
+                    e.getMessage(), e);
+            throw new OrchestratorUnavailableException("Usuario service unavailable", e);
         }
 
-        if (usuario == null || !usuario.isAtivo()) {
-            log.warn("Usuário inativo ou não encontrado: {}", loginRequest.getLogin());
-            throw new InvalidCredentialsException("Usuário inativo ou não encontrado");
-        }
-
-        // 2. Validar credenciais localmente (o orchestrator apenas fornece os dados do
-        // usuário)
-        if (usuario.getSenha() == null || usuario.getSenha().isBlank()) {
-            log.warn("Senha não encontrada no orquestrador para usuário: {}", loginRequest.getLogin());
-            throw new InvalidCredentialsException("Credenciais inválidas");
-        }
-
-        boolean credenciaisValidas = passwordEncoder.matches(loginRequest.getSenha(), usuario.getSenha());
-        if (!credenciaisValidas) {
+        if (tokenResponse == null || !tokenResponse.containsKey("token")) {
             log.warn("Credenciais inválidas para usuário: {}", loginRequest.getLogin());
             throw new InvalidCredentialsException("Credenciais inválidas");
         }
 
-        // 3. Criar authentication e contexto de segurança
+        String token = String.valueOf(tokenResponse.get("token"));
+
+        String perfilTipo = null;
+        Long userId = null;
+        try {
+            perfilTipo = jwtService.getUserProfileFromToken(token);
+        } catch (Exception e) {
+            log.debug("Não foi possível extrair perfil do token: {}", e.getMessage());
+        }
+        try {
+            Object userIdObj = tokenResponse.get("userId");
+            if (userIdObj instanceof Number) {
+                userId = ((Number) userIdObj).longValue();
+            } else if (userIdObj instanceof String) {
+                userId = Long.parseLong((String) userIdObj);
+            }
+        } catch (Exception e) {
+            log.debug("Não foi possível extrair userId do response de login: {}", e.getMessage());
+        }
+
+        UsuarioResponse usuario = UsuarioResponse.builder()
+                .id(userId)
+                .login(loginRequest.getLogin())
+                .nome(null)
+                .email(null)
+                .ativo(true)
+                .perfil(perfilTipo != null
+                        ? com.fiap.techchallenge.appointment_service.core.dto.PerfilResponse.builder().tipo(perfilTipo)
+                                .build()
+                        : null)
+                .build();
+
         var userDetails = new UserDetailsImpl(usuario);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 4. Gerar token JWT
-        String token = jwtService.generateToken(authentication);
+        java.time.LocalDateTime expiresAt = null;
+        try {
+            expiresAt = jwtService.getExpirationFromToken(token);
+        } catch (Exception e) {
+            log.debug("Não foi possível extrair expiration do token retornado pelo usuario-service: {}",
+                    e.getMessage());
+        }
 
-        String perfilTipo = usuario.getPerfil() != null ? usuario.getPerfil().getTipo() : null;
-
-        log.info("Autenticação bem-sucedida para usuário: {}", loginRequest.getLogin());
+        log.info("Autenticação delegada ao usuario-service bem-sucedida para usuário: {}", loginRequest.getLogin());
 
         return AuthResponse.builder()
                 .token(token)
@@ -75,8 +99,8 @@ public class AutorizacaoService {
                 .login(usuario.getLogin())
                 .nome(usuario.getNome())
                 .email(usuario.getEmail())
-                .perfil(perfilTipo)
-                .expiresAt(jwtService.getExpirationFromToken(token))
+                .perfil(usuario.getPerfil() != null ? usuario.getPerfil().getTipo() : null)
+                .expiresAt(expiresAt)
                 .build();
     }
 
@@ -88,15 +112,4 @@ public class AutorizacaoService {
         return jwtService.getUsernameFromToken(token);
     }
 
-    public void processAuthenticationEvent(AuthEvent authEvent) {
-        eventosAutenticacao.processarEventoAutenticacao(authEvent);
-    }
-
-    public void processAuthorizationEvent(AuthEvent authEvent) {
-        eventosAutenticacao.processarEventoAutorizacao(authEvent);
-    }
-
-    public void processGeneralAuthEvent(AuthEvent authEvent) {
-        eventosAutenticacao.processarEventoGeralAuth(authEvent);
-    }
 }

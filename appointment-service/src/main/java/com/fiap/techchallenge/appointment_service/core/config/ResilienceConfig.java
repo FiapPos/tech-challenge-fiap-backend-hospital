@@ -5,16 +5,16 @@ import io.github.resilience4j.retry.RetryRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+@Configuration("coreResilienceConfig")
 public class ResilienceConfig {
 
-    @Bean
-    public RetryRegistry retryRegistry() {
+    @Bean("coreRetryRegistry")
+    public RetryRegistry coreRetryRegistry() {
         return RetryRegistry.ofDefaults();
     }
 
-    @Bean
-    public CircuitBreakerRegistry circuitBreakerRegistry() {
+    @Bean("coreCircuitBreakerRegistry")
+    public CircuitBreakerRegistry coreCircuitBreakerRegistry() {
         return CircuitBreakerRegistry.ofDefaults();
     }
 }

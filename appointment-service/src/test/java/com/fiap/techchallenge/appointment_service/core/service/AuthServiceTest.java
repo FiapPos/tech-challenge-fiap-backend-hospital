@@ -1,6 +1,7 @@
 package com.fiap.techchallenge.appointment_service.core.service;
 
 import com.fiap.techchallenge.appointment_service.core.service.UsuarioService;
+import com.fiap.techchallenge.appointment_service.core.service.JwtService;
 import com.fiap.techchallenge.appointment_service.core.dto.AuthResponse;
 import com.fiap.techchallenge.appointment_service.core.dto.LoginRequest;
 import com.fiap.techchallenge.appointment_service.core.dto.UsuarioResponse;
@@ -9,33 +10,22 @@ import com.fiap.techchallenge.appointment_service.core.exception.OrchestratorUna
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import com.fiap.techchallenge.appointment_service.core.service.EventosAtenticacao;
-import com.fiap.techchallenge.appointment_service.core.service.AutorizacaoService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 public class AuthServiceTest {
 
     private UsuarioService usuarioService;
     private JwtService jwtService;
-    private EventosAtenticacao eventosAtenticacao;
-    private PasswordEncoder passwordEncoder;
+
     private AutorizacaoService autorizacaoService;
 
     @BeforeEach
     void setup() {
         usuarioService = Mockito.mock(UsuarioService.class);
         jwtService = Mockito.mock(JwtService.class);
-        eventosAtenticacao = Mockito.mock(EventosAtenticacao.class);
-        passwordEncoder = Mockito.mock(PasswordEncoder.class);
-
-        // default behavior: matches returns true for convenience unless overridden
-        Mockito.when(passwordEncoder.matches(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
-
-        autorizacaoService = new AutorizacaoService(usuarioService, jwtService, eventosAtenticacao, passwordEncoder);
+        autorizacaoService = new AutorizacaoService(usuarioService, jwtService);
     }
 
     @Test
@@ -48,8 +38,11 @@ public class AuthServiceTest {
         usuario.setAtivo(true);
         // profil handling omitted for brevity
 
-        when(usuarioService.findUsuarioByLogin(anyString())).thenReturn(usuario);
-        when(jwtService.generateToken(Mockito.any())).thenReturn("token123");
+        java.util.Map<String, Object> tokenMap = new java.util.HashMap<>();
+        tokenMap.put("token", "token123");
+        tokenMap.put("userId", 1L);
+        when(usuarioService.loginCredentials(Mockito.anyMap())).thenReturn(tokenMap);
+        when(jwtService.getUserProfileFromToken("token123")).thenReturn("ADMIN");
         when(jwtService.getExpirationFromToken("token123")).thenReturn(java.time.LocalDateTime.now().plusHours(1));
 
         var req = new LoginRequest();
@@ -69,7 +62,7 @@ public class AuthServiceTest {
         usuario.setLogin("user1");
         usuario.setAtivo(true);
 
-        when(usuarioService.findUsuarioByLogin(anyString())).thenReturn(usuario);
+        when(usuarioService.loginCredentials(Mockito.anyMap())).thenReturn(null);
 
         var req = new LoginRequest();
         req.setLogin("user1");
@@ -80,7 +73,7 @@ public class AuthServiceTest {
 
     @Test
     void autenticar_orquestradorIndisponivel_lanca() throws Exception {
-        when(usuarioService.findUsuarioByLogin(anyString())).thenThrow(new RuntimeException("conn fail"));
+        when(usuarioService.loginCredentials(Mockito.anyMap())).thenThrow(new RuntimeException("conn fail"));
 
         var req = new LoginRequest();
         req.setLogin("user1");

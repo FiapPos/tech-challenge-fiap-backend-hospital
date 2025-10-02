@@ -15,7 +15,6 @@ public class ResilienceConfig {
     public RetryRegistry retryRegistry(
             @Value("${resilience4j.retry.instances.orchestrator-find.max-attempts:3}") int maxAttempts,
             @Value("${resilience4j.retry.instances.orchestrator-find.wait-duration:200ms}") String waitDurationStr) {
-        // parse waitDurationStr like '200ms' or '1s'
         Duration waitDuration = Duration.ofMillis(200);
         try {
             if (waitDurationStr.endsWith("ms")) {
@@ -24,8 +23,6 @@ public class ResilienceConfig {
                 waitDuration = Duration.ofSeconds(Long.parseLong(waitDurationStr.replace("s", "")));
             }
         } catch (NumberFormatException nfe) {
-            // leave default and log debug so misconfiguration is visible
-            // avoid throwing on invalid config value
         }
 
         RetryConfig config = RetryConfig.custom()
