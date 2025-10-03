@@ -1,0 +1,185 @@
+{
+  "info": {
+    "name": "GraphQL Histórico Médico - API Tests",
+    "description": "Collection para testar as consultas GraphQL do histórico médico",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Todos os Atendimentos de um Paciente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"query { todosAtendimentosPaciente(pacienteId: \\\"1\\\") { id agendamentoId pacienteId nomePaciente nomeMedico nomeHospital especializacao statusAgendamento dataHoraAgendamento criadoEm } }\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/graphql",
+          "host": ["{{base_url}}"],
+          "path": ["graphql"]
+        }
+      }
+    },
+    {
+      "name": "2. Atendimentos Futuros de um Paciente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"query { atendimentosFuturosPaciente(pacienteId: \\\"1\\\") { id nomePaciente nomeMedico nomeHospital dataHoraAgendamento statusAgendamento } }\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/graphql",
+          "host": ["{{base_url}}"],
+          "path": ["graphql"]
+        }
+      }
+    },
+    {
+      "name": "3. Atendimentos Passados de um Paciente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"query { atendimentosPassadosPaciente(pacienteId: \\\"1\\\") { id nomePaciente nomeMedico nomeHospital dataHoraAgendamento statusAgendamento } }\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/graphql",
+          "host": ["{{base_url}}"],
+          "path": ["graphql"]
+        }
+      }
+    },
+    {
+      "name": "4. Atendimentos por Status",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"query { atendimentosPorStatus(pacienteId: \\\"1\\\", status: CRIADA) { id nomePaciente nomeMedico statusAgendamento dataHoraAgendamento } }\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/graphql",
+          "host": ["{{base_url}}"],
+          "path": ["graphql"]
+        }
+      }
+    },
+    {
+      "name": "5. Atendimentos por Período",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"query { atendimentosPorPeriodo(pacienteId: \\\"1\\\", dataInicio: \\\"2024-01-01T00:00:00\\\", dataFim: \\\"2024-12-31T23:59:59\\\") { id nomePaciente nomeMedico nomeHospital dataHoraAgendamento statusAgendamento } }\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/graphql",
+          "host": ["{{base_url}}"],
+          "path": ["graphql"]
+        }
+      }
+    },
+    {
+      "name": "6. Atendimentos por Médico",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"query { atendimentosPorMedico(medicoId: \\\"1\\\") { id pacienteId nomePaciente nomeMedico especializacao dataHoraAgendamento statusAgendamento } }\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/graphql",
+          "host": ["{{base_url}}"],
+          "path": ["graphql"]
+        }
+      }
+    },
+    {
+      "name": "7. Consulta Complexa com Variáveis",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"query BuscarHistoricoPaciente($pacienteId: ID!, $status: StatusAgendamento!) { todosAtendimentos: todosAtendimentosPaciente(pacienteId: $pacienteId) { id nomePaciente nomeMedico dataHoraAgendamento statusAgendamento } atendimentosPorStatus: atendimentosPorStatus(pacienteId: $pacienteId, status: $status) { id nomeMedico dataHoraAgendamento } }\",\n  \"variables\": {\n    \"pacienteId\": \"1\",\n    \"status\": \"CRIADA\"\n  }\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/graphql",
+          "host": ["{{base_url}}"],
+          "path": ["graphql"]
+        }
+      }
+    },
+    {
+      "name": "8. Schema Introspection",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": \"query IntrospectionQuery { __schema { queryType { name fields { name type { name kind ofType { name kind } } } } } }\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/graphql",
+          "host": ["{{base_url}}"],
+          "path": ["graphql"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3003",
+      "type": "string"
+    }
+  ]
+}
+
