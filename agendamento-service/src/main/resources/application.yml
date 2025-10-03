@@ -13,6 +13,7 @@ spring:
     topic:
       notificacao-sucesso:  notificacao-sucesso
       consultas: consultas
+      historico-sucesso: historico-sucesso
     consumer:
       group-id: agendamento-group
       auto-offset-reset: latest

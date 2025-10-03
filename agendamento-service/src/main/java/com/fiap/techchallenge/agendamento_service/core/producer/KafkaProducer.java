@@ -18,6 +18,9 @@ public class KafkaProducer {
     @Value("${spring.kafka.topic.notificacao-sucesso}")
     private String topicoNotificacoes;
 
+    @Value("${spring.kafka.topic.historico-sucesso}")
+    private String topicoHistorico;
+
     private final KafkaTemplate<String, DadosAgendamento> kafkaTemplate;
 
     public KafkaProducer(KafkaTemplate<String, DadosAgendamento> kafkaTemplate) {
@@ -27,6 +30,7 @@ public class KafkaProducer {
     public void enviarEventos(DadosAgendamento dadosAgendamento) {
         enviarEventoNotificacoes(dadosAgendamento);
         enviarEventoConsulta(dadosAgendamento);
+        enviarEventoHistorico(dadosAgendamento);
     }
 
     private void enviarEventoConsulta(DadosAgendamento evento) {
@@ -44,6 +48,15 @@ public class KafkaProducer {
             kafkaTemplate.send(topicoNotificacoes, String.valueOf(evento.getAgendamentoId()), evento);
         } catch (Exception e) {
             logger.error("Erro ao enviar evento de notificacao para o Kafka", e);
+        }
+    }
+
+    private void enviarEventoHistorico(DadosAgendamento evento) {
+        try {
+            logger.info("Enviando evento de historico para o tópico Kafka '{}': {}", topicoHistorico, evento);
+            kafkaTemplate.send(topicoHistorico, String.valueOf(evento.getAgendamentoId()), evento);
+        } catch (Exception e) {
+            logger.error("Erro ao enviar evento de historico para o Kafka", e);
         }
     }
 }

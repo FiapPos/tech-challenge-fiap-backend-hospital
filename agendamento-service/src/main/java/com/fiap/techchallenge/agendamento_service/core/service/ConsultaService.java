@@ -30,7 +30,17 @@ public class ConsultaService {
         consulta.setMedicoId(dto.getMedicoId());
         consulta.setDataHora(dto.getDataHoraAgendamento());
         consulta.setStatus(EStatusAgendamento.PENDENTE); // Status inicial definido pela Saga
-        return repository.save(consulta);
+
+        Consulta consultaSalva = repository.save(consulta);
+
+        // Atualiza o DTO com o ID gerado e envia evento para criar histórico imediatamente
+        dto.setAgendamentoId(consultaSalva.getId());
+        dto.setStatusAgendamento(consultaSalva.getStatus());
+
+        // Publica evento de criação no Kafka para registrar no histórico
+        kafkaProducer.enviarEventos(dto);
+
+        return consultaSalva;
     }
 
     @Transactional
