@@ -26,6 +26,14 @@ public class ConsultaController {
         return ResponseEntity.ok(dto);
     }
 
+    // Endpoint solicitado pela Sonia para atualizar a consulta
+    @PutMapping("/{id}")
+    public ResponseEntity<DadosAgendamento> atualizarConsulta(@PathVariable Long id, @RequestBody DadosAgendamento dto) {
+        Consulta consultaAtualizada = service.atualizarConsulta(id, dto);
+        DadosAgendamento responseDto = new DadosAgendamento(consultaAtualizada);
+        return ResponseEntity.ok(responseDto);
+    }
+
     // Endpoint de compensação (chamado pelo orquestrador em caso de falha)
     @DeleteMapping("/cancelar")
     public ResponseEntity<Void> cancelarConsulta(@RequestBody DadosAgendamento dto) {

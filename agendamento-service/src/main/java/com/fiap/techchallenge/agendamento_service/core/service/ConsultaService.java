@@ -58,4 +58,26 @@ public class ConsultaService {
         // Publica evento de confirmação no Kafka
         kafkaProducer.enviarEventos(dto);
     }
+
+    @Transactional
+    public Consulta atualizarConsulta(Long id, DadosAgendamento dto) {
+        Consulta consultaExistente = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
+
+        if (dto.getDataHoraAgendamento() != null) {
+            consultaExistente.setDataHora(dto.getDataHoraAgendamento());
+        }
+        if (dto.getStatusAgendamento() != null) {
+            consultaExistente.setStatus(dto.getStatusAgendamento());
+        }
+        if (dto.getMedicoId() != 0) {
+            consultaExistente.setMedicoId(dto.getMedicoId());
+        }
+
+        Consulta consultaAtualizada = repository.save(consultaExistente);
+        DadosAgendamento eventoDto = new DadosAgendamento(consultaAtualizada);
+        kafkaProducer.enviarEventos(eventoDto);
+
+        return consultaAtualizada;
+    }
 }
