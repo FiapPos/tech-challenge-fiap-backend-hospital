@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-package com.fiap.techchallenge.orchestrator_service;
-
-=======
 /*
 package com.fiap.techchallenge.orchestrator_service;
->>>>>>> origin/main
 import com.fiap.techchallenge.orchestrator_service.client.AgendamentoServiceClient;
 import com.fiap.techchallenge.orchestrator_service.client.NotificacaoServiceClient;
 import com.fiap.techchallenge.orchestrator_service.client.UsuarioServiceClient;
@@ -47,12 +42,7 @@ class AgendamentoSagaServiceTests {
         // Define a requisição de entrada para o teste
         AgendamentoRequest request = new AgendamentoRequest(1L, 2L, LocalDateTime.now());
 
-<<<<<<< HEAD
-        // Define o DTO que o mock do agendamentoClient deve retornar ao criar a
-        // consulta
-=======
         // Define o DTO que o mock do agendamentoClient deve retornar ao criar a consulta
->>>>>>> origin/main
         ConsultaDTO consultaCriada = new ConsultaDTO(100L, 1L, 2L, request.getDataHora(), "PENDENTE");
 
         // Configura o comportamento dos Mocks para o cenário de sucesso
@@ -73,12 +63,7 @@ class AgendamentoSagaServiceTests {
         assertEquals("Agendamento concluído com sucesso.", response.getMensagem());
         assertEquals(100L, response.getConsultaId());
 
-<<<<<<< HEAD
-        // Verifica se os métodos dos mocks foram chamados na ordem e quantidade
-        // corretas
-=======
         // Verifica se os métodos dos mocks foram chamados na ordem e quantidade corretas
->>>>>>> origin/main
         verify(usuarioClient, times(1)).existe(1L);
         verify(usuarioClient, times(1)).existe(2L);
         verify(agendamentoClient, times(1)).criarConsultaPendente(any(ConsultaDTO.class));
@@ -143,9 +128,5 @@ class AgendamentoSagaServiceTests {
         // Garante que o passo final da saga (confirmar a consulta) NUNCA foi chamado
         verify(agendamentoClient, never()).confirmarConsulta(anyLong());
     }
-<<<<<<< HEAD
-}
-=======
 }
 */
->>>>>>> origin/main

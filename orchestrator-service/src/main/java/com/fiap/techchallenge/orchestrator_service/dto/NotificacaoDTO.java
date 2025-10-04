@@ -1,8 +1,4 @@
 package com.fiap.techchallenge.orchestrator_service.dto;
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/main
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;

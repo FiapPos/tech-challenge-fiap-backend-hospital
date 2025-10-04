@@ -21,9 +21,6 @@ public class OrchestratorClient {
     @Value("${orchestrator-service.url:http://orchestrator-service:8080}")
     private String orchestratorBaseUrl;
 
-    @Value("${usuario-service.url:http://usuario-service:3000}")
-    private String usuarioServiceBaseUrl;
-
     private final RestTemplate restTemplate;
     private final CircuitBreakerFactory<?, ?> circuitBreakerFactory;
     private final RetryRegistry retryRegistry;
@@ -45,17 +42,7 @@ public class OrchestratorClient {
         this.retryRegistry = retryRegistry;
     }
 
-    public ResponseEntity<Object> loginOnUsuarioService(Object payload) {
-        String url = usuarioServiceBaseUrl + "/login";
-        Supplier<ResponseEntity<Object>> call = () -> {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Object> entity = new HttpEntity<>(payload, headers);
-            return restTemplate.exchange(url, HttpMethod.POST, entity, Object.class);
-        };
-
-        return invokeForResponse("loginUsuarioService", call);
-    }
+    // login responsibility moved to UsuarioClient
 
     public ResponseEntity<Object> createAgendamentoSaga(Object payload, HttpHeaders incomingHeaders) {
         String url = orchestratorBaseUrl + "/api/saga/agendamentos";

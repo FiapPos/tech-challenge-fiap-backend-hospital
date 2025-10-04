@@ -11,7 +11,6 @@ import com.fiap.techchallenge.usuario_service.core.queries.usuario.BuscaUsuarioP
 import com.fiap.techchallenge.usuario_service.core.queries.usuario.ListarUsuariosQuery;
 import com.fiap.techchallenge.usuario_service.core.queries.usuario.ListarUsuariosPorIdEspecialidadeQuery;
 import com.fiap.techchallenge.usuario_service.core.queries.usuario.ListarUsuarioPorLoginQuery;
-import com.fiap.techchallenge.usuario_service.core.queries.usuario.ExisteUsuarioQuery;
 import com.fiap.techchallenge.usuario_service.core.queries.params.ListarUsuariosParams;
 import com.fiap.techchallenge.usuario_service.core.queries.resultadoItem.usuario.ListarUsuariosResultadoItem;
 import com.fiap.techchallenge.usuario_service.core.utils.doc.UsuarioControllerDoc;
@@ -35,11 +34,7 @@ public class UsuarioController implements UsuarioControllerDoc {
         private final DesativarUsuarioComando desativarUsuarioComando;
         private final ListarUsuariosPorIdEspecialidadeQuery listarUsuariosPorIdEspecialidadeQuery;
         private final ListarUsuarioPorLoginQuery listarUsuarioPorLoginQuery;
-<<<<<<< HEAD
-        private final ExisteUsuarioQuery existeUsuarioQuery;
-=======
         private final BuscaUsuarioPorIdQuery buscaUsuarioPorIdQuery;
->>>>>>> origin/main
 
         @PostMapping
         public ResponseEntity<Void> criarUsuario(@RequestBody @Valid CriarUsuarioComandoDto criarUsuarioComandoDto) {
@@ -86,15 +81,8 @@ public class UsuarioController implements UsuarioControllerDoc {
                 return ResponseEntity.ok(item);
         }
 
-<<<<<<< HEAD
-        @GetMapping("/existe/{usuarioId}")
-        public ResponseEntity<Boolean> existeUsuario(@PathVariable Long usuarioId) {
-                boolean existe = existeUsuarioQuery.execute(usuarioId);
-                return ResponseEntity.ok(existe);
-=======
         @GetMapping("/{id}")
         public ResponseEntity<EncontraUsuarioItem> buscaUsuario(@PathVariable Long id, @RequestParam Perfil perfil, @RequestParam Optional<Long> especialidadeId) {
                 return ResponseEntity.ok(buscaUsuarioPorIdQuery.execute(id, perfil, especialidadeId));
->>>>>>> origin/main
         }
 }

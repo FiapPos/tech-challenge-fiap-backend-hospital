@@ -33,11 +33,7 @@ public interface UsuarioRepository {
 
     void deleteAll();
 
-<<<<<<< HEAD
-    boolean existsById(Long id);
-=======
     Optional<Usuario> findByIdAndPerfil(Long id, Perfil perfil);
 
     Optional<Usuario> findByIdAndPerfilAndEspecialidadeId(Long id, Perfil perfil, Long especialidadeId);
->>>>>>> origin/main
 }

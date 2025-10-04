@@ -113,10 +113,6 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     }
 
     @Override
-<<<<<<< HEAD
-    public boolean existsById(Long id) {
-        return jpaRepository.existsById(id);
-=======
     public Optional<Usuario> findByIdAndPerfil(Long id, Perfil perfil) {
         return jpaRepository.findByIdAndPerfil_NomePerfil(id, perfil)
                 .map(UsuarioEntity::toDomain);
@@ -126,6 +122,5 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     public Optional<Usuario> findByIdAndPerfilAndEspecialidadeId(Long id, Perfil perfil, Long especialidadeId) {
         return jpaRepository.findByIdAndPerfil_NomePerfilAndEspecialidadeId(id, perfil, especialidadeId)
                 .map(UsuarioEntity::toDomain);
->>>>>>> origin/main
     }
 }
