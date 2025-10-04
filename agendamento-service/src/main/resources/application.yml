@@ -11,9 +11,8 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
     topic:
-      orquestrador: orquestrador
-      agendamento-sucesso: agendamento-sucesso
-      agendamento-falha: agendamento-falha
+      notificacao-sucesso:  notificacao-sucesso
+      consultas: consultas
     consumer:
       group-id: agendamento-group
       auto-offset-reset: latest
@@ -23,12 +22,6 @@ spring:
       properties:
         spring.json.use.type.headers: false
         spring.json.add.type.headers: false
-
-  # Desabilita JPA/Hibernate para testes apenas com Kafka
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
   datasource:
     driver-class-name: org.postgresql.Driver

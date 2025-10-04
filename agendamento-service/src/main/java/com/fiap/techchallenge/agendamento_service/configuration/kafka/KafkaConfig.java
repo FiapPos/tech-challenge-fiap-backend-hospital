@@ -1,6 +1,6 @@
 package com.fiap.techchallenge.agendamento_service.configuration.kafka;
 
-import com.fiap.techchallenge.agendamento_service.core.dto.Evento;
+import com.fiap.techchallenge.agendamento_service.core.dto.DadosAgendamento;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -38,14 +38,11 @@ public class KafkaConfig {
     @Value("${spring.kafka.consumer.auto-offset-reset}")
     private String autoOffSetReset;
 
-    @Value("${spring.kafka.topic.agendamento-sucesso}")
-    private String topicoAgendamentoComSucesso;
+    @Value("${spring.kafka.topic.consultas}")
+    private String topicoConsultas;
 
-    @Value("${spring.kafka.topic.agendamento-falha}")
-    private String topicoAgendamentoComFalha;
-
-    @Value("${spring.kafka.topic.orquestrador}")
-    private String topicoOrquestrador;
+    @Value("${spring.kafka.topic.notificacao-sucesso}")
+    private String topicoNotificacoes;
 
     private Map<String, Object> baseConsumerConfigs() {
         Map<String, Object> props = new HashMap<>();
@@ -61,15 +58,15 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, Evento> appointmentConsumerFactory() {
+    public ConsumerFactory<String, DadosAgendamento> appointmentConsumerFactory() {
         Map<String, Object> props = baseConsumerConfigs();
-        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, Evento.class);
+        props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, DadosAgendamento.class);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Evento> appointmentKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Evento> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, DadosAgendamento> appointmentKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, DadosAgendamento> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(appointmentConsumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         return factory;
@@ -85,12 +82,12 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<String, Object> producerFactory() {
+    public ProducerFactory<String, DadosAgendamento> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfigs());
     }
 
     @Bean
-    public KafkaTemplate<String, Object> kafkaTemplate() {
+    public KafkaTemplate<String, DadosAgendamento> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
@@ -104,17 +101,12 @@ public class KafkaConfig {
     }
 
     @Bean
-    public NewTopic criaTopicoDeAgendamentoComSucesso() {
-        return buildTopic(topicoAgendamentoComSucesso);
+    public NewTopic criaTopicoDeNotificacoes() {
+        return buildTopic(topicoNotificacoes);
     }
 
     @Bean
-    public NewTopic criaTopicoDeAgendamentoComFalha() {
-        return buildTopic(topicoAgendamentoComFalha);
-    }
-
-    @Bean
-    public NewTopic criaTopicoDeOrquestrador() {
-        return buildTopic(topicoOrquestrador);
+    public NewTopic criaTopicoDeConsultas() {
+        return buildTopic(topicoConsultas);
     }
 }
