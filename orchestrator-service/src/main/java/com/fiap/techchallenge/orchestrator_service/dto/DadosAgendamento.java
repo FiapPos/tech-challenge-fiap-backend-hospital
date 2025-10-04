@@ -36,19 +36,19 @@ public class DadosAgendamento implements Serializable {
     private LocalDateTime atualizadoEm;
     private String observacoes;
 
-
-    public String getDataHoraFormatada() {
-        return getDataHoraAgendamento() != null
-                ? getDataHoraAgendamento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
-                : null;
-    }
-
-
     public void atualiza(EspecialidadeDTO especialidade,
-                         UsuarioDTO medico, HospitalDTO hospital,
+                         UsuarioDTO medico,
+                         HospitalDTO hospital,
                          LocalDateTime dataHora,
                          String observacoes,
                          UsuarioDTO paciente) {
+
+        atualiza(especialidade, medico, hospital, paciente);
+        this.dataHoraAgendamento = dataHora;
+        if (observacoes != null) this.observacoes = observacoes;
+    }
+
+    public void atualiza(EspecialidadeDTO especialidade, UsuarioDTO medico, HospitalDTO hospital, UsuarioDTO paciente) {
         this.especialidadeId = especialidade.getId();
         this.medicoId = medico.getId();
         this.hospitalId = hospital.getId();
@@ -58,7 +58,5 @@ public class DadosAgendamento implements Serializable {
         this.nomePaciente = paciente.getNome();
         this.enderecoHospital = hospital.getEndereco();
         this.especializacao = especialidade.getNome();
-        this.dataHoraAgendamento = dataHora;
-        if (observacoes != null) this.observacoes = observacoes;
     }
 }

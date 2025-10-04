@@ -9,8 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento.CANCELADA;
-import static com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento.CRIADA;
+import static com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento.*;
 
 @Service
 public class ConsultaService {
@@ -44,7 +43,6 @@ public class ConsultaService {
         dto.setStatusAgendamento(CANCELADA);
         repository.save(consulta);
 
-        // Publica evento de cancelamento no Kafka
         kafkaProducer.enviarEventos(dto);
     }
 
@@ -63,6 +61,7 @@ public class ConsultaService {
     public DadosAgendamento atualizarConsulta(Long id, DadosAgendamento dto) {
         Consulta consulta = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
         consulta.atualiza(dto);
+        dto.setStatusAgendamento(ATUALIZADA);
         repository.save(consulta);
 
         kafkaProducer.enviarEventos(dto);

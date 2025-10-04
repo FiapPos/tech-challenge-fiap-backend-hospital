@@ -3,17 +3,17 @@ import com.fiap.techchallenge.orchestrator_service.client.AgendamentoServiceClie
 import com.fiap.techchallenge.orchestrator_service.client.HospitalServiceClient;
 import com.fiap.techchallenge.orchestrator_service.client.UsuarioServiceClient;
 import com.fiap.techchallenge.orchestrator_service.dto.*;
-import com.fiap.techchallenge.orchestrator_service.enums.Perfil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static com.fiap.techchallenge.orchestrator_service.enums.EStatusAgendamento.CANCELADA;
 import static com.fiap.techchallenge.orchestrator_service.enums.Perfil.MEDICO;
+import static com.fiap.techchallenge.orchestrator_service.enums.Perfil.PACIENTE;
 
 @Slf4j
 @Service
@@ -39,7 +39,7 @@ public class AgendamentoSagaService {
             DadosAgendamento consultaPendente = new DadosAgendamento();
 
             log.info("SAGA - Validando paciente {}", request.getPacienteId());
-            UsuarioDTO paciente = usuarioClient.buscaPor(request.getPacienteId(), Perfil.PACIENTE);
+            UsuarioDTO paciente = usuarioClient.buscaPor(request.getPacienteId(), PACIENTE);
             if (paciente == null) throw new SagaException("Paciente não encontrado.");
             consultaPendente.setPacienteId(paciente.getId());
             consultaPendente.setNomePaciente(paciente.getNome());
@@ -52,6 +52,7 @@ public class AgendamentoSagaService {
             if (medico == null) throw new SagaException("Médico não encontrado.");
             consultaPendente.setMedicoId(medico.getId());
             consultaPendente.setNomeMedico(medico.getNome());
+            consultaPendente.setEspecialidadeId(especialidade.getId());
             consultaPendente.setEspecializacao(especialidade.getNome());
 
             HospitalDTO dadosHospital = hospitalServiceClient.buscaPor(request.getHospitalId());
@@ -96,25 +97,27 @@ public class AgendamentoSagaService {
         List<Consumer<Void>> compensations = new ArrayList<>();
         try {
             DadosAgendamento atual = agendamentoClient.buscarConsulta(Long.parseLong(appointmentId));
-            if (atual == null) return new SagaResponse(false, "Agendamento não encontrado.", null);
+            Long medicoId = request.getMedicoId() == null ? atual.getMedicoId() : request.getMedicoId();
+            Long especialidadeId = request.getEspecialidadeId() == null ? atual.getEspecialidadeId() : request.getEspecialidadeId();
+            Long hospitalId = request.getHospitalId() == null ? atual.getHospitalId() : request.getHospitalId();
+            LocalDateTime dataHora = request.getDataHora() == null ? atual.getDataHoraAgendamento() : request.getDataHora();
 
-            DadosAgendamento copiaAnterior = new DadosAgendamento(atual);
+            EspecialidadeDTO especialidade = usuarioClient.buscaPor(especialidadeId);
+            if (especialidade == null) throw new SagaException("Especialidade não encontrada.");
 
-            if (request.getDataHora() != null) {
-                try {
-                    atual.setDataHoraAgendamento(LocalDateTime.parse(request.getDataHora(), DateTimeFormatter.ISO_LOCAL_DATE_TIME));
-                } catch (DateTimeParseException e) {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-                    atual.setDataHoraAgendamento(LocalDateTime.parse(request.getDataHora(), formatter));
-                }
-            }
-            if (request.getServicoId() != null) atual.setServicoId(request.getServicoId());
-            if (request.getObservacoes() != null) atual.setObservacoes(request.getObservacoes());
+            UsuarioDTO paciente = usuarioClient.buscaPor(request.getPacienteId(), PACIENTE);
+            if (paciente == null) throw new SagaException("Paciente não encontrado.");
 
-            compensations.add(v -> agendamentoClient.editarConsulta(copiaAnterior.getAgendamentoId(), copiaAnterior));
+            UsuarioDTO medico = usuarioClient.buscaPor(medicoId, MEDICO, especialidade.getId());
+            if (medico == null) throw new SagaException("Médico não encontrado.");
+
+            HospitalDTO hospital = hospitalServiceClient.buscaPor(hospitalId);
+            if (hospital == null) throw new SagaException("Hospital não encontrado.");
+
+            compensations.add(v -> agendamentoClient.editarConsulta(atual.getAgendamentoId(), atual));
+            atual.atualiza(especialidade, medico, hospital, dataHora, request.getObservacoes(), paciente);
 
             agendamentoClient.editarConsulta(atual.getAgendamentoId(), atual);
-
             log.info("SAGA - Edição concluída com sucesso para ID: {}", appointmentId);
             return new SagaResponse(true, "Agendamento editado com sucesso.", atual.getAgendamentoId());
 
@@ -132,50 +135,25 @@ public class AgendamentoSagaService {
         }
     }
 
+    public void cancelarSaga(String agendamentoId) {
+        DadosAgendamento atual = agendamentoClient.buscarConsulta(Long.parseLong(agendamentoId));
+        if (CANCELADA.equals(atual.getStatusAgendamento())) throw new IllegalStateException("Consulta já está cancelada.");
 
-    public List<AgendamentoResponse> listarAgendamentos(String patientId, String status) {
-        List<DadosAgendamento> agendamentos = agendamentoClient.listarConsultas(patientId, status);
-        List<AgendamentoResponse> responses = new ArrayList<>();
-        for (DadosAgendamento d : agendamentos) {
-            responses.add(mapToResponse(d));
-        }
-        return responses;
-    }
+        EspecialidadeDTO especialidade = usuarioClient.buscaPor(atual.getEspecialidadeId());
+        if (especialidade == null) throw new SagaException("Especialidade não encontrada.");
 
-    public AgendamentoResponse buscarAgendamento(String appointmentId) {
-        try {
-            DadosAgendamento dados = agendamentoClient.buscarConsulta(Long.parseLong(appointmentId));
-            if (dados == null) return null;
-            return AgendamentoResponse.builder()
-                    .appointmentId(String.valueOf(dados.getAgendamentoId()))
-                    .patientId(String.valueOf(dados.getPacienteId()))
-                    .dataHora(dados.getDataHoraFormatada())
-                    .servicoId(dados.getServicoId())
-                    .sagaId(dados.getSagaId())
-                    .status(dados.getStatusAgendamento() != null ? dados.getStatusAgendamento().name() : null)
-                    .atualizadoEm(dados.getAtualizadoEm() != null ? dados.getAtualizadoEm().toString() : null)
-                    .build();
-        } catch (Exception e) {
-            log.error("Erro ao buscar agendamento: {}", e.getMessage());
-            return null;
-        }
-    }
+        UsuarioDTO paciente = usuarioClient.buscaPor(atual.getPacienteId(), PACIENTE);
+        if (paciente == null) throw new SagaException("Paciente não encontrado.");
 
+        UsuarioDTO medico = usuarioClient.buscaPor(atual.getMedicoId(), MEDICO, especialidade.getId());
+        if (medico == null) throw new SagaException("Médico não encontrado.");
 
-    public List<SagaEventoDto> buscarHistoricoAgendamento(String appointmentId) {
-        return agendamentoClient.buscarEventos(Long.parseLong(appointmentId));
-    }
+        HospitalDTO hospital = hospitalServiceClient.buscaPor(atual.getHospitalId());
+        if (hospital == null) throw new SagaException("Hospital não encontrado.");
 
-    private AgendamentoResponse mapToResponse(DadosAgendamento d) {
-        AgendamentoResponse resp = new AgendamentoResponse();
-        resp.setAppointmentId(String.valueOf(d.getAgendamentoId()));
-        resp.setPatientId(String.valueOf(d.getPacienteId()));
-        resp.setDataHora(d.getDataHoraFormatada());
-        resp.setServicoId(d.getServicoId());
-        resp.setSagaId(d.getSagaId());
-        resp.setStatus(d.getStatusAgendamento() != null ? d.getStatusAgendamento().name() : null);
-        resp.setAtualizadoEm(d.getAtualizadoEm() != null ? d.getAtualizadoEm().toString() : null);
-        return resp;
+        atual.atualiza(especialidade, medico, hospital, paciente);
+
+        agendamentoClient.cancelarConsulta(atual);
     }
 
     private static class SagaException extends RuntimeException {
