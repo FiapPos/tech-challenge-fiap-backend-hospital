@@ -28,8 +28,10 @@ public class ConsultaService {
         Consulta consulta = new Consulta();
         consulta.setPacienteId(dto.getPacienteId());
         consulta.setMedicoId(dto.getMedicoId());
+        consulta.setEspecialidadeId(dto.getEspecialidadeId());
+        consulta.setHospitalId(dto.getHospitalId());
         consulta.setDataHora(dto.getDataHoraAgendamento());
-        consulta.setStatus(EStatusAgendamento.PENDENTE); // Status inicial definido pela Saga
+        consulta.setStatus(EStatusAgendamento.PENDENTE);
         return repository.save(consulta);
     }
 
@@ -55,29 +57,19 @@ public class ConsultaService {
         dto.setStatusAgendamento(CRIADA);
         repository.save(consulta);
 
-        // Publica evento de confirmação no Kafka
         kafkaProducer.enviarEventos(dto);
     }
 
-    @Transactional
-    public Consulta atualizarConsulta(Long id, DadosAgendamento dto) {
-        Consulta consultaExistente = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
+    public DadosAgendamento atualizarConsulta(Long id, DadosAgendamento dto) {
+        Consulta consulta = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
+        consulta.atualiza(dto);
+        repository.save(consulta);
 
-        if (dto.getDataHoraAgendamento() != null) {
-            consultaExistente.setDataHora(dto.getDataHoraAgendamento());
-        }
-        if (dto.getStatusAgendamento() != null) {
-            consultaExistente.setStatus(dto.getStatusAgendamento());
-        }
-        if (dto.getMedicoId() != 0) {
-            consultaExistente.setMedicoId(dto.getMedicoId());
-        }
+        kafkaProducer.enviarEventos(dto);
+        return dto;
+    }
 
-        Consulta consultaAtualizada = repository.save(consultaExistente);
-        DadosAgendamento eventoDto = new DadosAgendamento(consultaAtualizada);
-        kafkaProducer.enviarEventos(eventoDto);
-
-        return consultaAtualizada;
+    public Consulta buscaConsulta(Long id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
     }
 }

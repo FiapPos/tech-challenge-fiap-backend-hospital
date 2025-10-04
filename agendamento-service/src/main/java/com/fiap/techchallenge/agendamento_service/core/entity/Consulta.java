@@ -1,8 +1,10 @@
 package com.fiap.techchallenge.agendamento_service.core.entity;
+import com.fiap.techchallenge.agendamento_service.core.dto.DadosAgendamento;
 import com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -22,48 +24,38 @@ public class Consulta {
     private Long medicoId;
 
     @Column(nullable = false)
+    private Long especialidadeId;
+
+    @Column(nullable = false)
+    private Long hospitalId;
+
+    @Column(nullable = false)
     private LocalDateTime dataHora;
 
     @Column(nullable = false)
     private EStatusAgendamento status;
 
-    public Long getId() {
-        return id;
+    @Column(nullable = false)
+    private LocalDateTime criadoEm;
+
+    private LocalDateTime atualizadoEm;
+
+    @PrePersist
+    protected void onCreate() {
+        criadoEm = LocalDateTime.now();
     }
 
-    public Long getPacienteId() {
-        return pacienteId;
+    @PreUpdate
+    protected void onUpdate() {
+        atualizadoEm = LocalDateTime.now();
     }
 
-    public Long getMedicoId() {
-        return medicoId;
-    }
-
-    public LocalDateTime getDataHora() {
-        return dataHora;
-    }
-
-    public EStatusAgendamento getStatus() {
-        return status;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setPacienteId(Long pacienteId) {
-        this.pacienteId = pacienteId;
-    }
-
-    public void setMedicoId(Long medicoId) {
-        this.medicoId = medicoId;
-    }
-
-    public void setDataHora(LocalDateTime dataHora) {
-        this.dataHora = dataHora;
-    }
-
-    public void setStatus(EStatusAgendamento status) {
-        this.status = status;
+    public void atualiza(DadosAgendamento dto) {
+        this.medicoId = dto.getMedicoId();
+        this.especialidadeId = dto.getEspecialidadeId();
+        this.hospitalId = dto.getHospitalId();
+        this.dataHora = LocalDateTime.now();
+        this.status = EStatusAgendamento.ATUALIZADA;
+        this.atualizadoEm = LocalDateTime.now();
     }
 }
