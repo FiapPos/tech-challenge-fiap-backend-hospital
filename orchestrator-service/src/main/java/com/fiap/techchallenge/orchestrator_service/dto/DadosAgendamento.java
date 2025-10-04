@@ -19,6 +19,7 @@ public class DadosAgendamento implements Serializable {
     private long agendamentoId;
     private long pacienteId;
     private long hospitalId;
+    private long especialidadeId;
     private long medicoId;
 
     private String nomePaciente;
@@ -27,7 +28,6 @@ public class DadosAgendamento implements Serializable {
     private String enderecoHospital;
     private String especializacao;
 
-    private String servicoId;
     private String sagaId;
     private EStatusAgendamento statusAgendamento;
 
@@ -36,52 +36,29 @@ public class DadosAgendamento implements Serializable {
     private LocalDateTime atualizadoEm;
     private String observacoes;
 
-    public DadosAgendamento(long pacienteId,
-                            long hospitalId,
-                            long medicoId,
-                            long agendamentoId,
-                            String nomePaciente,
-                            String nomeMedico,
-                            String nomeHospital,
-                            String enderecoHospital,
-                            String especializacao,
-                            LocalDateTime dataHoraAgendamento,
-                            LocalDateTime criadoEm) {
-        this.pacienteId = pacienteId;
-        this.hospitalId = hospitalId;
-        this.medicoId = medicoId;
-        this.agendamentoId = agendamentoId;
-        this.nomePaciente = nomePaciente;
-        this.nomeMedico = nomeMedico;
-        this.nomeHospital = nomeHospital;
-        this.enderecoHospital = enderecoHospital;
-        this.especializacao = especializacao;
-        this.dataHoraAgendamento = dataHoraAgendamento;
-        this.criadoEm = criadoEm;
-    }
-
-    public DadosAgendamento(DadosAgendamento outro) {
-        this.agendamentoId = outro.agendamentoId;
-        this.pacienteId = outro.pacienteId;
-        this.hospitalId = outro.hospitalId;
-        this.medicoId = outro.medicoId;
-        this.nomePaciente = outro.nomePaciente;
-        this.nomeMedico = outro.nomeMedico;
-        this.nomeHospital = outro.nomeHospital;
-        this.enderecoHospital = outro.enderecoHospital;
-        this.especializacao = outro.especializacao;
-        this.servicoId = outro.servicoId;
-        this.sagaId = outro.sagaId;
-        this.statusAgendamento = outro.statusAgendamento;
-        this.dataHoraAgendamento = outro.dataHoraAgendamento;
-        this.criadoEm = outro.criadoEm;
-        this.atualizadoEm = outro.atualizadoEm;
-        this.observacoes = outro.observacoes;
-    }
 
     public String getDataHoraFormatada() {
         return getDataHoraAgendamento() != null
                 ? getDataHoraAgendamento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
                 : null;
+    }
+
+
+    public void atualiza(EspecialidadeDTO especialidade,
+                         UsuarioDTO medico, HospitalDTO hospital,
+                         LocalDateTime dataHora,
+                         String observacoes,
+                         UsuarioDTO paciente) {
+        this.especialidadeId = especialidade.getId();
+        this.medicoId = medico.getId();
+        this.hospitalId = hospital.getId();
+        this.pacienteId = paciente.getId();
+        this.nomeHospital = hospital.getNome();
+        this.nomeMedico = medico.getNome();
+        this.nomePaciente = paciente.getNome();
+        this.enderecoHospital = hospital.getEndereco();
+        this.especializacao = especialidade.getNome();
+        this.dataHoraAgendamento = dataHora;
+        if (observacoes != null) this.observacoes = observacoes;
     }
 }
