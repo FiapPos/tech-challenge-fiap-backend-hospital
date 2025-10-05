@@ -11,7 +11,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 public class AppointmentServiceApplication {
 
 	public static void main(String[] args) {
-		System.setProperty("spring.main.web-application-type", "reactive");
+		// The application uses Spring MVC (servlet) stack. Don't force reactive type
+		// which
+		// causes Spring to look for a ReactiveWebServerFactory and fail to start.
+		System.setProperty("spring.main.web-application-type", "servlet");
 		SpringApplication.run(AppointmentServiceApplication.class, args);
 	}
 

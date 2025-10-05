@@ -1,10 +1,7 @@
 package com.fiap.techchallenge.appointment_service.core.service;
 
-import com.fiap.techchallenge.appointment_service.core.service.UsuarioService;
-import com.fiap.techchallenge.appointment_service.core.service.JwtService;
-import com.fiap.techchallenge.appointment_service.core.dto.AuthResponse;
-import com.fiap.techchallenge.appointment_service.core.dto.LoginRequest;
-import com.fiap.techchallenge.appointment_service.core.dto.UsuarioResponse;
+import com.fiap.techchallenge.appointment_service.core.dto.request.LoginRequest;
+import com.fiap.techchallenge.appointment_service.core.dto.response.UsuarioResponse;
 import com.fiap.techchallenge.appointment_service.core.exception.InvalidCredentialsException;
 import com.fiap.techchallenge.appointment_service.core.exception.OrchestratorUnavailableException;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +33,6 @@ public class AuthServiceTest {
         usuario.setNome("User One");
         usuario.setEmail("u1@example.com");
         usuario.setAtivo(true);
-        // profil handling omitted for brevity
 
         java.util.Map<String, Object> tokenMap = new java.util.HashMap<>();
         tokenMap.put("token", "token123");
@@ -49,10 +45,9 @@ public class AuthServiceTest {
         req.setLogin("user1");
         req.setSenha("pwd");
 
-        AuthResponse res = autorizacaoService.authenticate(req);
-        assertNotNull(res);
-        assertEquals("user1", res.getLogin());
-        assertEquals("token123", res.getToken());
+        String token = autorizacaoService.authenticate(req);
+        assertNotNull(token);
+        assertEquals("token123", token);
     }
 
     @Test

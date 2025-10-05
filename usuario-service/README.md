@@ -15,7 +15,13 @@ Serviço responsável pelo ciclo de vida de usuários (cadastro, atualização, 
 
 Base URL (Docker): `http://localhost:3001`
 
-### 👥 Usuários
+### � Autenticação
+| Método | Caminho | Descrição |
+|--------|---------|-----------|
+| POST | /login | Autenticar usuário e obter token JWT |
+| PUT | /login/atualiza-senha | Atualizar senha do usuário |
+
+### �👥 Usuários
 | Método | Caminho | Descrição |
 |--------|---------|-----------|
 | POST | /usuarios | Criar novo usuário |
@@ -99,16 +105,51 @@ infrastructure/
 ```
 
 ## 🔐 Segurança
-Atualmente permissiva (endpoints públicos). Camada preparada para futura ativação de autenticação/JWT.
+
+### Autenticação JWT
+O serviço implementa autenticação baseada em **JSON Web Tokens (JWT)** com as seguintes características:
+
+- **Endpoint de login**: `POST /login`
+- **Token válido por**: 24 horas (configurável via `JWT_EXPIRATION_TIME`)
+- **Header de autenticação**: `Authorization: Bearer <token>`
+- **Algoritmo**: HMAC256
+
+### Endpoints Públicos (sem autenticação)
+- `/login` - Autenticação
+- `/usuarios/**` - Gestão de usuários
+- `/swagger-ui/**` - Documentação
+- `/v3/api-docs/**` - OpenAPI
+
+### Formato do Login
+```json
+{
+  "login": "usuario@email.com",
+  "senha": "senha123",
+  "perfil": "MEDICO" // Opcional: MEDICO, PACIENTE, ADMIN
+}
+```
+
+### Resposta do Login
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+### Configurações JWT
+Variáveis de ambiente:
+- `JWT_SECRET`: Chave secreta para assinatura dos tokens
+- `JWT_EXPIRATION_TIME`: Tempo de expiração em milissegundos (padrão: 86400000 = 24h)
 
 ## 📄 Documentação OpenAPI
 Disponível em: `http://localhost:3001/swagger-ui/index.html` (Docker) ou `http://localhost:3000/swagger-ui/index.html` (local).
 
 ## 🧭 Próximos Melhorias Sugeridas
 - Adicionar testes de integração (MockMvc)
-- Introduzir autenticação/JWT
 - Publicar imagem em registry
 - Eventos Kafka para criação/atualização de usuário
+- Implementar refresh tokens
+- Adicionar rate limiting nos endpoints de autenticação
 
 ---
 > Referência cruzada: documentação global do projeto no README raiz.

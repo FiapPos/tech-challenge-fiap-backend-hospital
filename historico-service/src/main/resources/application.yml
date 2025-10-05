@@ -2,6 +2,8 @@ server:
   port: 3003
 
 spring:
+  application:
+    name: historico-service
   cloud:
     config:
       enabled: false
@@ -27,9 +29,19 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # Configuração GraphQL
+  graphql:
+    graphiql:
+      enabled: true
+      path: /graphiql
+    path: /graphql
+    cors:
+      allowed-origins: "*"
+      allowed-methods: GET, POST
 
 logging:
   level:

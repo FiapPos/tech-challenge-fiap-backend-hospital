@@ -1,0 +1,37 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: api-gateway-service
+  security:
+    enabled: false
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+
+# Configuração JWT (manter para evitar erros)
+jwt:
+  secret: test-secret-key-that-is-long-enough-for-hmac-sha256-algorithm
+  expiration: 86400
+
+# URL do historico-service para testes
+historico-service:
+  url: http://localhost:19090
+
+# URLs dos outros serviços (para evitar erros)
+orchestrator-service:
+  url: http://localhost:18080
+
+services:
+  orchestrator-service:
+    url: http://localhost:18080
+  usuario-service:
+    url: http://localhost:18080
+
+logging:
+  level:
+    "[com.fiap.techchallenge.appointment_service]": DEBUG
+    "[org.springframework.security]": DEBUG

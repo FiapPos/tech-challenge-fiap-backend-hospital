@@ -1,9 +1,7 @@
 package com.fiap.techchallenge.appointment_service.core.service;
 
-import com.fiap.techchallenge.appointment_service.core.dto.AuthResponse;
-import com.fiap.techchallenge.appointment_service.core.dto.LoginRequest;
-import com.fiap.techchallenge.appointment_service.core.dto.UserDetailsImpl;
-import com.fiap.techchallenge.appointment_service.core.dto.UsuarioResponse;
+import com.fiap.techchallenge.appointment_service.core.dto.request.LoginRequest;
+import com.fiap.techchallenge.appointment_service.core.dto.response.UsuarioResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,23 +20,10 @@ public class AutorizacaoService {
     private final UsuarioService usuarioService;
     private final JwtService jwtService;
 
-    public AuthResponse authenticate(LoginRequest loginRequest) {
+    public String authenticate(LoginRequest loginRequest) {
         log.debug("Iniciando autenticação para usuário: {}", loginRequest.getLogin());
 
-        java.util.Map<String, Object> tokenResponse;
-        try {
-            java.util.Map<String, Object> credentials = new java.util.HashMap<>();
-            credentials.put("login", loginRequest.getLogin());
-            credentials.put("senha", loginRequest.getSenha());
-            if (loginRequest.getPerfil() != null && !loginRequest.getPerfil().isBlank()) {
-                credentials.put("perfil", loginRequest.getPerfil());
-            }
-            tokenResponse = usuarioService.loginCredentials(credentials);
-        } catch (RuntimeException e) {
-            log.error("Erro ao chamar usuario-service para login do usuário '{}': {}", loginRequest.getLogin(),
-                    e.getMessage(), e);
-            throw new OrchestratorUnavailableException("Usuario service unavailable", e);
-        }
+        java.util.Map<String, Object> tokenResponse = chamarUsuarioService(loginRequest);
 
         if (tokenResponse == null || !tokenResponse.containsKey("token")) {
             log.warn("Credenciais inválidas para usuário: {}", loginRequest.getLogin());
@@ -47,61 +32,81 @@ public class AutorizacaoService {
 
         String token = String.valueOf(tokenResponse.get("token"));
 
-        String perfilTipo = null;
-        Long userId = null;
+        String perfilTipo = extrairPerfilDoToken(token);
+        Long userId = extrairUserIdDoResponse(tokenResponse);
+
+        UsuarioResponse usuario = buildUsuarioResponse(loginRequest.getLogin(), perfilTipo, userId);
+
+        setAuthenticationContext(usuario);
+
+        log.info("Autenticação delegada ao usuario-service bem-sucedida para usuário: {}", loginRequest.getLogin());
+
+        return token;
+    }
+
+    private java.util.Map<String, Object> chamarUsuarioService(LoginRequest loginRequest) {
         try {
-            perfilTipo = jwtService.getUserProfileFromToken(token);
+            return usuarioService.loginCredentials(buildCredentials(loginRequest));
+        } catch (RuntimeException e) {
+            log.error("Erro ao chamar usuario-service para login do usuário '{}': {}", loginRequest.getLogin(),
+                    e.getMessage(), e);
+            throw new OrchestratorUnavailableException("Usuario service unavailable", e);
+        }
+    }
+
+    private java.util.Map<String, Object> buildCredentials(LoginRequest loginRequest) {
+        var credentials = new java.util.HashMap<String, Object>();
+        credentials.put("login", loginRequest.getLogin());
+        credentials.put("senha", loginRequest.getSenha());
+
+        String perfil = loginRequest.getPerfil();
+        if (perfil != null && !perfil.isBlank()) {
+            credentials.put("perfil", perfil.trim());
+        }
+
+        return credentials;
+    }
+
+    private String extrairPerfilDoToken(String token) {
+        try {
+            return jwtService.getUserProfileFromToken(token);
         } catch (Exception e) {
             log.debug("Não foi possível extrair perfil do token: {}", e.getMessage());
+            return null;
         }
+    }
+
+    private Long extrairUserIdDoResponse(java.util.Map<String, Object> tokenResponse) {
         try {
             Object userIdObj = tokenResponse.get("userId");
             if (userIdObj instanceof Number) {
-                userId = ((Number) userIdObj).longValue();
+                return ((Number) userIdObj).longValue();
             } else if (userIdObj instanceof String) {
-                userId = Long.parseLong((String) userIdObj);
+                return Long.parseLong((String) userIdObj);
             }
         } catch (Exception e) {
             log.debug("Não foi possível extrair userId do response de login: {}", e.getMessage());
         }
+        return null;
+    }
 
-        UsuarioResponse usuario = UsuarioResponse.builder()
+    private UsuarioResponse buildUsuarioResponse(String login, String perfilTipo, Long userId) {
+        return UsuarioResponse.builder()
                 .id(userId)
-                .login(loginRequest.getLogin())
-                .nome(null)
-                .email(null)
-                .ativo(true)
+                .login(login)
                 .perfil(perfilTipo != null
-                        ? com.fiap.techchallenge.appointment_service.core.dto.PerfilResponse.builder().tipo(perfilTipo)
+                        ? com.fiap.techchallenge.appointment_service.core.dto.response.PerfilResponse.builder()
+                                .tipo(perfilTipo)
                                 .build()
                         : null)
                 .build();
+    }
 
+    private void setAuthenticationContext(UsuarioResponse usuario) {
         var userDetails = new UserDetailsImpl(usuario);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        java.time.LocalDateTime expiresAt = null;
-        try {
-            expiresAt = jwtService.getExpirationFromToken(token);
-        } catch (Exception e) {
-            log.debug("Não foi possível extrair expiration do token retornado pelo usuario-service: {}",
-                    e.getMessage());
-        }
-
-        log.info("Autenticação delegada ao usuario-service bem-sucedida para usuário: {}", loginRequest.getLogin());
-
-        return AuthResponse.builder()
-                .token(token)
-                .type("Bearer")
-                .userId(usuario.getId())
-                .login(usuario.getLogin())
-                .nome(usuario.getNome())
-                .email(usuario.getEmail())
-                .perfil(usuario.getPerfil() != null ? usuario.getPerfil().getTipo() : null)
-                .expiresAt(expiresAt)
-                .build();
     }
 
     public boolean validateToken(String token) {
@@ -110,6 +115,11 @@ public class AutorizacaoService {
 
     public String getUsernameFromToken(String token) {
         return jwtService.getUsernameFromToken(token);
+    }
+
+    public String authenticateToken(LoginRequest loginRequest) {
+
+        return authenticate(loginRequest);
     }
 
 }

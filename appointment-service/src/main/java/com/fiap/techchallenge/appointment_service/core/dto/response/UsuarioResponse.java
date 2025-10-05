@@ -1,4 +1,4 @@
-package com.fiap.techchallenge.appointment_service.core.dto;
+package com.fiap.techchallenge.appointment_service.core.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

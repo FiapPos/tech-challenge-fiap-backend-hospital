@@ -10,5 +10,5 @@ FROM eclipse-temurin:21-jre-alpine
 
 COPY --from=builder /app/target/*.jar historico-service.jar
 
-EXPOSE 8080
+EXPOSE 3003
 ENTRYPOINT ["java", "-jar", "historico-service.jar"]

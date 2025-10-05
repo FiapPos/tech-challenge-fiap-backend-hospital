@@ -2,7 +2,7 @@ package com.fiap.techchallenge.appointment_service.core.mapper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fiap.techchallenge.appointment_service.core.dto.AgendamentoRequest;
+import com.fiap.techchallenge.appointment_service.core.dto.request.AgendamentoRequest;
 import org.springframework.stereotype.Component;
 
 @Component

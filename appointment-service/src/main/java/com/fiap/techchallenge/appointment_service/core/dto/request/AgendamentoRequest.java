@@ -1,4 +1,4 @@
-package com.fiap.techchallenge.appointment_service.core.dto;
+package com.fiap.techchallenge.appointment_service.core.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;

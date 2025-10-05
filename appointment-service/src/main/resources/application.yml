@@ -30,11 +30,15 @@ orchestrator-service:
 services:
   orchestrator-service:
     url: ${ORCHESTRATOR_SERVICE_URL:http://orchestrator-service:8080}
+  usuario-service:
+    url: ${USUARIO_SERVICE_URL:http://localhost:3000}
 
 logging:
   level:
     "[org.apache.kafka]": INFO
     "[com.fiap.techchallenge.appointment_service]": DEBUG
+  "io.github.resilience4j": DEBUG
+  "org.springframework.cloud.circuitbreaker": DEBUG
 
 # Configuração do Feign Client (mantido para comunicação com orchestrator)
 feign:
@@ -45,37 +49,5 @@ feign:
         read-timeout: 10000
         logger-level: basic
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
-  endpoint:
-    health:
-      show-details: when-authorized
 
-# Resilience4j configuration for orchestrator calls
-resilience4j:
-  retry:
-    instances:
-      orchestrator-find:
-        max-attempts: 3
-        wait-duration: 200ms
-      orchestrator-validate:
-        max-attempts: 3
-        wait-duration: 200ms
 
-  circuitbreaker:
-    instances:
-      orchestrator-find:
-        register-health-indicator: true
-        sliding-window-type: COUNT_BASED
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 5s
-      orchestrator-validate:
-        register-health-indicator: true
-        sliding-window-type: COUNT_BASED
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        wait-duration-in-open-state: 5s

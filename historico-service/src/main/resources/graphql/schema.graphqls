@@ -1,0 +1,39 @@
+type Query {
+    # Consultas para histórico médico de pacientes
+    todosAtendimentosPaciente(pacienteId: ID!): [HistoricoMedico!]!
+    atendimentosFuturosPaciente(pacienteId: ID!): [HistoricoMedico!]!
+    atendimentosPassadosPaciente(pacienteId: ID!): [HistoricoMedico!]!
+    atendimentosPorStatus(pacienteId: ID!, status: StatusAgendamento!): [HistoricoMedico!]!
+    atendimentosPorPeriodo(pacienteId: ID!, dataInicio: String!, dataFim: String!): [HistoricoMedico!]!
+
+    # Consultas para médicos
+    atendimentosPorMedico(medicoId: ID!): [HistoricoMedico!]!
+    atendimentosFuturosPorMedico(medicoId: ID!): [HistoricoMedico!]!
+
+    # Consultas para hospitais
+    atendimentosPorHospital(hospitalId: ID!): [HistoricoMedico!]!
+}
+
+type HistoricoMedico {
+    id: ID!
+    agendamentoId: ID!
+    pacienteId: ID!
+    hospitalId: ID!
+    medicoId: ID!
+    nomePaciente: String!
+    nomeMedico: String!
+    nomeHospital: String!
+    enderecoHospital: String
+    especializacao: String
+    statusAgendamento: StatusAgendamento!
+    dataHoraAgendamento: String!
+    criadoEm: String!
+    atualizadoEm: String
+}
+
+enum StatusAgendamento {
+    CRIADA
+    ATUALIZADA
+    CANCELADA
+    PENDENTE
+}

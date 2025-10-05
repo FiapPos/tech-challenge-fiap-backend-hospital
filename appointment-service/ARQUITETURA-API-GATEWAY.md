@@ -2,7 +2,7 @@
 
 ## 📋 Visão Geral
 
-O **API Gateway** (appointment-service) atua como **porta única de entrada** para todas as requisições externas, comunicando-se **EXCLUSIVAMENTE** com o **orchestrator-service**, que é responsável pelo roteamento interno para os microserviços específicos.
+O **API Gateway** (appointment-service) atua como **porta única de entrada** para todas as requisições externas, comunicando-se o **orchestrator-service**, **usuario-service** e **historico-service**.
 
 ## 🔄 Fluxo de Comunicação
 
@@ -48,11 +48,8 @@ O **API Gateway** (appointment-service) atua como **porta única de entrada** pa
 
 ### **Endpoints Públicos (sem autenticação)**
 - **POST** `/api/usuario/login` → **orchestrator-service**
-- **POST** `/api/usuario/criacao` → **orchestrator-service**
 
 ### **Endpoints Protegidos (com autenticação JWT)**
-- **GET** `/api/usuario/consulta/**` → **orchestrator-service**
-  - **Perfis:** ADMIN, MEDICO, ENFERMEIRO, PACIENTE
   
 - **PUT/PATCH** `/api/agendamento/edicao/**` → **orchestrator-service**
   - **Perfis:** ADMIN, MEDICO, ENFERMEIRO

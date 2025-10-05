@@ -1,6 +1,6 @@
 package com.fiap.techchallenge.appointment_service.config;
 
-import com.fiap.techchallenge.appointment_service.core.client.OrchestratorException;
+import com.fiap.techchallenge.appointment_service.infra.client.OrchestratorException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
