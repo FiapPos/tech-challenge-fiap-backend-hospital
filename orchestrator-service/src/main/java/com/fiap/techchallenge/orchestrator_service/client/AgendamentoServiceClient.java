@@ -6,15 +6,19 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(name = "agendamento-service", url = "${services.agendamento.url}")
 public interface AgendamentoServiceClient {
 
-    // Cria a consulta e retorna o DTO com o ID gerado
     @PostMapping("/api/consultas")
     DadosAgendamento criarConsultaPendente(@RequestBody DadosAgendamento consulta);
 
-    // Ação de compensação
     @DeleteMapping("/api/consultas/cancelar")
     void cancelarConsulta(@RequestBody DadosAgendamento consulta);
 
-    // Ação final de sucesso
     @PutMapping("/api/consultas/confirmar")
     void confirmarConsulta(@RequestBody DadosAgendamento consulta);
+
+    @GetMapping("/api/consultas/{id}")
+    DadosAgendamento buscarConsulta(@PathVariable("id") Long id);
+
+    @PutMapping("/api/consultas/{id}")
+    void editarConsulta(@PathVariable("id") Long id,
+                        @RequestBody DadosAgendamento consulta);
 }
