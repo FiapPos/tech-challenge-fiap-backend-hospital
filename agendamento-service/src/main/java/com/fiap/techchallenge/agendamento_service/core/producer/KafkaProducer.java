@@ -27,8 +27,13 @@ public class KafkaProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void enviarEventos(DadosAgendamento dadosAgendamento) {
+    public void enviarEventosParaNotificacao(DadosAgendamento dadosAgendamento) {
         enviarEventoNotificacoes(dadosAgendamento);
+        enviarEventoConsulta(dadosAgendamento);
+        enviarEventoHistorico(dadosAgendamento);
+    }
+
+    public void enviarEventosParaHistorico(DadosAgendamento dadosAgendamento) {
         enviarEventoConsulta(dadosAgendamento);
         enviarEventoHistorico(dadosAgendamento);
     }

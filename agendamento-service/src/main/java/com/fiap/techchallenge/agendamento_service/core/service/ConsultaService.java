@@ -39,7 +39,7 @@ public class ConsultaService {
         dto.setStatusAgendamento(consultaSalva.getStatus());
 
         // Publica evento de criação no Kafka para registrar no histórico
-        kafkaProducer.enviarEventos(dto);
+        kafkaProducer.enviarEventosParaHistorico(dto);
 
         return consultaSalva;
     }
@@ -53,7 +53,7 @@ public class ConsultaService {
         dto.setStatusAgendamento(CANCELADA);
         repository.save(consulta);
 
-        kafkaProducer.enviarEventos(dto);
+        kafkaProducer.enviarEventosParaNotificacao(dto);
     }
 
     @Transactional
@@ -65,7 +65,7 @@ public class ConsultaService {
         dto.setStatusAgendamento(CRIADA);
         repository.save(consulta);
 
-        kafkaProducer.enviarEventos(dto);
+        kafkaProducer.enviarEventosParaNotificacao(dto);
     }
 
     public DadosAgendamento atualizarConsulta(Long id, DadosAgendamento dto) {
@@ -74,7 +74,7 @@ public class ConsultaService {
         dto.setStatusAgendamento(ATUALIZADA);
         repository.save(consulta);
 
-        kafkaProducer.enviarEventos(dto);
+        kafkaProducer.enviarEventosParaNotificacao(dto);
         return dto;
     }
 
