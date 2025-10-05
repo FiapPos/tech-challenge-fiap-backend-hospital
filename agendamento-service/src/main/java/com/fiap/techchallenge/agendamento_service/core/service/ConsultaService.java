@@ -9,8 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento.CANCELADA;
-import static com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento.CRIADA;
+import static com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento.*;
 
 @Service
 public class ConsultaService {
@@ -28,6 +27,8 @@ public class ConsultaService {
         Consulta consulta = new Consulta();
         consulta.setPacienteId(dto.getPacienteId());
         consulta.setMedicoId(dto.getMedicoId());
+        consulta.setEspecialidadeId(dto.getEspecialidadeId());
+        consulta.setHospitalId(dto.getHospitalId());
         consulta.setDataHora(dto.getDataHoraAgendamento());
         consulta.setStatus(EStatusAgendamento.PENDENTE); // Status inicial definido pela Saga
 
@@ -52,7 +53,6 @@ public class ConsultaService {
         dto.setStatusAgendamento(CANCELADA);
         repository.save(consulta);
 
-        // Publica evento de cancelamento no Kafka
         kafkaProducer.enviarEventos(dto);
     }
 
@@ -65,7 +65,20 @@ public class ConsultaService {
         dto.setStatusAgendamento(CRIADA);
         repository.save(consulta);
 
-        // Publica evento de confirmação no Kafka
         kafkaProducer.enviarEventos(dto);
+    }
+
+    public DadosAgendamento atualizarConsulta(Long id, DadosAgendamento dto) {
+        Consulta consulta = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
+        consulta.atualiza(dto);
+        dto.setStatusAgendamento(ATUALIZADA);
+        repository.save(consulta);
+
+        kafkaProducer.enviarEventos(dto);
+        return dto;
+    }
+
+    public Consulta buscaConsulta(Long id) {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
     }
 }

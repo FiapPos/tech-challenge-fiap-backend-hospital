@@ -17,6 +17,6 @@ public class NotificacaoCriacaoStrategy implements NotificacaoStrategy {
 
     @Override
     public boolean isAplicavel(DadosAgendamento agendamento) {
-        return agendamento.getAtualizadoEm() == null && CRIADA.equals(agendamento.getStatusAgendamento());
+        return CRIADA.equals(agendamento.getStatusAgendamento());
     }
 }
