@@ -38,18 +38,18 @@ public class DadosAgendamento implements Serializable {
     private String observacoes;
 
     public void atualiza(EspecialidadeDTO especialidade,
-                         UsuarioDto medico,
+                         UsuarioDTO medico,
                          HospitalDTO hospital,
                          LocalDateTime dataHora,
                          String observacoes,
-                         UsuarioDto paciente) {
+                         UsuarioDTO paciente) {
 
         atualiza(especialidade, medico, hospital, paciente);
         this.dataHoraAgendamento = dataHora;
         if (observacoes != null) this.observacoes = observacoes;
     }
 
-    public void atualiza(EspecialidadeDTO especialidade, UsuarioDto medico, HospitalDTO hospital, UsuarioDto paciente) {
+    public void atualiza(EspecialidadeDTO especialidade, UsuarioDTO medico, HospitalDTO hospital, UsuarioDTO paciente) {
         this.especialidadeId = especialidade.getId();
         this.medicoId = medico.getId();
         this.hospitalId = hospital.getId();
