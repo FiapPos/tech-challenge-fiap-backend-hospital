@@ -1,10 +1,12 @@
 package com.fiap.techchallenge.orchestrator_service.dto;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fiap.techchallenge.orchestrator_service.enums.EStatusAgendamento;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -36,18 +38,18 @@ public class DadosAgendamento implements Serializable {
     private String observacoes;
 
     public void atualiza(EspecialidadeDTO especialidade,
-                         UsuarioDTO medico,
+                         UsuarioDto medico,
                          HospitalDTO hospital,
                          LocalDateTime dataHora,
                          String observacoes,
-                         UsuarioDTO paciente) {
+                         UsuarioDto paciente) {
 
         atualiza(especialidade, medico, hospital, paciente);
         this.dataHoraAgendamento = dataHora;
         if (observacoes != null) this.observacoes = observacoes;
     }
 
-    public void atualiza(EspecialidadeDTO especialidade, UsuarioDTO medico, HospitalDTO hospital, UsuarioDTO paciente) {
+    public void atualiza(EspecialidadeDTO especialidade, UsuarioDto medico, HospitalDTO hospital, UsuarioDto paciente) {
         this.especialidadeId = especialidade.getId();
         this.medicoId = medico.getId();
         this.hospitalId = hospital.getId();
