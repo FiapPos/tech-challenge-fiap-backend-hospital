@@ -1,25 +1,27 @@
+scalar Long
+
 type Query {
     # Consultas para histórico médico de pacientes
-    todosAtendimentosPaciente(pacienteId: ID!): [HistoricoMedico!]!
-    atendimentosFuturosPaciente(pacienteId: ID!): [HistoricoMedico!]!
-    atendimentosPassadosPaciente(pacienteId: ID!): [HistoricoMedico!]!
-    atendimentosPorStatus(pacienteId: ID!, status: StatusAgendamento!): [HistoricoMedico!]!
-    atendimentosPorPeriodo(pacienteId: ID!, dataInicio: String!, dataFim: String!): [HistoricoMedico!]!
+    todosAtendimentosPaciente(pacienteId: Long!): [HistoricoMedico!]!
+    atendimentosFuturosPaciente(pacienteId: Long!): [HistoricoMedico!]!
+    atendimentosPassadosPaciente(pacienteId: Long!): [HistoricoMedico!]!
+    atendimentosPorStatus(pacienteId: Long!, status: StatusAgendamento!): [HistoricoMedico!]!
+    atendimentosPorPeriodo(pacienteId: Long!, dataInicio: String!, dataFim: String!): [HistoricoMedico!]!
 
     # Consultas para médicos
-    atendimentosPorMedico(medicoId: ID!): [HistoricoMedico!]!
-    atendimentosFuturosPorMedico(medicoId: ID!): [HistoricoMedico!]!
+    atendimentosPorMedico(medicoId: Long!): [HistoricoMedico!]!
+    atendimentosFuturosPorMedico(medicoId: Long!): [HistoricoMedico!]!
 
     # Consultas para hospitais
-    atendimentosPorHospital(hospitalId: ID!): [HistoricoMedico!]!
+    atendimentosPorHospital(hospitalId: Long!): [HistoricoMedico!]!
 }
 
 type HistoricoMedico {
-    id: ID!
-    agendamentoId: ID!
-    pacienteId: ID!
-    hospitalId: ID!
-    medicoId: ID!
+    id: Long!
+    agendamentoId: Long!
+    pacienteId: Long!
+    hospitalId: Long!
+    medicoId: Long!
     nomePaciente: String!
     nomeMedico: String!
     nomeHospital: String!

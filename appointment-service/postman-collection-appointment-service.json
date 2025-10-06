@@ -47,7 +47,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"login\": \"admin\",\n  \"senha\": \"senha123\",\n  \"perfil\": \"ADMIN\"\n}"
+              "raw": "{\n  \"login\": \"admin\",\n  \"senha\": \"senha123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/auth/login",
@@ -185,7 +185,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"pacienteId\": 102,\n  \"medicoId\": 101,\n  \"dataHora\": \"2025-10-15T10:30:00\"\n}"
+              "raw": "{\n  \"pacienteId\": 102,\n  \"medicoId\": 101,\n  \"hospitalId\": 1,\n  \"especialidadeId\": 1,\n  \"dataHora\": \"2025-10-15T10:30:00\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/agendamento/criacao",

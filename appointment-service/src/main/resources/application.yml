@@ -33,6 +33,10 @@ services:
   usuario-service:
     url: ${USUARIO_SERVICE_URL:http://localhost:3000}
 
+# Configuração do historico-service
+historico-service:
+  url: ${HISTORICO_SERVICE_URL:http://localhost:3003}
+
 logging:
   level:
     "[org.apache.kafka]": INFO

@@ -140,6 +140,7 @@ services:
       - SPRING_CLOUD_CONFIG_ENABLED=false
       - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
       - JWT_SECRET=hospital-microservices-shared-jwt-secret-key-2025
+      - HISTORICO_SERVICE_URL=http://historico-service:3003
     ports:
       - 3005:3002
 
@@ -196,7 +197,7 @@ services:
       - SPRING_CLOUD_CONFIG_ENABLED=false
       - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
     ports:
-      - 3003:8080
+      - 3003:3003
 
   notificacao-service:
     build: './notificacao-service'

@@ -23,7 +23,7 @@ public class HistoricoService {
     private String historicoBaseUrl;
 
     public List<HistoricoMedicoDto> buscarTodosAtendimentosPaciente(Long pacienteId) {
-        String query = "query($pacienteId: Long) { todosAtendimentosPaciente(pacienteId: $pacienteId) { id dataHora status medicoId pacienteId descricao } }";
+        String query = "query($pacienteId: Long!) { todosAtendimentosPaciente(pacienteId: $pacienteId) { id agendamentoId pacienteId hospitalId medicoId nomePaciente nomeMedico nomeHospital enderecoHospital especializacao statusAgendamento dataHoraAgendamento criadoEm atualizadoEm } }";
 
         JsonNode root = graphqlClient.execute(query, Map.of("pacienteId", pacienteId), historicoBaseUrl);
         if (root == null)
@@ -49,7 +49,7 @@ public class HistoricoService {
     }
 
     public List<HistoricoMedicoDto> buscarAtendimentosFuturosPaciente(Long pacienteId) {
-        String query = "query($pacienteId: Long) { atendimentosFuturosPaciente(pacienteId: $pacienteId) { id agendamentoId pacienteId nomePaciente nomeMedico nomeHospital enderecoHospital especializacao statusAgendamento dataHoraAgendamento criadoEm atualizadoEm } }";
+        String query = "query($pacienteId: Long!) { atendimentosFuturosPaciente(pacienteId: $pacienteId) { id agendamentoId pacienteId hospitalId medicoId nomePaciente nomeMedico nomeHospital enderecoHospital especializacao statusAgendamento dataHoraAgendamento criadoEm atualizadoEm } }";
 
         JsonNode root = graphqlClient.execute(query, Map.of("pacienteId", pacienteId), historicoBaseUrl);
         if (root == null)
@@ -75,7 +75,7 @@ public class HistoricoService {
     }
 
     public List<HistoricoMedicoDto> buscarAtendimentosPorMedico(Long medicoId) {
-        String query = "query($medicoId: Long) { atendimentosPorMedico(medicoId: $medicoId) { id agendamentoId pacienteId nomePaciente nomeMedico nomeHospital enderecoHospital especializacao statusAgendamento dataHoraAgendamento criadoEm atualizadoEm } }";
+        String query = "query($medicoId: Long!) { atendimentosPorMedico(medicoId: $medicoId) { id agendamentoId pacienteId hospitalId medicoId nomePaciente nomeMedico nomeHospital enderecoHospital especializacao statusAgendamento dataHoraAgendamento criadoEm atualizadoEm } }";
 
         JsonNode root = graphqlClient.execute(query, Map.of("medicoId", medicoId), historicoBaseUrl);
         if (root == null)
@@ -101,7 +101,7 @@ public class HistoricoService {
     }
 
     public List<HistoricoMedicoDto> buscarAtendimentosFuturosPorMedico(Long medicoId) {
-        String query = "query($medicoId: Long) { atendimentosFuturosPorMedico(medicoId: $medicoId) { id agendamentoId pacienteId nomePaciente nomeMedico nomeHospital enderecoHospital especializacao statusAgendamento dataHoraAgendamento criadoEm atualizadoEm } }";
+        String query = "query($medicoId: Long!) { atendimentosFuturosPorMedico(medicoId: $medicoId) { id agendamentoId pacienteId hospitalId medicoId nomePaciente nomeMedico nomeHospital enderecoHospital especializacao statusAgendamento dataHoraAgendamento criadoEm atualizadoEm } }";
 
         JsonNode root = graphqlClient.execute(query, Map.of("medicoId", medicoId), historicoBaseUrl);
         if (root == null)
