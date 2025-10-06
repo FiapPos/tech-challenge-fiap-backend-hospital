@@ -8,6 +8,7 @@ Sistema de gerenciamento hospitalar desenvolvido com arquitetura de microserviç
 - **usuario-service** - Gerenciamento de usuários, autenticação e autorização
 - **agendamento-service** - Agendamento de consultas
 - **appointment-service** - Gestão de consultas
+- **hospital-service** - Gerenciamento de hospitais
 - **historico-service** - Histórico médico
 - **notificacao-service** - Notificações
 - **orchestrator-service** - Orquestração de transações
