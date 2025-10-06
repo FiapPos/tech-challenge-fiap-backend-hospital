@@ -2,8 +2,6 @@
 
 Sistema de gerenciamento hospitalar desenvolvido com arquitetura de microserviços.
 
-> Documentação detalhada (endpoints, portas, execução) do usuario-service agora está em `usuario-service/README.md`.
-
 ## 🏗️ **ARQUITETURA**
 
 ### Microserviços:
@@ -21,5 +19,22 @@ Sistema de gerenciamento hospitalar desenvolvido com arquitetura de microserviç
 - **Messaging:** Apache Kafka
 - **Authentication:** JWT
 - **Containerization:** Docker
+
+### Documentações
+- **agendamento-service**
+  - [Documentação](agendamento-service/README.md)
+- **appointment-service**
+- **historico-service**
+  - [Documentação](historico-service/README.md)
+  - [Guia de testes](historico-service/GUIA_TESTES_GRAPHQL.md)
+- **hospital-service**
+  - [README.md](hospital-service/README.md)
+- **notificacao-service**
+  - [Documentação](notificacao-service/README.md)
+- **orchestrator-service**
+  - [Documentação](orchestrator-service/README.md)
+- **usuario-service**
+  - [Documentação](usuario-service/README.md)
+  - [Informações para o postman](usuario-service/postman)
 
 ---

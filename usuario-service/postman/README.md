@@ -41,17 +41,17 @@ Observação:
 ## 📋 Endpoints organizados por categoria
 
 ### 👥 Usuários
-- Criar Usuário — `POST /usuarios`
-- Listar Usuários — `GET /usuarios`
-- Listar Usuários por Especialidade — `GET /usuarios/por-especialidade/{especialidadeId}`
-- Atualizar Usuário — `PUT /usuarios/{id}`
-- Desativar Usuário — `DELETE /usuarios/{id}`
+- Criar Usuário — `POST /api/usuarios`
+- Listar Usuários — `GET /api/usuarios`
+- Listar Usuários por Especialidade — `GET /api/usuarios/por-especialidade/{especialidadeId}`
+- Atualizar Usuário — `PUT /api/usuarios/{id}`
+- Desativar Usuário — `DELETE /api/usuarios/{id}`
 
 ### 🏥 Especialidades
-- Criar Especialidade — `POST /especialidades`
-- Listar Especialidades — `GET /especialidades`
-- Atualizar Especialidade — `PATCH /especialidades/{id}`
-- Inativar Especialidade — `PATCH /especialidades/{id}/inativar`
+- Criar Especialidade — `POST /api/especialidades`
+- Listar Especialidades — `GET /api/especialidades`
+- Atualizar Especialidade — `PATCH /api/especialidades/{id}`
+- Inativar Especialidade — `PATCH /api/especialidades/{id}/inativar`
 
 ### 👨‍⚕️ Especialidades do Médico
 - Associar Especialidade — `POST /medicos/{medicoId}/especialidades/{especialidadeId}`
@@ -70,7 +70,7 @@ Observação:
 - Não é necessário token neste momento (endpoints públicos). Pule esta etapa.
 
 2) Criar Usuário:
-- Requisição: `POST /usuarios`
+- Requisição: `POST /api/usuarios`
 - Body (JSON):
 ```json
 {
@@ -86,7 +86,7 @@ Observação:
 ```
 
 3) Criar Especialidade:
-- Requisição: `POST /especialidades`
+- Requisição: `POST /api/especialidades`
 - Body (JSON):
 ```json
 {
@@ -96,7 +96,7 @@ Observação:
 ```
 
 4) Deletar Endereço:
-- Requisição: `DELETE /enderecos`
+- Requisição: `DELETE /api/enderecos`
 - Body (JSON):
 ```json
 {

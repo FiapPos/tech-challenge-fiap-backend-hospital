@@ -37,7 +37,7 @@ public class EspecialidadeController implements EspecialidadeControllerDoc {
     @PostMapping
     public ResponseEntity<EspecialidadeResponse> criar(@Validated @RequestBody CriarEspecialidadeCommandDto dto) {
         Especialidade criada = criarEspecialidadeComando.execute(dto);
-        return ResponseEntity.created(URI.create("/especialidades/" + criada.getId()))
+        return ResponseEntity.created(URI.create("/api/especialidades/" + criada.getId()))
                 .body(EspecialidadeResponse.fromDomain(criada));
     }
 

@@ -247,3 +247,5 @@ query {
   }
 }
 ```
+---
+> Referência cruzada: documentação global do projeto no README raiz.
