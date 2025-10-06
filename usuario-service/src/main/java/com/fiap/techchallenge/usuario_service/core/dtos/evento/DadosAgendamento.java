@@ -1,7 +1,7 @@
-package com.fiap.techchallenge.notificacao_service.core.dto;
+package com.fiap.techchallenge.usuario_service.core.dtos.evento;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fiap.techchallenge.notificacao_service.core.enums.EStatusAgendamento;
+import com.fiap.techchallenge.usuario_service.core.enums.EStatusAgendamento;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

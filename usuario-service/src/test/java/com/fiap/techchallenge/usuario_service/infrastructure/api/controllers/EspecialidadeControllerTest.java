@@ -62,7 +62,7 @@ public class EspecialidadeControllerTest {
         ResponseEntity<EspecialidadeResponse> resp = controller.criar(dto);
 
         assertEquals(HttpStatus.CREATED, resp.getStatusCode());
-        assertEquals(URI.create("/especialidades/" + criada.getId()), resp.getHeaders().getLocation());
+        assertEquals(URI.create("/api/especialidades/" + criada.getId()), resp.getHeaders().getLocation());
         assertNotNull(resp.getBody());
         assertEquals(criada.getId(), resp.getBody().id());
         assertEquals(nome, resp.getBody().nome());

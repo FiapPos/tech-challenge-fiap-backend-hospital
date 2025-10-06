@@ -7,10 +7,12 @@ import com.fiap.techchallenge.usuario_service.core.domain.usecases.especialidade
 import com.fiap.techchallenge.usuario_service.core.dtos.especialidade.CriarEspecialidadeCommandDto;
 import com.fiap.techchallenge.usuario_service.core.dtos.especialidade.AtualizarEspecialidadeCommandDto;
 import com.fiap.techchallenge.usuario_service.core.dtos.especialidade.EspecialidadeResponse;
+import com.fiap.techchallenge.usuario_service.core.enums.Perfil;
 import com.fiap.techchallenge.usuario_service.core.queries.especialidade.BuscaEspecialidadePorIdQuery;
 import com.fiap.techchallenge.usuario_service.core.queries.especialidade.ListarEspecialidadesQuery;
 import com.fiap.techchallenge.usuario_service.core.queries.resultadoItem.especialidade.EncontraEspecialidadeItem;
 import com.fiap.techchallenge.usuario_service.core.queries.resultadoItem.especialidade.ListarEspecialidadePorResultadoItem;
+import com.fiap.techchallenge.usuario_service.core.queries.resultadoItem.usuario.EncontraUsuarioItem;
 import com.fiap.techchallenge.usuario_service.core.utils.doc.EspecialidadeControllerDoc;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,7 +37,7 @@ public class EspecialidadeController implements EspecialidadeControllerDoc {
     @PostMapping
     public ResponseEntity<EspecialidadeResponse> criar(@Validated @RequestBody CriarEspecialidadeCommandDto dto) {
         Especialidade criada = criarEspecialidadeComando.execute(dto);
-        return ResponseEntity.created(URI.create("/especialidades/" + criada.getId()))
+        return ResponseEntity.created(URI.create("/api/especialidades/" + criada.getId()))
                 .body(EspecialidadeResponse.fromDomain(criada));
     }
 

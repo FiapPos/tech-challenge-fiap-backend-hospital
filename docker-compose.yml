@@ -245,7 +245,7 @@ services:
       - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
       - SPRING_AUTOCONFIGURE_EXCLUDE=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
     ports:
-      - 3007:8080
+      - 8080:8080
 
 networks:
   orchestrator-saga:

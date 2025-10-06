@@ -4,6 +4,7 @@ import com.fiap.techchallenge.notificacao_service.core.dto.DadosAgendamento;
 import com.fiap.techchallenge.notificacao_service.core.dto.NotificacaoAgendamentoEdicao;
 import org.springframework.stereotype.Component;
 
+import static com.fiap.techchallenge.notificacao_service.core.enums.EStatusAgendamento.ATUALIZADA;
 import static com.fiap.techchallenge.notificacao_service.core.enums.EStatusAgendamento.CANCELADA;
 
 @Component
@@ -17,6 +18,6 @@ public class NotificacaoEdicaoStrategy implements NotificacaoStrategy {
 
     @Override
     public boolean isAplicavel(DadosAgendamento agendamento) {
-        return agendamento.getAtualizadoEm() != null && !CANCELADA.equals(agendamento.getStatusAgendamento());
+        return ATUALIZADA.equals(agendamento.getStatusAgendamento());
     }
 }

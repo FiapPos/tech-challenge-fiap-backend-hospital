@@ -30,8 +30,18 @@ public class ConsultaService {
         consulta.setEspecialidadeId(dto.getEspecialidadeId());
         consulta.setHospitalId(dto.getHospitalId());
         consulta.setDataHora(dto.getDataHoraAgendamento());
-        consulta.setStatus(EStatusAgendamento.PENDENTE);
-        return repository.save(consulta);
+        consulta.setStatus(EStatusAgendamento.PENDENTE); // Status inicial definido pela Saga
+
+        Consulta consultaSalva = repository.save(consulta);
+
+        // Atualiza o DTO com o ID gerado e envia evento para criar histórico imediatamente
+        dto.setAgendamentoId(consultaSalva.getId());
+        dto.setStatusAgendamento(consultaSalva.getStatus());
+
+        // Publica evento de criação no Kafka para registrar no histórico
+        kafkaProducer.enviarEventosParaHistorico(dto);
+
+        return consultaSalva;
     }
 
     @Transactional
@@ -43,7 +53,7 @@ public class ConsultaService {
         dto.setStatusAgendamento(CANCELADA);
         repository.save(consulta);
 
-        kafkaProducer.enviarEventos(dto);
+        kafkaProducer.enviarEventosParaNotificacao(dto);
     }
 
     @Transactional
@@ -55,7 +65,7 @@ public class ConsultaService {
         dto.setStatusAgendamento(CRIADA);
         repository.save(consulta);
 
-        kafkaProducer.enviarEventos(dto);
+        kafkaProducer.enviarEventosParaNotificacao(dto);
     }
 
     public DadosAgendamento atualizarConsulta(Long id, DadosAgendamento dto) {
@@ -64,7 +74,7 @@ public class ConsultaService {
         dto.setStatusAgendamento(ATUALIZADA);
         repository.save(consulta);
 
-        kafkaProducer.enviarEventos(dto);
+        kafkaProducer.enviarEventosParaNotificacao(dto);
         return dto;
     }
 
