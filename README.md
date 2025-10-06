@@ -25,11 +25,13 @@ Sistema de gerenciamento hospitalar desenvolvido com arquitetura de microserviç
 - **agendamento-service**
   - [Documentação](agendamento-service/README.md)
 - **appointment-service**
+  - [Documentação](appointment-service/README.md)
+  - [Documentação do postman](appointment-service/README-POSTMAN.md)
 - **historico-service**
   - [Documentação](historico-service/README.md)
   - [Guia de testes](historico-service/GUIA_TESTES_GRAPHQL.md)
 - **hospital-service**
-  - [README.md](hospital-service/README.md)
+  - [Documentação](hospital-service/README.md)
 - **notificacao-service**
   - [Documentação](notificacao-service/README.md)
 - **orchestrator-service**
