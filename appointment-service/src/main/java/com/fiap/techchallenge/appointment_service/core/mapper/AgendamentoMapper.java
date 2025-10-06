@@ -20,6 +20,10 @@ public class AgendamentoMapper {
             node.put("pacienteId", req.getPacienteId());
         if (req.getMedicoId() != null)
             node.put("medicoId", req.getMedicoId());
+        if (req.getHospitalId() != null)
+            node.put("hospitalId", req.getHospitalId());
+        if (req.getEspecialidadeId() != null)
+            node.put("especialidadeId", req.getEspecialidadeId());
         node.putPOJO("dataHora", req.getDataHora());
         return node;
     }

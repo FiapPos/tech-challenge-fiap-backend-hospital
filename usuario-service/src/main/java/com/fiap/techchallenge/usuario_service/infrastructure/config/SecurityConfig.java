@@ -43,7 +43,9 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/v3/api-docs.yaml",
                                 "/webjars/**",
-                                "/usuarios/**")
+                                "/usuarios/**",
+                                "/api/**",
+                                "/especialidades/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(

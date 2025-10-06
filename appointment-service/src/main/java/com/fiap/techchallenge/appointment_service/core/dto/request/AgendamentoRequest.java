@@ -20,6 +20,12 @@ public class AgendamentoRequest {
     private Long medicoId;
 
     @NotNull
+    private Long hospitalId;
+
+    @NotNull
+    private Long especialidadeId;
+
+    @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime dataHora;
 
