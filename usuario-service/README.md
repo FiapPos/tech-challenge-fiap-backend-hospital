@@ -16,29 +16,29 @@ Serviço responsável pelo ciclo de vida de usuários (cadastro, atualização, 
 Base URL (Docker): `http://localhost:3001`
 
 ### 👥 Usuários
-| Método | Caminho | Descrição |
-|--------|---------|-----------|
-| POST | /usuarios | Criar novo usuário |
-| GET | /usuarios | Listar usuários (filtros opcionais) |
-| GET | /usuarios/por-especialidade/{especialidadeId} | Listar usuários por especialidade |
-| GET | /usuarios/por-login/{login} | Buscar usuário por login |
-| PUT | /usuarios/{id} | Atualizar usuário |
-| DELETE | /usuarios/{id} | Desativar usuário |
+| Método | Caminho                                       | Descrição |
+|--------|-----------------------------------------------|-----------|
+| POST | /api/usuarios                                 | Criar novo usuário |
+| GET | /api/usuarios                                     | Listar usuários (filtros opcionais) |
+| GET | /api/usuarios/por-especialidade/{especialidadeId} | Listar usuários por especialidade |
+| GET | /api/usuarios/por-login/{login}                   | Buscar usuário por login |
+| PUT | /api/usuarios/{id}                                | Atualizar usuário |
+| DELETE | /api/usuarios/{id}                                | Desativar usuário |
 
 ### 🏥 Especialidades
 | Método | Caminho | Descrição |
 |--------|---------|-----------|
-| POST | /especialidades | Criar especialidade |
-| GET | /especialidades | Listar especialidades |
-| PATCH | /especialidades/{id} | Atualizar especialidade |
-| PATCH | /especialidades/{id}/inativar | Inativar especialidade |
+| POST | /api/especialidades | Criar especialidade |
+| GET | /api/especialidades | Listar especialidades |
+| PATCH | /api/especialidades/{id} | Atualizar especialidade |
+| PATCH |/api/especialidades/{id}/inativar | Inativar especialidade |
 
 ### 👨‍⚕️ Especialidades do Médico
-| Método | Caminho | Descrição |
-|--------|---------|-----------|
+| Método | Caminho                                                  | Descrição |
+|--------|----------------------------------------------------------|-----------|
 | POST | /medicos/{medicoId}/especialidades/{especialidadeId} | Associar especialidade ao médico |
-| GET | /medicos/{medicoId}/especialidades | Listar especialidades do médico |
-| DELETE | /medicos/{medicoId}/especialidades/{especialidadeId} | Desassociar especialidade do médico |
+| GET | /medicos/{medicoId}/especialidades                   | Listar especialidades do médico |
+| DELETE | /medicos/{medicoId}/especialidades/{especialidadeId}     | Desassociar especialidade do médico |
 
 ### 🏠 Endereços
 | Método | Caminho | Descrição |
