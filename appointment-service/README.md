@@ -40,17 +40,17 @@ Microserviço que atua como **API Gateway** do sistema hospitalar, fornecendo um
 │  ✅ Logging Centralizado                       │
 └─────────────────┬───────────────────────────────┘
                   │ Comunicação direta
-    ┌─────────────┼─────────────┐
-    │             │             │
-┌───▼───┐    ┌────▼────┐   ┌────▼────┐
-│usuario│    │orches-  │   │histórico│
-│service│    │trator   │   │service  │
-│ :3000 │    │service  │   │ :3003   │
-│       │    │ :8080   │   │         │
-│Login &│    │Agenda-  │   │GraphQL  │
-│Auth   │    │mentos   │   │Queries  │
-│(REST) │    │(REST)   │   │         │
-└───────┘    └─────────┘   └─────────┘
+    ┌─────────────┼
+    │             │             
+┌───▼───┐    ┌────▼────┐   
+│usuario│    │orches-  │   
+│service│    │trator   │   
+│ :3000 │    │service  │   
+│       │    │ :8080   │   
+│Login &│    │Agenda-  │   
+│Auth   │    │mentos   │   
+│(REST) │    │(REST)   │ 
+└───────┘    └─────────┘  
 ```
 
 ## 🏗️ Estrutura do Projeto
@@ -126,6 +126,8 @@ POST /api/agendamento/criacao
 {
   "pacienteId": 102,
   "medicoId": 101,
+  "hospitalId": 1,
+  "especialidadeId": 1,
   "dataHora": "2025-10-15T10:30:00"
 }
 ```
@@ -141,39 +143,9 @@ PUT /api/agendamento/{id}
   "pacienteId": 102,
   "medicoId": 101,
   "dataHora": "2025-10-15T15:30:00",
-  "status": "AGENDADO",
   "descricao": "Consulta de rotina - horário alterado"
 }
 ```
-
-### 📋 Histórico Médico
-```http
-GET /api/historico/paciente/{id}
-```
-**Headers:** `Authorization: Bearer {token}`  
-**Perfis:** MEDICO, PACIENTE, ENFERMEIRO  
-**Descrição:** Busca histórico completo do paciente
-
-```http
-GET /api/historico/paciente/{id}/futuros
-```
-**Headers:** `Authorization: Bearer {token}`  
-**Perfis:** MEDICO, PACIENTE, ENFERMEIRO  
-**Descrição:** Busca agendamentos futuros do paciente
-
-```http
-GET /api/historico/medico/{id}
-```
-**Headers:** `Authorization: Bearer {token}`  
-**Perfis:** MEDICO, ENFERMEIRO  
-**Descrição:** Busca histórico de atendimentos do médico
-
-```http
-GET /api/historico/medico/{id}/futuros
-```
-**Headers:** `Authorization: Bearer {token}`  
-**Perfis:** MEDICO, ENFERMEIRO  
-**Descrição:** Busca agendamentos futuros do médico
 
 ## 👥 Perfis de Usuário
 
@@ -275,7 +247,6 @@ O sistema possui os seguintes usuários pré-configurados para teste:
 
 | ID  | Nome               | CPF         | Login      | Senha    | Perfil     |
 |-----|-------------------|-------------|------------|----------|------------|
-| 100 | Administrador     | 00000000000 | admin      | senha123 | ADMIN      |
 | 101 | Medico Exemplo    | 11111111111 | medico     | senha123 | MEDICO     |
 | 102 | Paciente Exemplo  | 22222222222 | paciente   | senha123 | PACIENTE   |
 | 103 | Enfermeiro        | 33333333333 | enfermeiro | senha123 | ENFERMEIRO |
@@ -352,7 +323,7 @@ O sistema possui os seguintes usuários pré-configurados para teste:
 
 ### Coleção Postman
 Uma coleção completa do Postman está disponível no arquivo:
-- `postman-collection-appointment-service.json`
+- `Appointment Service API.postman_collection.json`
 - `README-POSTMAN.md` (documentação da coleção)
 
 ### Fluxo de Teste Recomendado
