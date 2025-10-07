@@ -20,19 +20,25 @@ A coleção inclui requisições de login para os seguintes usuários:
 
 ## 🚀 Como Usar
 
-### 1. Importar no Postman
+### 1. Subir o projeto
+
+A partir da raiz do projeto:
+
+```docker-compose up --build```
+
+### 2. Importar no Postman
 1. Abra o Postman
 2. Clique em "Import"
 3. Selecione o arquivo `Appointment Service API.postman_collection.json`
 4. A coleção será importada com todas as requisições configuradas
 
-### 2. Variáveis de Ambiente
+### 3. Variáveis de Ambiente
 A coleção utiliza as seguintes variáveis:
 - `baseUrl`: URL base da API (padrão: `http://localhost:3005`)
 - `baseUrlGraphQL`: URL base da API do GraphQL (padrão: `http://localhost:3003`)
 - `authToken`: Token JWT (preenchido automaticamente após login)
 
-### 3. Fluxo de Teste Recomendado
+### 4. Fluxo de Teste Recomendado
 
 #### 1️⃣ Hospital
 Crie um hospital primeiro.
