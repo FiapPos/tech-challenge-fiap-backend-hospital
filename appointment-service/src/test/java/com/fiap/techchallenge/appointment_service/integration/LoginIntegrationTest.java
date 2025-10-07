@@ -71,7 +71,7 @@ public class LoginIntegrationTest {
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
                 .compact();
 
-        stubFor(post(urlEqualTo("/login"))
+        stubFor(post(urlEqualTo("/api/auth/login"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")

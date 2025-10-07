@@ -1,0 +1,508 @@
+{
+	"info": {
+		"_postman_id": "4985c246-b286-4c9d-bc57-35b70345b6da",
+		"name": "Appointment Service API",
+		"description": "Coleção de requisições para o serviço de agendamentos do hospital",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5999133"
+	},
+	"item": [
+		{
+			"name": "Hospital",
+			"item": [
+				{
+					"name": "Criar Hospital",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Hospital São Paulo\",\n  \"endereco\": \"Rua das Flores, 123 - Centro, São Paulo - SP\",\n  \"telefone\": \"(11) 1234-5678\",\n  \"email\": \"contato\",\n  \"especialidades\": \"Cardiologia, Neurologia, Ortopedia, Pediatria\",\n  \"ativo\": true,\n  \"criadoEm\": \"2024-01-15T10:30:00\",\n  \"atualizadoEm\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3006/api/hospitais",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3006",
+							"path": [
+								"api",
+								"hospitais"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Autenticação",
+			"item": [
+				{
+					"name": "Login - Médico",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const responseJson = pm.response.json();",
+									"    pm.collectionVariables.set('authToken', responseJson.token);",
+									"    console.log('Token salvo:', responseJson.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"login\": \"medico\",\n  \"senha\": \"senha123\",\n  \"perfil\": \"MEDICO\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Paciente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const responseJson = pm.response.json();",
+									"    pm.collectionVariables.set('authToken', responseJson.token);",
+									"    console.log('Token salvo:', responseJson.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"login\": \"paciente\",\n  \"senha\": \"senha123\",\n  \"perfil\": \"PACIENTE\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login - Enfermeiro",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const responseJson = pm.response.json();",
+									"    pm.collectionVariables.set('authToken', responseJson.token);",
+									"    console.log('Token salvo:', responseJson.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"login\": \"enfermeiro\",\n  \"senha\": \"senha123\",\n  \"perfil\": \"ENFERMEIRO\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Agendamentos",
+			"item": [
+				{
+					"name": "Criar Agendamento",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pacienteId\": 102,\n  \"medicoId\": 101,\n  \"hospitalId\": 1,\n  \"especialidadeId\": 1,\n  \"dataHora\": \"2025-10-15T10:30:00\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/agendamento/criacao",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"agendamento",
+								"criacao"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Editar Agendamento",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{authToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pacienteId\": 102,\n  \"medicoId\": 101,\n  \"dataHora\": \"2025-10-16T15:30:00\",\n  \"descricao\": \"Consulta de rotina - horário alterado\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/agendamento/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"agendamento",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GraphQL Histórico Médico - API Tests",
+			"item": [
+				{
+					"name": "1. Todos os Atendimentos de um Paciente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { todosAtendimentosPaciente(pacienteId: \\\"102\\\") { id agendamentoId pacienteId nomePaciente nomeMedico nomeHospital especializacao statusAgendamento dataHoraAgendamento criadoEm } }\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrlGraphQL}}/graphql",
+							"host": [
+								"{{baseUrlGraphQL}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Atendimentos Futuros de um Paciente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { atendimentosFuturosPaciente(pacienteId: \\\"102\\\") { id nomePaciente nomeMedico nomeHospital dataHoraAgendamento statusAgendamento } }\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrlGraphQL}}/graphql",
+							"host": [
+								"{{baseUrlGraphQL}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Atendimentos Passados de um Paciente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { atendimentosPassadosPaciente(pacienteId: \\\"102\\\") { id nomePaciente nomeMedico nomeHospital dataHoraAgendamento statusAgendamento } }\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrlGraphQL}}/graphql",
+							"host": [
+								"{{baseUrlGraphQL}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Atendimentos por Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { atendimentosPorStatus(pacienteId: \\\"102\\\", status: CRIADA) { id nomePaciente nomeMedico statusAgendamento dataHoraAgendamento } }\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrlGraphQL}}/graphql",
+							"host": [
+								"{{baseUrlGraphQL}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Atendimentos por Período",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { atendimentosPorPeriodo(pacienteId: \\\"102\\\", dataInicio: \\\"2024-01-01T00:00:00\\\", dataFim: \\\"2024-12-31T23:59:59\\\") { id nomePaciente nomeMedico nomeHospital dataHoraAgendamento statusAgendamento } }\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrlGraphQL}}/graphql",
+							"host": [
+								"{{baseUrlGraphQL}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. Atendimentos por Médico",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query { atendimentosPorMedico(medicoId: \\\"102\\\") { id pacienteId nomePaciente nomeMedico especializacao dataHoraAgendamento statusAgendamento } }\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrlGraphQL}}/graphql",
+							"host": [
+								"{{baseUrlGraphQL}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. Consulta Complexa com Variáveis",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query BuscarHistoricoPaciente($pacienteId: Long!, $status: StatusAgendamento!) { todosAtendimentos: todosAtendimentosPaciente(pacienteId: $pacienteId) { id nomePaciente nomeMedico dataHoraAgendamento statusAgendamento } atendimentosPorStatus: atendimentosPorStatus(pacienteId: $pacienteId, status: $status) { id nomeMedico dataHoraAgendamento } }\",\n  \"variables\": {\n    \"pacienteId\": \"102\",\n    \"status\": \"CRIADA\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrlGraphQL}}/graphql",
+							"host": [
+								"{{baseUrlGraphQL}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. Schema Introspection",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"query IntrospectionQuery { __schema { queryType { name fields { name type { name kind ofType { name kind } } } } } }\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrlGraphQL}}/graphql",
+							"host": [
+								"{{baseUrlGraphQL}}"
+							],
+							"path": [
+								"graphql"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3005",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "baseUrlGraphQL",
+			"value": "http://localhost:3003",
+			"type": "string"
+		}
+	]
+}

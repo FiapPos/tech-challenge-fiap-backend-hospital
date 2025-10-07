@@ -9,7 +9,7 @@ import java.util.Map;
 @FeignClient(name = "usuario-service", url = "${usuario-service.url:http://usuario-service:3000}")
 public interface UsuarioFeignClient {
 
-    @PostMapping(value = "/login")
+    @PostMapping(value = "/api/auth/login")
     Map<String, Object> login(@RequestBody Map<String, Object> payload);
 
 }

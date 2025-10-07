@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/auth")
 public class LoginController implements LoginControllerDoc {
 
     private final AutenticaJwtComando autenticaJwtComando;
