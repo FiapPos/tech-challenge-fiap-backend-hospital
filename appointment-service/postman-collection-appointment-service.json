@@ -1,0 +1,353 @@
+{
+  "info": {
+    "name": "Appointment Service API",
+    "description": "Coleção de requisições para o serviço de agendamentos do hospital",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3002",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Login - Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.collectionVariables.set('authToken', responseJson.token);",
+                  "    console.log('Token salvo:', responseJson.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"admin\",\n  \"senha\": \"senha123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Médico",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.collectionVariables.set('authToken', responseJson.token);",
+                  "    console.log('Token salvo:', responseJson.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"medico\",\n  \"senha\": \"senha123\",\n  \"perfil\": \"MEDICO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Paciente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.collectionVariables.set('authToken', responseJson.token);",
+                  "    console.log('Token salvo:', responseJson.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"paciente\",\n  \"senha\": \"senha123\",\n  \"perfil\": \"PACIENTE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Login - Enfermeiro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.collectionVariables.set('authToken', responseJson.token);",
+                  "    console.log('Token salvo:', responseJson.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"enfermeiro\",\n  \"senha\": \"senha123\",\n  \"perfil\": \"ENFERMEIRO\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Agendamentos",
+      "item": [
+        {
+          "name": "Criar Agendamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": 102,\n  \"medicoId\": 101,\n  \"hospitalId\": 1,\n  \"especialidadeId\": 1,\n  \"dataHora\": \"2025-10-15T10:30:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/agendamento/criacao",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "agendamento", "criacao"]
+            }
+          }
+        },
+        {
+          "name": "Criar Agendamento - Caso 2",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": 102,\n  \"medicoId\": 101,\n  \"dataHora\": \"2025-10-20T14:00:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/agendamento/criacao",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "agendamento", "criacao"]
+            }
+          }
+        },
+        {
+          "name": "Editar Agendamento",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pacienteId\": 102,\n  \"medicoId\": 101,\n  \"dataHora\": \"2025-10-15T15:30:00\",\n  \"status\": \"AGENDADO\",\n  \"descricao\": \"Consulta de rotina - horário alterado\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/agendamento/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "agendamento", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Histórico Médico",
+      "item": [
+        {
+          "name": "Buscar Histórico do Paciente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/historico/paciente/102",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "historico", "paciente", "102"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Atendimentos Futuros do Paciente",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/historico/paciente/102/futuros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "historico", "paciente", "102", "futuros"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Atendimentos por Médico",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/historico/medico/101",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "historico", "medico", "101"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Atendimentos Futuros por Médico",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/historico/medico/101/futuros",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "historico", "medico", "101", "futuros"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

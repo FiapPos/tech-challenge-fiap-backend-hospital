@@ -1,10 +1,12 @@
 package com.fiap.techchallenge.orchestrator_service.service;
+
 import com.fiap.techchallenge.orchestrator_service.client.AgendamentoServiceClient;
 import com.fiap.techchallenge.orchestrator_service.client.HospitalServiceClient;
 import com.fiap.techchallenge.orchestrator_service.client.UsuarioServiceClient;
 import com.fiap.techchallenge.orchestrator_service.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -137,7 +139,8 @@ public class AgendamentoSagaService {
 
     public void cancelarSaga(String agendamentoId) {
         DadosAgendamento atual = agendamentoClient.buscarConsulta(Long.parseLong(agendamentoId));
-        if (CANCELADA.equals(atual.getStatusAgendamento())) throw new IllegalStateException("Consulta já está cancelada.");
+        if (CANCELADA.equals(atual.getStatusAgendamento()))
+            throw new IllegalStateException("Consulta já está cancelada.");
 
         EspecialidadeDTO especialidade = usuarioClient.buscaPor(atual.getEspecialidadeId());
         if (especialidade == null) throw new SagaException("Especialidade não encontrada.");

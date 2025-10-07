@@ -20,7 +20,7 @@
 ### Query 1: Todos os atendimentos de um paciente
 ```graphql
 query {
-  todosAtendimentosPaciente(pacienteId: "1") {
+  todosAtendimentosPaciente(pacienteId: "102") {
     id
     nomePaciente
     nomeMedico
@@ -35,7 +35,7 @@ query {
 ### Query 2: Apenas atendimentos futuros
 ```graphql
 query {
-  atendimentosFuturosPaciente(pacienteId: "1") {
+  atendimentosFuturosPaciente(pacienteId: "102") {
     id
     nomePaciente
     nomeMedico
@@ -48,7 +48,7 @@ query {
 ### Query 3: Atendimentos por status
 ```graphql
 query {
-  atendimentosPorStatus(pacienteId: "1", status: CRIADA) {
+  atendimentosPorStatus(pacienteId: "102", status: CRIADA) {
     id
     nomePaciente
     nomeMedico
@@ -62,7 +62,7 @@ query {
 ```graphql
 query {
   atendimentosPorPeriodo(
-    pacienteId: "1", 
+    pacienteId: "102", 
     dataInicio: "2024-01-01T00:00:00", 
     dataFim: "2024-12-31T23:59:59"
   ) {
@@ -99,7 +99,7 @@ query {
    - **Body** (raw JSON):
      ```json
      {
-       "query": "query { todosAtendimentosPaciente(pacienteId: \"1\") { id nomePaciente nomeMedico statusAgendamento } }"
+       "query": "query { todosAtendimentosPaciente(pacienteId: \"102\") { id nomePaciente nomeMedico statusAgendamento } }"
      }
      ```
 
@@ -108,7 +108,7 @@ query {
 #### 1. Consulta Simples:
 ```json
 {
-  "query": "query { todosAtendimentosPaciente(pacienteId: \"1\") { id nomePaciente nomeMedico nomeHospital statusAgendamento dataHoraAgendamento } }"
+  "query": "query { todosAtendimentosPaciente(pacienteId: \"102\") { id nomePaciente nomeMedico nomeHospital statusAgendamento dataHoraAgendamento } }"
 }
 ```
 
@@ -117,7 +117,7 @@ query {
 {
   "query": "query BuscarHistorico($pacienteId: ID!, $status: StatusAgendamento!) { atendimentosPorStatus(pacienteId: $pacienteId, status: $status) { id nomePaciente nomeMedico statusAgendamento dataHoraAgendamento } }",
   "variables": {
-    "pacienteId": "1",
+    "pacienteId": "102",
     "status": "CRIADA"
   }
 }
@@ -126,7 +126,7 @@ query {
 #### 3. Múltiplas Consultas em uma Requisição:
 ```json
 {
-  "query": "query { todos: todosAtendimentosPaciente(pacienteId: \"1\") { id nomePaciente statusAgendamento } futuros: atendimentosFuturosPaciente(pacienteId: \"1\") { id dataHoraAgendamento } }"
+  "query": "query { todos: todosAtendimentosPaciente(pacienteId: \"102\") { id nomePaciente statusAgendamento } futuros: atendimentosFuturosPaciente(pacienteId: \"102\") { id dataHoraAgendamento } }"
 }
 ```
 
@@ -138,7 +138,7 @@ curl -X POST \
   http://localhost:3003/graphql \
   -H 'Content-Type: application/json' \
   -d '{
-    "query": "query { todosAtendimentosPaciente(pacienteId: \"1\") { id nomePaciente nomeMedico statusAgendamento } }"
+    "query": "query { todosAtendimentosPaciente(pacienteId: \"102\") { id nomePaciente nomeMedico statusAgendamento } }"
   }'
 ```
 
@@ -149,7 +149,7 @@ curl -X POST \
   -H 'Content-Type: application/json' \
   -d '{
     "query": "query($pacienteId: ID!) { todosAtendimentosPaciente(pacienteId: $pacienteId) { id nomePaciente } }",
-    "variables": { "pacienteId": "1" }
+    "variables": { "pacienteId": "102" }
   }'
 ```
 
@@ -161,7 +161,7 @@ curl -X POST \
   "data": {
     "todosAtendimentosPaciente": [
       {
-        "id": "1",
+        "id": "102",
         "nomePaciente": "João Silva",
         "nomeMedico": "Dr. Carlos Santos",
         "nomeHospital": "Hospital São Paulo",

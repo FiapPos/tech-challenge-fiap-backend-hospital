@@ -139,6 +139,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_CLOUD_CONFIG_ENABLED=false
       - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
+      - JWT_SECRET=hospital-microservices-shared-jwt-secret-key-2025
+      - HISTORICO_SERVICE_URL=http://historico-service:3003
     ports:
       - 3005:3002
 
@@ -157,6 +159,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_CLOUD_CONFIG_ENABLED=false
       - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
+      - JWT_SECRET=hospital-microservices-shared-jwt-secret-key-2025
     ports:
       - 3001:3000
 

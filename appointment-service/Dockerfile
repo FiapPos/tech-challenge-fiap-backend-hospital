@@ -10,5 +10,5 @@ FROM eclipse-temurin:21-jre-alpine
 
 COPY --from=builder /app/target/*.jar appointment-service.jar
 
-EXPOSE 8080
+EXPOSE 3002
 ENTRYPOINT ["java", "-jar", "appointment-service.jar"]

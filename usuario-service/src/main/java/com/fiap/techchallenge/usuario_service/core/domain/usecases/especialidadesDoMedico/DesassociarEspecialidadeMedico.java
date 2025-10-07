@@ -2,7 +2,6 @@ package com.fiap.techchallenge.usuario_service.core.domain.usecases.especialidad
 
 import com.fiap.techchallenge.usuario_service.core.domain.entities.Usuario;
 import com.fiap.techchallenge.usuario_service.core.gateways.UsuarioRepository;
-import com.fiap.techchallenge.usuario_service.core.gateways.EspecialidadeRepository;
 import com.fiap.techchallenge.usuario_service.infrastructure.services.ValidarUsuarioExistente;
 import com.fiap.techchallenge.usuario_service.core.utils.ValidarPerfilMedico;
 import com.fiap.techchallenge.usuario_service.core.exceptions.BusinessException;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 public class DesassociarEspecialidadeMedico {
 
     private final UsuarioRepository usuarioRepository;
-    private final EspecialidadeRepository especialidadeRepository;
     private final ValidarUsuarioExistente validarUsuarioExistente;
     private final ValidarPerfilMedico validarPerfilMedico;
 

@@ -1,4 +1,5 @@
 package com.fiap.techchallenge.orchestrator_service.client;
+
 import com.fiap.techchallenge.orchestrator_service.dto.EspecialidadeDTO;
 import com.fiap.techchallenge.orchestrator_service.dto.UsuarioDTO;
 import com.fiap.techchallenge.orchestrator_service.enums.Perfil;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name = "usuario-service", url = "${services.usuario.url}")
 public interface UsuarioServiceClient {
-    
+
     @GetMapping("/api/usuarios/{usuarioId}")
     UsuarioDTO buscaPor(@PathVariable("usuarioId") Long usuarioId, @RequestParam Perfil perfil);
 
