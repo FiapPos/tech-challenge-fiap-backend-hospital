@@ -5,8 +5,8 @@ Este arquivo contém uma coleção completa do Postman para testar o serviço `a
 ## 📋 Configuração
 
 ### Base URL
-- **Desenvolvimento**: `http://localhost:3002`
-- **Porta padrão**: 3002 (conforme `application.yml`)
+- **Desenvolvimento**: `http://localhost:3005`
+- **Porta padrão**: 3005 (conforme `application.yml`)
 
 ### Usuários de Teste
 
@@ -14,7 +14,6 @@ A coleção inclui requisições de login para os seguintes usuários:
 
 | ID  | Nome               | CPF         | Login      | Senha    | Perfil     |
 |-----|-------------------|-------------|------------|----------|------------|
-| 100 | Administrador     | 00000000000 | admin      | senha123 | ADMIN      |
 | 101 | Medico Exemplo    | 11111111111 | medico     | senha123 | MEDICO     |
 | 102 | Paciente Exemplo  | 22222222222 | paciente   | senha123 | PACIENTE   |
 | 103 | Enfermeiro        | 33333333333 | enfermeiro | senha123 | ENFERMEIRO |
@@ -24,35 +23,37 @@ A coleção inclui requisições de login para os seguintes usuários:
 ### 1. Importar no Postman
 1. Abra o Postman
 2. Clique em "Import"
-3. Selecione o arquivo `postman-collection-appointment-service.json`
+3. Selecione o arquivo `Appointment Service API.postman_collection.json`
 4. A coleção será importada com todas as requisições configuradas
 
 ### 2. Variáveis de Ambiente
 A coleção utiliza as seguintes variáveis:
-- `baseUrl`: URL base da API (padrão: `http://localhost:3002`)
+- `baseUrl`: URL base da API (padrão: `http://localhost:3005`)
+- `baseUrlGraphQL`: URL base da API do GraphQL (padrão: `http://localhost:3003`)
 - `authToken`: Token JWT (preenchido automaticamente após login)
 
 ### 3. Fluxo de Teste Recomendado
 
-#### 1️⃣ Autenticação
+#### 1️⃣ Hospital
+Crie um hospital primeiro.
+- **Criar Hospital**: Aberto para qualquer perfil
+
+#### 2️⃣ Autenticação
 Execute uma das requisições de login primeiro:
-- **Login - Admin**: Para operações administrativas
 - **Login - Médico**: Para criar/editar agendamentos e consultar históricos
 - **Login - Paciente**: Para consultar próprio histórico
 - **Login - Enfermeiro**: Para criar agendamentos e consultar históricos
 
 > ⚠️ **Importante**: O token JWT é automaticamente salvo após o login bem-sucedido.
 
-#### 2️⃣ Agendamentos
+#### 3️⃣ Agendamentos
 - **Criar Agendamento**: Requer perfil MEDICO ou ENFERMEIRO
 - **Editar Agendamento**: Requer perfil MEDICO
 - Exemplos incluem agendamentos entre o médico (ID: 101) e paciente (ID: 102)
 
-#### 3️⃣ Histórico Médico
-- **Histórico do Paciente**: Todos os atendimentos (passados e futuros)
-- **Atendimentos Futuros do Paciente**: Apenas agendamentos futuros
-- **Atendimentos por Médico**: Histórico de um médico específico
-- **Atendimentos Futuros por Médico**: Agenda futura do médico
+#### 4️⃣ Histórico
+Acesso via GraphQL.
+- Guia dedicado de testes [aqui](../historico-service/GUIA_TESTES_GRAPHQL.md)
 
 ## 🔐 Autorização e Permissões
 
@@ -63,10 +64,6 @@ Execute uma das requisições de login primeiro:
 | `/api/auth/login` | POST | Público | Autenticação |
 | `/api/agendamento/criacao` | POST | MEDICO, ENFERMEIRO | Criar agendamento |
 | `/api/agendamento/{id}` | PUT | MEDICO | Editar agendamento |
-| `/api/historico/paciente/{id}` | GET | MEDICO, PACIENTE, ENFERMEIRO | Histórico do paciente |
-| `/api/historico/paciente/{id}/futuros` | GET | MEDICO, PACIENTE, ENFERMEIRO | Agendamentos futuros do paciente |
-| `/api/historico/medico/{id}` | GET | MEDICO, ENFERMEIRO | Histórico do médico |
-| `/api/historico/medico/{id}/futuros` | GET | MEDICO, ENFERMEIRO | Agendamentos futuros do médico |
 
 ## 📝 Estrutura das Requisições
 
@@ -84,6 +81,8 @@ Execute uma das requisições de login primeiro:
 {
   "pacienteId": 102,
   "medicoId": 101,
+  "hospitalId": 1,
+  "especialidadeId": 1,
   "dataHora": "2025-10-15T10:30:00"
 }
 ```
@@ -96,8 +95,7 @@ Execute uma das requisições de login primeiro:
     "dataHora": "2025-10-15T10:30:00",
     "status": "AGENDADO",
     "medicoId": 101,
-    "pacienteId": 102,
-    "descricao": "Consulta de rotina"
+    "pacienteId": 102
   }
 ]
 ```

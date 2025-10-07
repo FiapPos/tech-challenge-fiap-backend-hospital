@@ -76,6 +76,10 @@ Para testar o serviço, é necessário publicar eventos no tópico Kafka `notifi
 }
 ```
 
+- Exemplo de notificação
+
+![notificacao-kakfa.png](notificacao-kakfa.png)
+
 ## 🗃️ Banco de Dados
 - **Nenhum** - Serviço stateless, não persiste dados
 - Processa eventos e envia notificações de forma assíncrona
