@@ -24,9 +24,9 @@ public class HistoricoMedicoController {
     private final ValidarPaciente validarPaciente;
 
     @GetMapping("/paciente/{id}")
-    @PreAuthorize("hasAnyRole('MEDICO','PACIENTE','ENFERMEIRO')")
+    @PreAuthorize("hasAnyRole('PROFESSOR', 'ESTUDANTE', 'COORDENADOR')")
     public ResponseEntity<List<HistoricoMedicoDto>> historicoPaciente(@PathVariable("id") Long pacienteId) {
-        log.info("Proxy: buscando historico do paciente id={}", pacienteId);
+        log.info("Proxy: buscando historico do estudante id={}", pacienteId);
         validarPaciente.validar(pacienteId);
 
         List<HistoricoMedicoDto> dados = historicoIntegrationService.buscarTodosAtendimentosPaciente(pacienteId);
@@ -34,9 +34,9 @@ public class HistoricoMedicoController {
     }
 
     @GetMapping("/paciente/{id}/futuros")
-    @PreAuthorize("hasAnyRole('MEDICO','PACIENTE','ENFERMEIRO')")
+    @PreAuthorize("hasAnyRole('PROFESSOR', 'ESTUDANTE', 'COORDENADOR')")
     public ResponseEntity<List<HistoricoMedicoDto>> atendimentosFuturosPaciente(@PathVariable("id") Long pacienteId) {
-        log.info("Proxy: buscando atendimentos futuros do paciente id={}", pacienteId);
+        log.info("Proxy: buscando atendimentos futuros do estudante id={}", pacienteId);
 
         validarPaciente.validar(pacienteId);
 
@@ -45,18 +45,18 @@ public class HistoricoMedicoController {
     }
 
     @GetMapping("/medico/{id}")
-    @PreAuthorize("hasAnyRole('MEDICO','ENFERMEIRO')")
+    @PreAuthorize("hasAnyRole('PROFESSOR', 'COORDENADOR')")
     public ResponseEntity<List<HistoricoMedicoDto>> atendimentosPorMedico(@PathVariable("id") Long medicoId) {
-        log.info("Proxy: buscando atendimentos do medico id={}", medicoId);
+        log.info("Proxy: buscando atendimentos do professor id={}", medicoId);
 
         List<HistoricoMedicoDto> dados = historicoIntegrationService.buscarAtendimentosPorMedico(medicoId);
         return ResponseEntity.ok(dados);
     }
 
     @GetMapping("/medico/{id}/futuros")
-    @PreAuthorize("hasAnyRole('MEDICO','ENFERMEIRO')")
+    @PreAuthorize("hasAnyRole('PROFESSOR', 'COORDENADOR')")
     public ResponseEntity<List<HistoricoMedicoDto>> atendimentosFuturosPorMedico(@PathVariable("id") Long medicoId) {
-        log.info("Proxy: buscando atendimentos futuros do medico id={}", medicoId);
+        log.info("Proxy: buscando atendimentos futuros do professor id={}", medicoId);
 
         List<HistoricoMedicoDto> dados = historicoIntegrationService.buscarAtendimentosFuturosPorMedico(medicoId);
         return ResponseEntity.ok(dados);

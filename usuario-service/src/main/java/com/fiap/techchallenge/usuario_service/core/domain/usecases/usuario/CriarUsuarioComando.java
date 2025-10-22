@@ -29,7 +29,7 @@ public class CriarUsuarioComando {
         Usuario usuario = criarUsuarioBase.execute(dto);
         associarPerfis(usuario, dto);
 
-        if (Perfil.MEDICO.getCodigo().equals(dto.getPerfilId())) {
+        if (Perfil.PROFESSOR.getCodigo().equals(dto.getPerfilId())) {
             associarEspecialidadesSeMedico(usuario, dto);
         }
         return salvarUsuario(usuario);

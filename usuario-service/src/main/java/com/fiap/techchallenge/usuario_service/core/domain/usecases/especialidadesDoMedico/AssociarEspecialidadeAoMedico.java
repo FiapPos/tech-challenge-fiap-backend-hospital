@@ -7,7 +7,7 @@ import com.fiap.techchallenge.usuario_service.core.gateways.UsuarioRepository;
 import com.fiap.techchallenge.usuario_service.core.gateways.EspecialidadeRepository;
 import com.fiap.techchallenge.usuario_service.core.exceptions.BusinessException;
 import com.fiap.techchallenge.usuario_service.infrastructure.services.ValidarUsuarioExistente;
-import com.fiap.techchallenge.usuario_service.core.utils.ValidarPerfilMedico;
+import com.fiap.techchallenge.usuario_service.core.utils.ValidarPerfilProfessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,11 +18,11 @@ public class AssociarEspecialidadeAoMedico {
     private final UsuarioRepository usuarioRepository;
     private final EspecialidadeRepository especialidadeRepository;
     private final ValidarUsuarioExistente validarUsuarioExistente;
-    private final ValidarPerfilMedico validarPerfilMedico;
+    private final ValidarPerfilProfessor validarPerfilProfessor;
 
     public void execute(Long usuarioId, AssociarEspecialidadeMedicoDto dto) {
         Usuario usuario = validarUsuarioExistente.execute(usuarioId);
-        validarPerfilMedico.execute(usuario);
+        validarPerfilProfessor.execute(usuario);
         Especialidade especialidade = especialidadeRepository.findById(dto.getEspecialidadeId())
                 .orElseThrow(() -> new BusinessException("especialidade.nao.encontrada"));
 
@@ -36,7 +36,7 @@ public class AssociarEspecialidadeAoMedico {
 
     private void validarLimiteEspecialidades(Usuario usuario) {
         if (usuario.getEspecialidades() != null && usuario.getEspecialidades().size() >= 3) {
-            throw new BusinessException("medico.limite.especialidades");
+            throw new BusinessException("professor.limite.especialidades");
         }
     }
 

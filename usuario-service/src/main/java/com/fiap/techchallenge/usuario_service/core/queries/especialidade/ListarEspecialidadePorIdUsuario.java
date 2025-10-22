@@ -3,7 +3,7 @@ package com.fiap.techchallenge.usuario_service.core.queries.especialidade;
 import com.fiap.techchallenge.usuario_service.core.domain.entities.Especialidade;
 import com.fiap.techchallenge.usuario_service.core.domain.entities.Usuario;
 import com.fiap.techchallenge.usuario_service.core.queries.resultadoItem.especialidade.ListarEspecialidadePorResultadoItem;
-import com.fiap.techchallenge.usuario_service.core.utils.ValidarPerfilMedico;
+import com.fiap.techchallenge.usuario_service.core.utils.ValidarPerfilProfessor;
 import com.fiap.techchallenge.usuario_service.infrastructure.services.ValidarUsuarioExistente;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
 public class ListarEspecialidadePorIdUsuario {
 
     private final ValidarUsuarioExistente validarUsuarioExistente;
-    private final ValidarPerfilMedico validarPerfilMedico;
+    private final ValidarPerfilProfessor validarPerfilProfessor;
 
     public List<ListarEspecialidadePorResultadoItem> execute(Long usuarioId) {
         Usuario usuario = validarUsuarioExistente.execute(usuarioId);
-        validarPerfilMedico.execute(usuario);
+        validarPerfilProfessor.execute(usuario);
         List<Especialidade> especialidades = usuario.getEspecialidades();
         return mapToResultadoItemList(especialidades);
     }

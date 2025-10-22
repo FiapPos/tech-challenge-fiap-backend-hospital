@@ -1,0 +1,413 @@
+{
+	"info": {
+		"_postman_id": "feedback-service-001",
+		"name": "Feedback Service API",
+		"description": "Coleção completa para testar o serviço de feedbacks educacionais",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Feedbacks",
+			"item": [
+				{
+					"name": "Criar Feedback",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{estudante_id}}",
+								"description": "ID do estudante que está criando o feedback"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"aulaId\": 1,\n  \"cursoId\": 1,\n  \"professorId\": 10,\n  \"nota\": 5,\n  \"comentario\": \"Excelente aula! O professor explicou muito bem o conteúdo e tirou todas as dúvidas.\",\n  \"categoria\": \"DIDATICA\",\n  \"anonimo\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks"
+							]
+						},
+						"description": "Cria um novo feedback para uma aula. O estudante pode avaliar com nota de 1 a 5 e adicionar comentários."
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Feedback Anônimo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{estudante_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"aulaId\": 2,\n  \"cursoId\": 1,\n  \"professorId\": 10,\n  \"nota\": 3,\n  \"comentario\": \"Aula boa, mas poderia ter mais exemplos práticos para facilitar o entendimento.\",\n  \"categoria\": \"CONTEUDO\",\n  \"anonimo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks"
+							]
+						},
+						"description": "Cria um feedback anônimo onde o ID do estudante não será exposto."
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Feedback Crítico",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{estudante_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"aulaId\": 3,\n  \"cursoId\": 1,\n  \"professorId\": 10,\n  \"nota\": 2,\n  \"comentario\": \"Aula confusa, professor não conseguiu explicar bem o conteúdo e a turma ficou perdida.\",\n  \"categoria\": \"DIDATICA\",\n  \"anonimo\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks"
+							]
+						},
+						"description": "Cria um feedback com nota baixa (crítico) que requer atenção da administração."
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Feedback por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks/{{feedback_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks",
+								"{{feedback_id}}"
+							]
+						},
+						"description": "Busca um feedback específico pelo seu ID."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Feedbacks por Aula",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks/aula/{{aula_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks",
+								"aula",
+								"{{aula_id}}"
+							]
+						},
+						"description": "Lista todos os feedbacks de uma aula específica."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Feedbacks por Curso",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks/curso/{{curso_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks",
+								"curso",
+								"{{curso_id}}"
+							]
+						},
+						"description": "Lista todos os feedbacks de um curso específico."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Feedbacks por Estudante",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks/estudante/{{estudante_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks",
+								"estudante",
+								"{{estudante_id}}"
+							]
+						},
+						"description": "Lista todos os feedbacks criados por um estudante."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Feedbacks por Professor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks/professor/{{professor_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks",
+								"professor",
+								"{{professor_id}}"
+							]
+						},
+						"description": "Lista todos os feedbacks de um professor específico."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Feedbacks Críticos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks/criticos",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks",
+								"criticos"
+							]
+						},
+						"description": "Lista todos os feedbacks críticos (nota baixa) que precisam de atenção."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Administração",
+			"item": [
+				{
+					"name": "Responder Feedback",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "{{admin_id}}",
+								"description": "ID do administrador que está respondendo"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"resposta\": \"Obrigado pelo seu feedback! Estamos trabalhando para melhorar os exemplos práticos nas próximas aulas. Sua opinião é muito importante para nós.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks/{{feedback_id}}/responder",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks",
+								"{{feedback_id}}",
+								"responder"
+							]
+						},
+						"description": "Permite que um administrador responda a um feedback específico."
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar Status do Feedback",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks/{{feedback_id}}/status?status=EM_ANALISE",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks",
+								"{{feedback_id}}",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "EM_ANALISE",
+									"description": "Valores possíveis: PENDENTE, EM_ANALISE, RESPONDIDO, ARQUIVADO"
+								}
+							]
+						},
+						"description": "Atualiza o status de um feedback. Status disponíveis: PENDENTE, EM_ANALISE, RESPONDIDO, ARQUIVADO."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Estatísticas",
+			"item": [
+				{
+					"name": "Calcular Média da Aula",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks/aula/{{aula_id}}/media",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks",
+								"aula",
+								"{{aula_id}}",
+								"media"
+							]
+						},
+						"description": "Calcula a média das notas de uma aula específica."
+					},
+					"response": []
+				},
+				{
+					"name": "Calcular Média do Curso",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks/curso/{{curso_id}}/media",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks",
+								"curso",
+								"{{curso_id}}",
+								"media"
+							]
+						},
+						"description": "Calcula a média das notas de um curso específico."
+					},
+					"response": []
+				},
+				{
+					"name": "Calcular Média do Professor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/feedbacks/professor/{{professor_id}}/media",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"feedbacks",
+								"professor",
+								"{{professor_id}}",
+								"media"
+							]
+						},
+						"description": "Calcula a média das notas de um professor específico."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8086",
+			"type": "string"
+		},
+		{
+			"key": "estudante_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "admin_id",
+			"value": "100",
+			"type": "string"
+		},
+		{
+			"key": "feedback_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "aula_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "curso_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "professor_id",
+			"value": "10",
+			"type": "string"
+		}
+	]
+}
+

@@ -18,6 +18,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,12 +38,14 @@ public class UsuarioController implements UsuarioControllerDoc {
         private final BuscaUsuarioPorIdQuery buscaUsuarioPorIdQuery;
 
         @PostMapping
+        @PreAuthorize("hasAnyRole('ADMIN', 'COORDENADOR')")
         public ResponseEntity<Void> criarUsuario(@RequestBody @Valid CriarUsuarioComandoDto criarUsuarioComandoDto) {
                 criarUsuarioComando.execute(criarUsuarioComandoDto);
                 return new ResponseEntity<>(HttpStatus.CREATED);
         }
 
         @GetMapping
+        @PreAuthorize("hasAnyRole('ADMIN', 'COORDENADOR', 'PROFESSOR')")
         public ResponseEntity<List<ListarUsuariosResultadoItem>> listarUsuarios(ListarUsuariosParams params) {
                 List<ListarUsuariosResultadoItem> resultado = listarUsuariosQuery.execute(params);
                 if (resultado.isEmpty()) {
@@ -52,6 +55,7 @@ public class UsuarioController implements UsuarioControllerDoc {
         }
 
         @GetMapping("/por-especialidade/{especialidadeId}")
+        @PreAuthorize("hasAnyRole('ADMIN', 'COORDENADOR', 'PROFESSOR')")
         public ResponseEntity<List<ListarUsuariosResultadoItem>> listarUsuariosPorEspecialidade(
                         @PathVariable Long especialidadeId) {
                 List<ListarUsuariosResultadoItem> resultado = listarUsuariosPorIdEspecialidadeQuery
@@ -63,6 +67,7 @@ public class UsuarioController implements UsuarioControllerDoc {
         }
 
         @PutMapping("/{id}")
+        @PreAuthorize("hasAnyRole('ADMIN', 'COORDENADOR')")
         public ResponseEntity<Void> atualizarUsuario(@PathVariable Long id,
                         @RequestBody AtualizarUsuarioComandoDto dto) {
                 atualizarUsuarioComando.execute(id, dto);
@@ -70,18 +75,21 @@ public class UsuarioController implements UsuarioControllerDoc {
         }
 
         @DeleteMapping("/{id}")
+        @PreAuthorize("hasAnyRole('ADMIN', 'COORDENADOR')")
         public ResponseEntity<Void> desativarUsuario(@PathVariable Long id) {
                 desativarUsuarioComando.execute(id);
                 return ResponseEntity.ok().build();
         }
 
         @GetMapping("/por-login/{login}")
+        @PreAuthorize("hasAnyRole('ADMIN', 'COORDENADOR', 'PROFESSOR')")
         public ResponseEntity<ListarUsuariosResultadoItem> listarUsuarioPorLogin(@PathVariable String login) {
                 var item = listarUsuarioPorLoginQuery.execute(login);
                 return ResponseEntity.ok(item);
         }
 
         @GetMapping("/{id}")
+        @PreAuthorize("hasAnyRole('ADMIN', 'COORDENADOR', 'PROFESSOR')")
         public ResponseEntity<EncontraUsuarioItem> buscaUsuario(@PathVariable Long id, @RequestParam Perfil perfil, @RequestParam Optional<Long> especialidadeId) {
                 return ResponseEntity.ok(buscaUsuarioPorIdQuery.execute(id, perfil, especialidadeId));
         }

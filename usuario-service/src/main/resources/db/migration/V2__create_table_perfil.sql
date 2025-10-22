@@ -11,9 +11,9 @@ ALTER TABLE perfil ADD COLUMN IF NOT EXISTS descricao VARCHAR(255);
 -- Inserir perfis padrão com IDs fixos (idempotente)
 INSERT INTO perfil (id, nome_perfil, descricao) VALUES 
         (0, 'ADMIN', 'Administrador'),
-        (1, 'MEDICO', 'Médico'),
-        (2, 'PACIENTE', 'Paciente'),
-        (3, 'ENFERMEIRO', 'Enfermeiro')
+        (1, 'PROFESSOR', 'Professor'),
+        (2, 'ESTUDANTE', 'Estudante'),
+        (3, 'COORDENADOR', 'Coordenador')
 ON CONFLICT DO NOTHING;
 
 -- Ajustar a sequência (se existir) para o maior ID presente
@@ -28,4 +28,3 @@ EXCEPTION WHEN undefined_function OR undefined_table THEN
     -- ignora caso a sequência não exista
     NULL;
 END $$;
-

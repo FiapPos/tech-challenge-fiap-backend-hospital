@@ -6,6 +6,7 @@ import com.fiap.techchallenge.usuario_service.core.domain.usecases.login.Autenti
 import com.fiap.techchallenge.usuario_service.core.domain.usecases.login.AutenticaLoginComando;
 import com.fiap.techchallenge.usuario_service.core.dtos.login.AtualizaCredenciaisComandoDto;
 import com.fiap.techchallenge.usuario_service.core.dtos.login.CredenciaisUsuarioDto;
+import com.fiap.techchallenge.usuario_service.core.enums.Perfil;
 import com.fiap.techchallenge.usuario_service.core.utils.ValidaConfirmacaoDeSenha;
 import com.fiap.techchallenge.usuario_service.core.utils.doc.LoginControllerDoc;
 import jakarta.validation.Valid;
@@ -63,7 +64,7 @@ public class LoginController implements LoginControllerDoc {
             perfil = user.getPerfis().stream()
                     .map(p -> p.getPerfil())
                     .findFirst()
-                    .orElse(com.fiap.techchallenge.usuario_service.core.enums.Perfil.PACIENTE);
+                    .orElse(Perfil.PROFESSOR);
         }
 
         String token = autenticaJwtComando.createToken(user, perfil);

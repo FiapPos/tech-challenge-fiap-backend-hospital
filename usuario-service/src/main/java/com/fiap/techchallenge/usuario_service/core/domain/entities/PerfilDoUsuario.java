@@ -22,15 +22,15 @@ public class PerfilDoUsuario {
         return Perfil.ADMIN.equals(this.perfil);
     }
 
-    public boolean isMedico() {
-        return Perfil.MEDICO.equals(this.perfil);
+    public boolean isProfessor() {
+        return Perfil.PROFESSOR.equals(this.perfil);
     }
 
-    public boolean isPaciente() {
-        return Perfil.PACIENTE.equals(this.perfil);
+    public boolean isEstudante() {
+        return Perfil.ESTUDANTE.equals(this.perfil);
     }
 
-    public boolean isEnfermeiro() {
-        return Perfil.ENFERMEIRO.equals(this.perfil);
+    public boolean isCoordenador() {
+        return Perfil.COORDENADOR.equals(this.perfil);
     }
 }

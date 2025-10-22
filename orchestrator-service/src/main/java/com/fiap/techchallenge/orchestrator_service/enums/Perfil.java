@@ -3,15 +3,15 @@ package com.fiap.techchallenge.orchestrator_service.enums;
 import java.util.Arrays;
 
 /**
- * Enum que representa os perfis de usuário do sistema.
+ * Enum que representa os perfis de usuário do sistema educacional.
  * Os valores devem corresponder aos dados inseridos na tabela 'perfil' pela
  * migração V2.
  */
 public enum Perfil {
     ADMIN(0L),
-    MEDICO(1L),
-    PACIENTE(2L),
-    ENFERMEIRO(3L);
+    PROFESSOR(1L),
+    ESTUDANTE(2L),
+    COORDENADOR(3L);
 
     private final Long codigo;
 

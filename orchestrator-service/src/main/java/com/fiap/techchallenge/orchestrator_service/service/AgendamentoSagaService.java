@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static com.fiap.techchallenge.orchestrator_service.enums.EStatusAgendamento.CANCELADA;
-import static com.fiap.techchallenge.orchestrator_service.enums.Perfil.MEDICO;
-import static com.fiap.techchallenge.orchestrator_service.enums.Perfil.PACIENTE;
+import static com.fiap.techchallenge.orchestrator_service.enums.Perfil.PROFESSOR;
+import static com.fiap.techchallenge.orchestrator_service.enums.Perfil.ESTUDANTE;
 
 @Slf4j
 @Service
@@ -40,20 +40,20 @@ public class AgendamentoSagaService {
         try {
             DadosAgendamento consultaPendente = new DadosAgendamento();
 
-            log.info("SAGA - Validando paciente {}", request.getPacienteId());
-            UsuarioDTO paciente = usuarioClient.buscaPor(request.getPacienteId(), PACIENTE);
-            if (paciente == null) throw new SagaException("Paciente não encontrado.");
-            consultaPendente.setPacienteId(paciente.getId());
-            consultaPendente.setNomePaciente(paciente.getNome());
+            log.info("SAGA - Validando estudante {}", request.getPacienteId());
+            UsuarioDTO estudante = usuarioClient.buscaPor(request.getPacienteId(), ESTUDANTE);
+            if (estudante == null) throw new SagaException("Estudante não encontrado.");
+            consultaPendente.setPacienteId(estudante.getId());
+            consultaPendente.setNomePaciente(estudante.getNome());
 
             EspecialidadeDTO especialidade = usuarioClient.buscaPor(request.getEspecialidadeId());
             if (especialidade == null) throw new SagaException("Especialidade não encontrada.");
 
-            log.info("SAGA - Validando médico {}", request.getMedicoId());
-            UsuarioDTO medico = usuarioClient.buscaPor(request.getMedicoId(), MEDICO, especialidade.getId());
-            if (medico == null) throw new SagaException("Médico não encontrado.");
-            consultaPendente.setMedicoId(medico.getId());
-            consultaPendente.setNomeMedico(medico.getNome());
+            log.info("SAGA - Validando professor {}", request.getMedicoId());
+            UsuarioDTO professor = usuarioClient.buscaPor(request.getMedicoId(), PROFESSOR, especialidade.getId());
+            if (professor == null) throw new SagaException("Professor não encontrado.");
+            consultaPendente.setMedicoId(professor.getId());
+            consultaPendente.setNomeMedico(professor.getNome());
             consultaPendente.setEspecialidadeId(especialidade.getId());
             consultaPendente.setEspecializacao(especialidade.getNome());
 
@@ -99,7 +99,7 @@ public class AgendamentoSagaService {
         List<Consumer<Void>> compensations = new ArrayList<>();
         try {
             DadosAgendamento atual = agendamentoClient.buscarConsulta(Long.parseLong(appointmentId));
-            Long medicoId = request.getMedicoId() == null ? atual.getMedicoId() : request.getMedicoId();
+            Long professorId = request.getMedicoId() == null ? atual.getMedicoId() : request.getMedicoId();
             Long especialidadeId = request.getEspecialidadeId() == null ? atual.getEspecialidadeId() : request.getEspecialidadeId();
             Long hospitalId = request.getHospitalId() == null ? atual.getHospitalId() : request.getHospitalId();
             LocalDateTime dataHora = request.getDataHora() == null ? atual.getDataHoraAgendamento() : request.getDataHora();
@@ -107,17 +107,17 @@ public class AgendamentoSagaService {
             EspecialidadeDTO especialidade = usuarioClient.buscaPor(especialidadeId);
             if (especialidade == null) throw new SagaException("Especialidade não encontrada.");
 
-            UsuarioDTO paciente = usuarioClient.buscaPor(request.getPacienteId(), PACIENTE);
-            if (paciente == null) throw new SagaException("Paciente não encontrado.");
+            UsuarioDTO estudante = usuarioClient.buscaPor(request.getPacienteId(), ESTUDANTE);
+            if (estudante == null) throw new SagaException("Estudante não encontrado.");
 
-            UsuarioDTO medico = usuarioClient.buscaPor(medicoId, MEDICO, especialidade.getId());
-            if (medico == null) throw new SagaException("Médico não encontrado.");
+            UsuarioDTO professor = usuarioClient.buscaPor(professorId, PROFESSOR, especialidade.getId());
+            if (professor == null) throw new SagaException("Professor não encontrado.");
 
             HospitalDTO hospital = hospitalServiceClient.buscaPor(hospitalId);
             if (hospital == null) throw new SagaException("Hospital não encontrado.");
 
             compensations.add(v -> agendamentoClient.editarConsulta(atual.getAgendamentoId(), atual));
-            atual.atualiza(especialidade, medico, hospital, dataHora, request.getObservacoes(), paciente);
+            atual.atualiza(especialidade, professor, hospital, dataHora, request.getObservacoes(), estudante);
 
             agendamentoClient.editarConsulta(atual.getAgendamentoId(), atual);
             log.info("SAGA - Edição concluída com sucesso para ID: {}", appointmentId);
@@ -145,16 +145,16 @@ public class AgendamentoSagaService {
         EspecialidadeDTO especialidade = usuarioClient.buscaPor(atual.getEspecialidadeId());
         if (especialidade == null) throw new SagaException("Especialidade não encontrada.");
 
-        UsuarioDTO paciente = usuarioClient.buscaPor(atual.getPacienteId(), PACIENTE);
-        if (paciente == null) throw new SagaException("Paciente não encontrado.");
+        UsuarioDTO estudante = usuarioClient.buscaPor(atual.getPacienteId(), ESTUDANTE);
+        if (estudante == null) throw new SagaException("Estudante não encontrado.");
 
-        UsuarioDTO medico = usuarioClient.buscaPor(atual.getMedicoId(), MEDICO, especialidade.getId());
-        if (medico == null) throw new SagaException("Médico não encontrado.");
+        UsuarioDTO professor = usuarioClient.buscaPor(atual.getMedicoId(), PROFESSOR, especialidade.getId());
+        if (professor == null) throw new SagaException("Professor não encontrado.");
 
         HospitalDTO hospital = hospitalServiceClient.buscaPor(atual.getHospitalId());
         if (hospital == null) throw new SagaException("Hospital não encontrado.");
 
-        atual.atualiza(especialidade, medico, hospital, paciente);
+        atual.atualiza(especialidade, professor, hospital, estudante);
 
         agendamentoClient.cancelarConsulta(atual);
     }

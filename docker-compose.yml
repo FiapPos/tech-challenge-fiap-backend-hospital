@@ -69,6 +69,20 @@ services:
     volumes:
       - hospital-db-data:/var/lib/postgresql/data
 
+  feedback-db:
+    image: postgres:16-alpine
+    container_name: feedback-db
+    networks:
+      - orchestrator-saga
+    environment:
+      - POSTGRES_DB=feedbacks
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - 5437:5432
+    volumes:
+      - feedback-db-data:/var/lib/postgresql/data
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
     container_name: zookeeper
@@ -214,6 +228,25 @@ services:
     ports:
       - 3004:3000
 
+  feedback-service:
+    build: './feedback-service'
+    container_name: feedback-service
+    depends_on:
+      - feedback-db
+      - kafka
+    networks:
+      - orchestrator-saga
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://feedback-db:5432/feedbacks
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_CLOUD_CONFIG_ENABLED=false
+      - SPRING_CLOUD_CONFIG_IMPORT_CHECK_ENABLED=false
+      - JWT_SECRET=hospital-microservices-shared-jwt-secret-key-2025
+    ports:
+      - 3007:3007
+
   hospital-service:
     build: './hospital-service'
     container_name: hospital-service
@@ -258,6 +291,7 @@ volumes:
   agendamento-db-data:
   historico-db-data:
   hospital-db-data:
+  feedback-db-data:
   zookeeper-data:
   zookeeper-log:
   kafka-data:
