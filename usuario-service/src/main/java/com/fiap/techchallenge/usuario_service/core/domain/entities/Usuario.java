@@ -35,6 +35,8 @@ public class Usuario {
     private Boolean gestante;
     private Boolean pcd; // Pessoa com Deficiência
 
+    private Long chatId;
+
     /**
      * Calcula o peso de prioridade do usuário.
      * Quanto maior o peso, maior a prioridade para receber consultas canceladas.

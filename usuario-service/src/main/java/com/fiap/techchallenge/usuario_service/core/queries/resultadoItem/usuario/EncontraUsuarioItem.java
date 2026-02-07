@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class EncontraUsuarioItem {
     private Long id;
     private String nome;
+    private long chatId;
 }

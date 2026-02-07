@@ -1,9 +1,7 @@
 package com.fiap.techchallenge.agendamento_service.core.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -18,4 +16,7 @@ public interface UsuarioServiceClient {
 
     @GetMapping("/api/especialidades/{id}")
     Map<String, Object> buscarEspecialidadePorId(@PathVariable("id") Long id);
+
+    @PutMapping("/api/usuarios/atualiza-chat-id/{id}")
+    void vincularChatId(@PathVariable Long id, @RequestParam("chatId") long chatId);
 }

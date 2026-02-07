@@ -27,6 +27,7 @@ public class BuscaUsuarioPorIdQuery {
         return EncontraUsuarioItem.builder()
                 .id(usuario.getId())
                 .nome(usuario.getNome())
+                .chatId(usuario.getChatId() == null ? 0L : usuario.getChatId())
                 .build();
     }
 
