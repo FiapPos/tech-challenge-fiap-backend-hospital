@@ -7,6 +7,7 @@ spring:
     topic:
       orquestrador: orquestrador
       notificacao-sucesso: notificacao-sucesso
+      proposta-vaga: proposta-vaga
     consumer:
       group-id: notificacao-group
       auto-offset-reset: latest

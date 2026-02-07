@@ -30,6 +30,33 @@ public class Usuario {
     private PerfilDoUsuario perfil;
     private List<Especialidade> especialidades;
 
+    // Campos de prioridade para redirecionamento de consultas
+    private Boolean idoso;
+    private Boolean gestante;
+    private Boolean pcd; // Pessoa com Deficiência
+
+    /**
+     * Calcula o peso de prioridade do usuário.
+     * Quanto maior o peso, maior a prioridade para receber consultas canceladas.
+     * Prioridade: PCD (3) > Idoso (2) > Gestante (1)
+     */
+    public int calcularPesoPrioridade() {
+        int peso = 0;
+        if (Boolean.TRUE.equals(pcd)) peso += 3;
+        if (Boolean.TRUE.equals(idoso)) peso += 2;
+        if (Boolean.TRUE.equals(gestante)) peso += 1;
+        return peso;
+    }
+
+    /**
+     * Verifica se o usuário possui algum critério de prioridade
+     */
+    public boolean isPrioritario() {
+        return Boolean.TRUE.equals(idoso) ||
+               Boolean.TRUE.equals(gestante) ||
+               Boolean.TRUE.equals(pcd);
+    }
+
     public void trocaSenha(String novaSenha) {
         setSenha(novaSenha);
         this.dataAtualizacao = LocalDateTime.now();

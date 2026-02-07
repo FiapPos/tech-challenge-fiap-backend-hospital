@@ -57,7 +57,8 @@ public class AtualizarUsuarioComando {
     private boolean isPeloMenosUmCampoPreenchido(AtualizarUsuarioComandoDto dto) {
         return dto.getNome() != null || dto.getEmail() != null || dto.getSenha() != null ||
                 dto.getLogin() != null || dto.getTelefone() != null || dto.getCpf() != null ||
-                dto.getDataNascimento() != null;
+                dto.getDataNascimento() != null || dto.getIdoso() != null ||
+                dto.getGestante() != null || dto.getPcd() != null;
     }
 
     private void atualizarCampos(Usuario usuario, AtualizarUsuarioComandoDto dto) {
@@ -68,6 +69,7 @@ public class AtualizarUsuarioComando {
         atualizarDataNascimento(usuario, dto.getDataNascimento());
         atualizarLogin(usuario, dto.getLogin());
         atualizarSenha(usuario, dto.getSenha());
+        atualizarCamposPrioridade(usuario, dto);
         usuario.setDataAtualizacao(sharedService.getCurrentDateTime());
     }
 
@@ -110,6 +112,22 @@ public class AtualizarUsuarioComando {
     private void atualizarDataNascimento(Usuario usuario, java.time.LocalDate dataNascimento) {
         if (dataNascimento != null) {
             usuario.setDataNascimento(dataNascimento);
+        }
+    }
+
+    /**
+     * Atualiza os campos de prioridade (idoso, gestante, pcd) do usuário.
+     * Esses campos são usados para determinar a prioridade no redirecionamento de consultas.
+     */
+    private void atualizarCamposPrioridade(Usuario usuario, AtualizarUsuarioComandoDto dto) {
+        if (dto.getIdoso() != null) {
+            usuario.setIdoso(dto.getIdoso());
+        }
+        if (dto.getGestante() != null) {
+            usuario.setGestante(dto.getGestante());
+        }
+        if (dto.getPcd() != null) {
+            usuario.setPcd(dto.getPcd());
         }
     }
 }

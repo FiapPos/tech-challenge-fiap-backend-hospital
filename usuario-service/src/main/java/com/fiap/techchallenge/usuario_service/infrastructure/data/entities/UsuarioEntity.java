@@ -67,6 +67,16 @@ public class UsuarioEntity {
     @Column(name = "data_desativacao")
     private LocalDateTime dataDesativacao;
 
+    // Campos de prioridade para redirecionamento de consultas
+    @Column(name = "idoso")
+    private Boolean idoso = false;
+
+    @Column(name = "gestante")
+    private Boolean gestante = false;
+
+    @Column(name = "pcd")
+    private Boolean pcd = false; // Pessoa com Deficiência
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<EnderecoEntity> enderecos = new ArrayList<>();
 
@@ -108,7 +118,10 @@ public class UsuarioEntity {
                 this.dataDesativacao,
                 this.perfilId,
                 perfilConvertido,
-                especialidadesList);
+                especialidadesList,
+                this.idoso,
+                this.gestante,
+                this.pcd);
     }
 
     public static UsuarioEntity fromDomain(Usuario usuario) {
@@ -125,6 +138,9 @@ public class UsuarioEntity {
         entity.setDataCriacao(usuario.getDataCriacao());
         entity.setDataAtualizacao(usuario.getDataAtualizacao());
         entity.setDataDesativacao(usuario.getDataDesativacao());
+        entity.setIdoso(usuario.getIdoso());
+        entity.setGestante(usuario.getGestante());
+        entity.setPcd(usuario.getPcd());
 
         if (usuario.getPerfilId() != null) {
             entity.setPerfilId(usuario.getPerfilId());

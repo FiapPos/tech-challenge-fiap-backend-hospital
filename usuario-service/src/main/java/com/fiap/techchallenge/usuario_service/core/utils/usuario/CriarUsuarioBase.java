@@ -28,6 +28,11 @@ public class CriarUsuarioBase {
         usuario.setTelefone(dto.getTelefone());
         usuario.setEmail(dto.getEmail());
         usuario.setLogin(dto.getLogin());
+
+        // Configurar campos de prioridade
+        usuario.setIdoso(dto.getIdoso() != null ? dto.getIdoso() : false);
+        usuario.setGestante(dto.getGestante() != null ? dto.getGestante() : false);
+        usuario.setPcd(dto.getPcd() != null ? dto.getPcd() : false);
     }
 
     private void configurarDadosSeguranca(Usuario usuario, CriarUsuarioComandoDto dto) {
