@@ -1,5 +1,6 @@
 package com.fiap.techchallenge.agendamento_service.core.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fiap.techchallenge.agendamento_service.core.entity.Consulta;
 import com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento;
@@ -57,10 +58,4 @@ public class DadosAgendamento implements Serializable {
         this.statusAgendamento = consulta.getStatus();
     }
 
-
-    public String getDataHoraFormatada() {
-        return getDataHoraAgendamento() != null
-                ? getDataHoraAgendamento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
-                : null;
-    }
 }

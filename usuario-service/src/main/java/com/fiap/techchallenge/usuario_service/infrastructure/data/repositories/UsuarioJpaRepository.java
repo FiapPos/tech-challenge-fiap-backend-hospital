@@ -2,7 +2,6 @@ package com.fiap.techchallenge.usuario_service.infrastructure.data.repositories;
 
 import com.fiap.techchallenge.usuario_service.core.enums.Perfil;
 import com.fiap.techchallenge.usuario_service.infrastructure.data.entities.UsuarioEntity;
-import org.apache.kafka.common.security.auth.SaslExtensions;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -26,6 +25,9 @@ public interface UsuarioJpaRepository extends JpaRepository<UsuarioEntity, Long>
 
     @EntityGraph(attributePaths = { "perfil", "especialidades" })
     Optional<UsuarioEntity> findByLogin(String login);
+
+    @EntityGraph(attributePaths = { "perfil", "especialidades" })
+    Optional<UsuarioEntity> findByChatId(Long chatId);
 
     List<UsuarioEntity> findByEspecialidadesNome(String nome);
 

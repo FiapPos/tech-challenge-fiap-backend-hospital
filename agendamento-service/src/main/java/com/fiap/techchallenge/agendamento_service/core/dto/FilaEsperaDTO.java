@@ -61,6 +61,7 @@ public class FilaEsperaDTO implements Serializable {
         this.status = entity.getStatus();
         this.criadoEm = entity.getCriadoEm();
         this.notificadoEm = entity.getNotificadoEm();
+        this.telegramId = entity.getTelegramId();
 
         if (entity.getStatus() == EStatusFilaEspera.NOTIFICADO && entity.getId() != null) {
             this.urlAceitar = "/api/fila-espera/" + entity.getId() + "/aceitar";

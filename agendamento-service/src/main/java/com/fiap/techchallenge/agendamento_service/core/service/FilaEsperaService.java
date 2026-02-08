@@ -62,7 +62,7 @@ public class FilaEsperaService {
                 consultaCancelada.getHospitalId(),
                 consultaCancelada.getDataHoraAgendamento())
             .map(paciente -> {
-                log.info("Paciente prioritário encontrado: {} - peso: {}",
+                log.debug("Paciente prioritário encontrado: {} - peso: {}",
                         paciente.getPacienteId(), paciente.getPesoPrioridade());
 
                 paciente.setStatus(EStatusFilaEspera.NOTIFICADO);

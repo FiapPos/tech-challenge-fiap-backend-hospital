@@ -36,4 +36,6 @@ public interface UsuarioRepository {
     Optional<Usuario> findByIdAndPerfil(Long id, Perfil perfil);
 
     Optional<Usuario> findByIdAndPerfilAndEspecialidadeId(Long id, Perfil perfil, Long especialidadeId);
+
+    Optional<Usuario> findByChatId(Long chatId);
 }

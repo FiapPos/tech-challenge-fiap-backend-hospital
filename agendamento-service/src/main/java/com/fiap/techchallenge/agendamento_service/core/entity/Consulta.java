@@ -1,5 +1,6 @@
 package com.fiap.techchallenge.agendamento_service.core.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fiap.techchallenge.agendamento_service.core.dto.DadosAgendamento;
 import com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento;
 import jakarta.persistence.*;
@@ -7,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Data
 @NoArgsConstructor
@@ -61,15 +63,33 @@ public class Consulta {
 
     public void atualiza(DadosAgendamento dto) {
         this.medicoId = dto.getMedicoId();
-        this.especialidadeId = dto.getEspecialidadeId();
+        this.especialidadeId = dto.getEspecialidadeId() ;
         this.hospitalId = dto.getHospitalId();
         this.dataHora = dto.getDataHoraAgendamento() != null ? dto.getDataHoraAgendamento() : this.dataHora;
-        this.nomePaciente = dto.getNomePaciente();
-        this.nomeMedico = dto.getNomeMedico();
-        this.nomeHospital = dto.getNomeHospital();
-        this.enderecoHospital = dto.getEnderecoHospital();
-        this.especializacao = dto.getEspecializacao();
-        this.observacoes = dto.getObservacoes();
+        this.nomePaciente = dto.getNomePaciente() != null ? dto.getNomePaciente() : this.nomePaciente;
+        this.nomeMedico = dto.getNomeMedico() != null ? dto.getNomeMedico() : this.nomeMedico;
+        this.nomeHospital = dto.getNomeHospital() != null ? dto.getNomeHospital() : this.nomeHospital;
+        this.enderecoHospital = dto.getEnderecoHospital() != null ? dto.getEnderecoHospital() : this.enderecoHospital;
+        this.especializacao = dto.getEspecializacao() != null ? dto.getEspecializacao() : this.especializacao;
+        this.observacoes = dto.getObservacoes() != null ? dto.getObservacoes() : this.observacoes;
         this.status = EStatusAgendamento.ATUALIZADA;
+    }
+
+    @JsonIgnore
+    public String getTemplateDeMensagem() {
+        return String.format(
+                "• Consulta com %s na especialidade %s em %s, no endereço %s em %s",
+                getNomeMedico(),
+                getEspecializacao(),
+                getNomeHospital(),
+                getEnderecoHospital(),
+                getDataHoraFormatada()
+        );
+    }
+
+    public String getDataHoraFormatada() {
+        return getDataHora() != null
+                ? getDataHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                : null;
     }
 }

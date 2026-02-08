@@ -8,10 +8,7 @@ import com.fiap.techchallenge.usuario_service.core.dtos.usuario.AtualizarUsuario
 import com.fiap.techchallenge.usuario_service.core.dtos.usuario.CriarUsuarioComandoDto;
 import com.fiap.techchallenge.usuario_service.core.enums.Perfil;
 import com.fiap.techchallenge.usuario_service.core.queries.resultadoItem.usuario.EncontraUsuarioItem;
-import com.fiap.techchallenge.usuario_service.core.queries.usuario.BuscaUsuarioPorIdQuery;
-import com.fiap.techchallenge.usuario_service.core.queries.usuario.ListarUsuariosQuery;
-import com.fiap.techchallenge.usuario_service.core.queries.usuario.ListarUsuariosPorIdEspecialidadeQuery;
-import com.fiap.techchallenge.usuario_service.core.queries.usuario.ListarUsuarioPorLoginQuery;
+import com.fiap.techchallenge.usuario_service.core.queries.usuario.*;
 import com.fiap.techchallenge.usuario_service.core.queries.params.ListarUsuariosParams;
 import com.fiap.techchallenge.usuario_service.core.queries.resultadoItem.usuario.ListarUsuariosResultadoItem;
 import com.fiap.techchallenge.usuario_service.core.utils.doc.UsuarioControllerDoc;
@@ -38,6 +35,7 @@ public class UsuarioController implements UsuarioControllerDoc {
         private final ListarUsuariosPorIdEspecialidadeQuery listarUsuariosPorIdEspecialidadeQuery;
         private final ListarUsuarioPorLoginQuery listarUsuarioPorLoginQuery;
         private final BuscaUsuarioPorIdQuery buscaUsuarioPorIdQuery;
+        private final BuscaUsuarioPorChatIdQuery buscaUsuarioPorChatIdQuery;
         private final GeraQrCodeComando geraQrCodeComando;
 
         @PostMapping
@@ -88,6 +86,11 @@ public class UsuarioController implements UsuarioControllerDoc {
         @GetMapping("/{id}")
         public ResponseEntity<EncontraUsuarioItem> buscaUsuario(@PathVariable Long id, @RequestParam Perfil perfil, @RequestParam Optional<Long> especialidadeId) {
                 return ResponseEntity.ok(buscaUsuarioPorIdQuery.execute(id, perfil, especialidadeId));
+        }
+
+        @GetMapping("/por-chat/{chatId}")
+        public ResponseEntity<Long> buscaUsuarioPorChatId(@PathVariable Long chatId) {
+                return ResponseEntity.ok(buscaUsuarioPorChatIdQuery.execute(chatId));
         }
 
 

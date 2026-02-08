@@ -9,9 +9,12 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface HistoricoMedicoRepository extends JpaRepository<HistoricoMedico, Long> {
+
+    Optional<HistoricoMedico> findByAgendamentoId(Long agendamentoId);
 
     List<HistoricoMedico> findByPacienteIdOrderByDataHoraAgendamentoDesc(Long pacienteId);
 

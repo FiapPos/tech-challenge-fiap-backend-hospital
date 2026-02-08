@@ -45,7 +45,7 @@ public class HistoricoMedicoService {
     public Optional<HistoricoMedico> atualizarHistorico(DadosAgendamento dados) {
         log.info("Atualizando histórico médico para agendamento ID: {}", dados.getAgendamentoId());
 
-        return repository.findById(dados.getAgendamentoId())
+        return repository.findByAgendamentoId(dados.getAgendamentoId())
                 .map(historico -> {
                     historico.setStatusAgendamento(dados.getStatusAgendamento());
                     historico.setAtualizadoEm(LocalDateTime.now());
