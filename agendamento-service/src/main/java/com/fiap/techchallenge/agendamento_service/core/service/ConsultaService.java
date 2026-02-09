@@ -137,7 +137,7 @@ public class ConsultaService {
                     .processarRedirecionamento(consultaParaRedirecionamento)
                     .ifPresent(
                             filaEspera -> susAgendamentoBotService
-                                    .enviarSolicitacaoConfirmacaoParaPaciente(
+                                    .enviarSolicitacaoConfirmacaoParaPacienteNaFilaDeEspera(
                                             filaEspera.getPacienteId(),
                                             filaEspera.getId(),
                                             consulta

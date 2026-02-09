@@ -1,0 +1,1269 @@
+{
+	"info": {
+		"_postman_id": "859adcb3-28f3-4838-bb24-2951911b730f",
+		"name": "Prioridade Consultas - Agendamento Service",
+		"description": "Collection para testar funcionalidades de prioridade de consultas no agendamento-service.\n\n## URLs (Docker):\n- Agendamento Service: http://localhost:3002\n- Usuario Service: http://localhost:3001\n- Appointment Service: http://localhost:3005\n- Orchestrator Service: http://localhost:8080\n\n## Usuários de Teste (da migration V7):\n- admin / senha123 (ADMIN)\n- medico / senha123 (MEDICO)\n- paciente / senha123 (PACIENTE)\n- enfermeiro / senha123 (ENFERMEIRO)\n\n## Fluxo de Prioridade:\n1. Login para obter token\n2. Criar consulta pendente\n3. Cancelar consulta (dispara redirecionamento)\n4. Verificar disponibilidade\n5. Pacientes prioritários (idoso, gestante, PCD) recebem vaga",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Autenticação",
+			"item": [
+				{
+					"name": "Login Medico",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('token', jsonData.token);",
+									"    pm.test('Token obtido com sucesso', function() {",
+									"        pm.expect(jsonData.token).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"login\": \"medico\",\n  \"senha\": \"senha123\",\n  \"perfil\": \"MEDICO\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url_usuario}}/api/auth/login",
+							"host": [
+								"{{base_url_usuario}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Paciente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('token', jsonData.token);",
+									"    pm.test('Token obtido com sucesso', function() {",
+									"        pm.expect(jsonData.token).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"login\": \"paciente\",\n  \"senha\": \"senha123\",\n  \"perfil\": \"PACIENTE\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url_usuario}}/api/auth/login",
+							"host": [
+								"{{base_url_usuario}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('token', jsonData.token);",
+									"    pm.test('Token obtido com sucesso', function() {",
+									"        pm.expect(jsonData.token).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"login\": \"admin\",\n  \"senha\": \"senha123\",\n  \"perfil\": \"ADMIN\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url_usuario}}/api/auth/login",
+							"host": [
+								"{{base_url_usuario}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Consultas - CRUD",
+			"item": [
+				{
+					"name": "Criar Consulta Pendente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.agendamentoId) {",
+									"        pm.environment.set('consulta_id', jsonData.agendamentoId);",
+									"    }",
+									"    pm.test('Consulta criada com status PENDENTE', function() {",
+									"        pm.expect(jsonData.statusAgendamento).to.eql('PENDENTE');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pacienteId\": {{paciente_id}},\n  \"medicoId\": {{medico_id}},\n  \"especialidadeId\": {{especialidade_id}},\n  \"hospitalId\": {{hospital_id}},\n  \"nomePaciente\": \"Paciente Exemplo\",\n  \"nomeMedico\": \"Dr. Medico Exemplo\",\n  \"nomeHospital\": \"Hospital Central\",\n  \"enderecoHospital\": \"Rua Principal, 123 - Centro\",\n  \"especializacao\": \"Cardiologia\",\n  \"dataHoraAgendamento\": \"2026-03-15T14:30:00\",\n  \"observacoes\": \"Consulta de rotina\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Consulta por ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas/{{consulta_id}}",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas",
+								"{{consulta_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar Consulta",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"medicoId\": {{medico_id}},\n  \"especialidadeId\": {{especialidade_id}},\n  \"hospitalId\": {{hospital_id}},\n  \"dataHoraAgendamento\": \"2026-03-20T10:00:00\",\n  \"observacoes\": \"Consulta reagendada\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas/{{consulta_id}}",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas",
+								"{{consulta_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Confirmar Consulta",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"agendamentoId\": {{consulta_id}},\n  \"pacienteId\": {{paciente_id}},\n  \"medicoId\": {{medico_id}},\n  \"especialidadeId\": {{especialidade_id}},\n  \"hospitalId\": {{hospital_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas/confirmar",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas",
+								"confirmar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancelar Consulta",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"agendamentoId\": {{consulta_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas/cancelar",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas",
+								"cancelar"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Disponibilidade",
+			"item": [
+				{
+					"name": "Verificar Disponibilidade de Horário",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas/disponibilidade?medicoId={{medico_id}}&pacienteId={{paciente_id}}&dataHora=2026-03-15T14:30:00",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas",
+								"disponibilidade"
+							],
+							"query": [
+								{
+									"key": "medicoId",
+									"value": "{{medico_id}}"
+								},
+								{
+									"key": "pacienteId",
+									"value": "{{paciente_id}}"
+								},
+								{
+									"key": "dataHora",
+									"value": "2026-03-15T14:30:00"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Prioridade - Usuários",
+			"item": [
+				{
+					"name": "Listar Todos Usuários",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url_usuario}}/api/usuarios",
+							"host": [
+								"{{base_url_usuario}}"
+							],
+							"path": [
+								"api",
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Usuário por ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url_usuario}}/api/usuarios/{{paciente_id}}?perfil=PACIENTE",
+							"host": [
+								"{{base_url_usuario}}"
+							],
+							"path": [
+								"api",
+								"usuarios",
+								"{{paciente_id}}"
+							],
+							"query": [
+								{
+									"key": "perfil",
+									"value": "PACIENTE"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Paciente Prioritário (Idoso)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201 || pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.environment.set('paciente_prioritario_id', jsonData.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Maria Idosa\",\n  \"cpf\": \"55566677788\",\n  \"dataNascimento\": \"1950-05-15\",\n  \"email\": \"maria.idosa@example.com\",\n  \"senha\": \"senha123\",\n  \"login\": \"maria.idosa\",\n  \"perfilId\": 2,\n  \"telefone\": \"11999887766\",\n  \"idoso\": true,\n  \"gestante\": false,\n  \"pcd\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url_usuario}}/api/usuarios",
+							"host": [
+								"{{base_url_usuario}}"
+							],
+							"path": [
+								"api",
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Paciente Prioritário (PCD)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201 || pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.environment.set('paciente_pcd_id', jsonData.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Carlos PCD\",\n  \"cpf\": \"66677788899\",\n  \"dataNascimento\": \"1985-08-20\",\n  \"email\": \"carlos.pcd@example.com\",\n  \"senha\": \"senha123\",\n  \"login\": \"carlos.pcd\",\n  \"perfilId\": 2,\n  \"telefone\": \"11988776655\",\n  \"idoso\": false,\n  \"gestante\": false,\n  \"pcd\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url_usuario}}/api/usuarios",
+							"host": [
+								"{{base_url_usuario}}"
+							],
+							"path": [
+								"api",
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar Paciente Prioritário (Gestante)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201 || pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.id) {",
+									"        pm.environment.set('paciente_gestante_id', jsonData.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nome\": \"Ana Gestante\",\n  \"cpf\": \"77788899900\",\n  \"dataNascimento\": \"1992-03-10\",\n  \"email\": \"ana.gestante@example.com\",\n  \"senha\": \"senha123\",\n  \"login\": \"ana.gestante\",\n  \"perfilId\": 2,\n  \"telefone\": \"11977665544\",\n  \"idoso\": false,\n  \"gestante\": true,\n  \"pcd\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url_usuario}}/api/usuarios",
+							"host": [
+								"{{base_url_usuario}}"
+							],
+							"path": [
+								"api",
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5. Fluxo Completo - Prioridade",
+			"item": [
+				{
+					"name": "1. Login como Médico",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('token', jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"login\": \"medico\",\n  \"senha\": \"senha123\",\n  \"perfil\": \"MEDICO\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url_usuario}}/api/auth/login",
+							"host": [
+								"{{base_url_usuario}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Criar Consulta para Paciente Normal",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('consulta_normal_id', jsonData.agendamentoId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pacienteId\": {{paciente_id}},\n  \"medicoId\": {{medico_id}},\n  \"especialidadeId\": {{especialidade_id}},\n  \"hospitalId\": {{hospital_id}},\n  \"nomePaciente\": \"Paciente Normal\",\n  \"nomeMedico\": \"Dr. Medico\",\n  \"nomeHospital\": \"Hospital Central\",\n  \"enderecoHospital\": \"Rua Principal, 123\",\n  \"especializacao\": \"Cardiologia\",\n  \"dataHoraAgendamento\": \"2026-03-20T09:00:00\",\n  \"observacoes\": \"Consulta normal para teste de prioridade\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Confirmar Consulta Normal",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"agendamentoId\": {{consulta_normal_id}},\n  \"pacienteId\": {{paciente_id}},\n  \"medicoId\": {{medico_id}},\n  \"especialidadeId\": {{especialidade_id}},\n  \"hospitalId\": {{hospital_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas/confirmar",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas",
+								"confirmar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Cancelar Consulta (dispara redirecionamento prioritário)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"agendamentoId\": {{consulta_normal_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas/cancelar",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas",
+								"cancelar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Verificar Consulta Cancelada",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas/{{consulta_normal_id}}",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas",
+								"{{consulta_normal_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6. Fila de Espera - Prioridade",
+			"item": [
+				{
+					"name": "1. Adicionar Paciente Normal na Fila (peso 0)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('fila_normal_id', jsonData.id);",
+									"    pm.test('Peso prioridade deve ser 0', function() {",
+									"        pm.expect(jsonData.pesoPrioridade).to.eql(0);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pacienteId\": 102,\n  \"especialidadeId\": {{especialidade_id}},\n  \"hospitalId\": {{hospital_id}},\n  \"medicoPreferidoId\": null,\n  \"dataHoraPreferida\": \"2026-03-15T14:30:00\",\n  \"emailPaciente\": \"normal@test.com\",\n  \"idoso\": false,\n  \"gestante\": false,\n  \"pcd\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/fila-espera",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"fila-espera"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Adicionar Paciente Gestante na Fila (peso 1)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('fila_gestante_id', jsonData.id);",
+									"    pm.test('Peso prioridade deve ser 1', function() {",
+									"        pm.expect(jsonData.pesoPrioridade).to.eql(1);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pacienteId\": 106,\n  \"especialidadeId\": {{especialidade_id}},\n  \"hospitalId\": {{hospital_id}},\n  \"medicoPreferidoId\": null,\n  \"dataHoraPreferida\": \"2026-03-15T14:30:00\",\n  \"emailPaciente\": \"gestante@test.com\",\n  \"idoso\": false,\n  \"gestante\": true,\n  \"pcd\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/fila-espera",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"fila-espera"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Adicionar Paciente Idoso na Fila (peso 2)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('fila_idoso_id', jsonData.id);",
+									"    pm.test('Peso prioridade deve ser 2', function() {",
+									"        pm.expect(jsonData.pesoPrioridade).to.eql(2);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pacienteId\": 104,\n  \"especialidadeId\": {{especialidade_id}},\n  \"hospitalId\": {{hospital_id}},\n  \"medicoPreferidoId\": null,\n  \"dataHoraPreferida\": \"2026-03-15T14:30:00\",\n  \"emailPaciente\": \"idoso@test.com\",\n  \"idoso\": true,\n  \"gestante\": false,\n  \"pcd\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/fila-espera",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"fila-espera"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. Adicionar Paciente PCD na Fila (peso 3) - MAIOR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('fila_pcd_id', jsonData.id);",
+									"    pm.test('Peso prioridade deve ser 3', function() {",
+									"        pm.expect(jsonData.pesoPrioridade).to.eql(3);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pacienteId\": 105,\n  \"especialidadeId\": {{especialidade_id}},\n  \"hospitalId\": {{hospital_id}},\n  \"medicoPreferidoId\": null,\n  \"dataHoraPreferida\": \"2026-03-15T14:30:00\",\n  \"emailPaciente\": \"pcd@test.com\",\n  \"idoso\": false,\n  \"gestante\": false,\n  \"pcd\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/fila-espera",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"fila-espera"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Ver Pacientes Prioritários (ordenado por peso)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('Lista deve estar ordenada por prioridade', function() {",
+									"        if (jsonData.length > 1) {",
+									"            for (var i = 0; i < jsonData.length - 1; i++) {",
+									"                pm.expect(jsonData[i].pesoPrioridade).to.be.at.least(jsonData[i+1].pesoPrioridade);",
+									"            }",
+									"        }",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/fila-espera/prioritarios?especialidadeId={{especialidade_id}}&hospitalId={{hospital_id}}&dataHora=2026-03-15T14:30:00",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"fila-espera",
+								"prioritarios"
+							],
+							"query": [
+								{
+									"key": "especialidadeId",
+									"value": "{{especialidade_id}}"
+								},
+								{
+									"key": "hospitalId",
+									"value": "{{hospital_id}}"
+								},
+								{
+									"key": "dataHora",
+									"value": "2026-03-15T14:30:00"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "6. Buscar Fila por Paciente PCD",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/fila-espera/paciente/203",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"fila-espera",
+								"paciente",
+								"203"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "7. Aceitar Proposta de Horário",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/fila-espera/{{fila_pcd_id}}/aceitar",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"fila-espera",
+								"{{fila_pcd_id}}",
+								"aceitar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "8. Recusar Proposta de Horário",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/fila-espera/{{fila_idoso_id}}/recusar",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"fila-espera",
+								"{{fila_idoso_id}}",
+								"recusar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "9. Remover da Fila",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/fila-espera/{{fila_normal_id}}",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"fila-espera",
+								"{{fila_normal_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "7. Teste Completo - Fluxo Prioridade",
+			"item": [
+				{
+					"name": "1. Criar Consulta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('consulta_teste_id', jsonData.agendamentoId);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pacienteId\": {{paciente_id}},\n  \"medicoId\": {{medico_id}},\n  \"especialidadeId\": {{especialidade_id}},\n  \"hospitalId\": {{hospital_id}},\n  \"nomePaciente\": \"Paciente Teste\",\n  \"nomeMedico\": \"Dr. Medico Exemplo\",\n  \"nomeHospital\": \"Hospital Central\",\n  \"enderecoHospital\": \"Rua Principal, 123\",\n  \"especializacao\": \"Cardiologia\",\n  \"dataHoraAgendamento\": \"2026-03-20T10:00:00\",\n  \"observacoes\": \"Consulta para teste de prioridade\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Confirmar Consulta",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"agendamentoId\": {{consulta_teste_id}},\n  \"pacienteId\": {{paciente_id}},\n  \"medicoId\": {{medico_id}},\n  \"especialidadeId\": {{especialidade_id}},\n  \"hospitalId\": {{hospital_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas/confirmar",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas",
+								"confirmar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3. Adicionar PCD na Fila (maior prioridade)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('fila_teste_id', jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pacienteId\": 105,\n  \"especialidadeId\": {{especialidade_id}},\n  \"hospitalId\": {{hospital_id}},\n  \"medicoPreferidoId\": null,\n  \"dataHoraPreferida\": \"2026-03-20T10:00:00\",\n  \"emailPaciente\": \"pcd.teste@test.com\",\n  \"idoso\": false,\n  \"gestante\": false,\n  \"pcd\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/fila-espera",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"fila-espera"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4. CANCELAR Consulta (dispara redirecionamento)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"agendamentoId\": {{consulta_teste_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/consultas/cancelar",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"consultas",
+								"cancelar"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5. Verificar Status do Paciente PCD (deve ser NOTIFICADO)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('Status deve ser NOTIFICADO', function() {",
+									"        pm.expect(jsonData.status).to.eql('NOTIFICADO');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url_agendamento}}/api/fila-espera/{{fila_teste_id}}",
+							"host": [
+								"{{base_url_agendamento}}"
+							],
+							"path": [
+								"api",
+								"fila-espera",
+								"{{fila_teste_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Execute em ordem para ver o sistema de prioridade funcionando"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

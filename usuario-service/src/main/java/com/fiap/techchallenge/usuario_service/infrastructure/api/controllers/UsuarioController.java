@@ -14,7 +14,9 @@ import com.fiap.techchallenge.usuario_service.core.queries.resultadoItem.usuario
 import com.fiap.techchallenge.usuario_service.core.utils.doc.UsuarioControllerDoc;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -96,7 +98,12 @@ public class UsuarioController implements UsuarioControllerDoc {
 
         @GetMapping(value = "/{id}/qrCode", produces = IMAGE_PNG_VALUE)
         public ResponseEntity<byte[]> geraQrCode(@PathVariable Long id) {
-                return ResponseEntity.ok(geraQrCodeComando.geraQrCode(id));
+                byte[] png = geraQrCodeComando.geraQrCode(id);
+                return ResponseEntity.ok()
+                                .contentType(MediaType.IMAGE_PNG)
+                                .header(HttpHeaders.CONTENT_DISPOSITION,
+                                                "inline; filename=\"usuario-" + id + "-qrcode.png\"")
+                                .body(png);
         }
 
         @PutMapping("/atualiza-chat-id/{id}")

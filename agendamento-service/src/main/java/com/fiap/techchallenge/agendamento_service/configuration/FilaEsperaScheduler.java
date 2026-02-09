@@ -15,6 +15,10 @@ public class FilaEsperaScheduler {
 
     private final FilaEsperaService filaEsperaService;
 
+    /**
+     * Descomente para alocar as pessoas da fila de forma automática
+     * conforme disponibilidade
+     */
 //    @Scheduled(cron = "0 */5 * * * *")
 //    public void alocarPacientesDaFila() {
 //        log.info("Iniciando alocação automática de pacientes da fila de espera");
@@ -25,15 +29,15 @@ public class FilaEsperaScheduler {
 //            log.error("Erro ao alocar pacientes da fila: {}", e.getMessage());
 //        }
 //    }
-//
-//    @Scheduled(cron = "0 0 * * * *")
-//    public void verificarPropostasExpiradas() {
-//        log.info("Verificando propostas expiradas (não respondidas em 24h)");
-//        try {
-//            filaEsperaService.expirarPropostasAntigas();
-//            log.info("Verificação de propostas expiradas concluída");
-//        } catch (Exception e) {
-//            log.error("Erro ao verificar propostas expiradas: {}", e.getMessage());
-//        }
-//    }
+
+    @Scheduled(cron = "0 0 * * * *")
+    public void verificarPropostasExpiradas() {
+        log.info("Verificando propostas expiradas (não respondidas em 24h)");
+        try {
+            filaEsperaService.expirarPropostasAntigas();
+            log.info("Verificação de propostas expiradas concluída");
+        } catch (Exception e) {
+            log.error("Erro ao verificar propostas expiradas: {}", e.getMessage());
+        }
+    }
 }

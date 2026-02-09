@@ -33,7 +33,9 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
     private final FilaEsperaService filaEsperaService;
     private final ConsultaRepository consultaRepository;
 
-    public SusAgendamentoBotService(UsuarioServiceClient service, FilaEsperaService filaEsperaService, ConsultaRepository consultaRepository) {
+    public SusAgendamentoBotService(UsuarioServiceClient service,
+                                    FilaEsperaService filaEsperaService,
+                                    ConsultaRepository consultaRepository) {
         this.service = service;
         this.filaEsperaService = filaEsperaService;
         this.consultaRepository = consultaRepository;
@@ -88,11 +90,11 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
         if (partes.length > 1) {
             String usuarioId = partes[1];
             service.vincularChatId(Long.valueOf(usuarioId), chat_id);
-            enviarMensagem(chat_id, "✅ Olá! Esse é o serviço de notificações do SUS. Agora você receberá notificações de confirmação e lembretes por aqui! \n\n" +
+            enviarMensagem(chat_id, "✅ Olá! Eu sou o Zé Gotinha e esse é o serviço de notificações do SUS. Agora você receberá notificações de confirmação e lembretes por aqui! \n\n" +
                     "Lista de comandos: \n" +
                     "• /consultas: Listagem de consultas futuras");
         } else {
-            enviarMensagem(chat_id, "Bem-vindo ao assistente do SUS! Escaneie o QR Code na sua guia para ativar os lembretes.");
+            enviarMensagem(chat_id, "Boas vindas ao assistente do SUS! Escaneie o QR Code na sua guia para ativar os lembretes.");
         }
     }
 
@@ -118,7 +120,19 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
         enviarMensagem(chat_id, corpoConsultas.isEmpty() ? "Não existem próximas consultas agendadas." : consultas);
     }
 
-    public void enviarSolicitacaoConfirmacao(long chatId, Long filaEsperaId, Consulta consulta) {
+    public void enviarSolicitacaoConfirmacaoParaPacienteNaFilaDeEspera(Long pacienteId, Long filaEsperaId, Consulta consulta) {
+        if (pacienteId == null) return;
+
+        UsuarioDTO paciente = service.buscarUsuarioPorId(pacienteId, "PACIENTE");
+        if (paciente == null) return;
+
+        long chatId = paciente.getChatId();
+        if (chatId == 0L) return;
+
+        enviarSolicitacaoConfirmacaoParaFilaDeEspera(chatId, filaEsperaId, consulta);
+    }
+
+    private void enviarSolicitacaoConfirmacaoParaFilaDeEspera(long chatId, Long filaEsperaId, Consulta consulta) {
         InlineKeyboardButton botaoSim = InlineKeyboardButton.builder()
                 .text("✅ Confirmar Presença")
                 .callbackData("CONFIRMAR_" + filaEsperaId)
@@ -145,18 +159,6 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-    }
-
-    public void enviarSolicitacaoConfirmacaoParaPaciente(Long pacienteId, Long filaEsperaId, Consulta consulta) {
-        if (pacienteId == null) return;
-
-        UsuarioDTO paciente = service.buscarUsuarioPorId(pacienteId, "PACIENTE");
-        if (paciente == null) return;
-
-        long chatId = paciente.getChatId();
-        if (chatId == 0L) return;
-
-        enviarSolicitacaoConfirmacao(chatId, filaEsperaId, consulta);
     }
 
     public void enviarConfirmacao(Consulta consulta) {
