@@ -17,3 +17,7 @@ services:
   hospital:
     url: ${HOSPITAL_SERVICE_URL:http://localhost:3006}
 
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN}
+

@@ -8,6 +8,7 @@ import com.fiap.techchallenge.agendamento_service.core.enums.EStatusFilaEspera;
 import com.fiap.techchallenge.agendamento_service.core.repository.ConsultaRepository;
 import com.fiap.techchallenge.agendamento_service.core.repository.FilaEsperaRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.BotSession;
@@ -32,6 +33,7 @@ import static java.util.stream.Collectors.joining;
 @Component
 public class SusAgendamentoBotService implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
 
+    private final String botToken;
     private final TelegramClient telegramClient;
     private final UsuarioServiceClient service;
     private final FilaEsperaService filaEsperaService;
@@ -40,17 +42,23 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
 
     public SusAgendamentoBotService(UsuarioServiceClient service,
                                     FilaEsperaService filaEsperaService,
-                                    ConsultaRepository consultaRepository, FilaEsperaRepository filaEsperaRepository) {
+                                    ConsultaRepository consultaRepository,
+                                    FilaEsperaRepository filaEsperaRepository,
+                                    @Value("${telegram.bot.token}") String botToken) {
         this.service = service;
         this.filaEsperaService = filaEsperaService;
         this.consultaRepository = consultaRepository;
-        telegramClient = new OkHttpTelegramClient(getBotToken());
+        this.botToken = botToken;
+        if (this.botToken == null || this.botToken.isBlank()) {
+            throw new IllegalStateException("Configuração ausente: 'telegram.bot.token' (defina via env TELEGRAM_BOT_TOKEN).");
+        }
+        telegramClient = new OkHttpTelegramClient(this.botToken);
         this.filaEsperaRepository = filaEsperaRepository;
     }
 
     @Override
     public String getBotToken() {
-        return "8312571764:AAHd8DskcfvLLt_lOd_kDKwdmI-aGLenEsw";
+        return botToken;
     }
 
     @Override
@@ -101,7 +109,10 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
     private void confirmarConsulta(Long id, long chatId) {
         Consulta consulta = consultaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
-        if (consulta.isCriada()) enviarMensagem(chatId, "Essa consulta não está mais disponível para ações.");
+        if (consulta.isCriada()) {
+            enviarMensagem(chatId, "Essa consulta não está mais disponível para ações.");
+            return;
+        }
 
         consulta.setStatus(CRIADA);
         consultaRepository.save(consulta);
@@ -111,7 +122,10 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
     private void recusarConsulta(Long id, long chatId) {
         Consulta consulta = consultaRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
-        if (consulta.isCancelada()) enviarMensagem(chatId, "Essa consulta não está mais disponível para ações.");
+        if (consulta.isCancelada()) {
+            enviarMensagem(chatId, "Essa consulta não está mais disponível para ações.");
+            return;
+        }
 
         consulta.setStatus(CANCELADA);
         consultaRepository.save(consulta);
