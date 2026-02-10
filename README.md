@@ -7,6 +7,8 @@ Sistema de gerenciamento hospitalar desenvolvido com arquitetura de microserviç
 - Collection do Postman: [Prioridade Consultas - Agendamento Service.postman_collection.json](agendamento-service/postman/Prioridade%20Consultas%20-%20Agendamento%20Service.postman_collection.json) e [Prioridade-Consultas.postman_environment.json](agendamento-service/postman/Prioridade-Consultas.postman_environment.json)
 - Simulação de fluxo completo de notificação e redirecionamento entre dois usuários distintos: https://drive.google.com/file/d/1R95HxQT4EiCdeuIBXSGy-Ys0IjMCwddJ/view?usp=sharing
 
+![simulacao.gif](simulacao.gif)
+
 ## Equipe
 - [Gustavo Lima - RM363714](https://github.com/GustavoLimaAl)
 - [Isabella Cruz - RM363205](https://github.com/isabellacoliveira)

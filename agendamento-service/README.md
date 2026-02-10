@@ -2,7 +2,10 @@
 
 Serviço responsável por registrar, atualizar, confirmar e cancelar consultas médicas.
 
+Vídeo de exemplo: https://drive.google.com/file/d/1CjNAuJimmRYVFovcMOpfj1sT-wzl6WCO/view?usp=sharing
+
 ![callback.gif](callback.gif)
+
 
 ## 🔌 Portas
 
