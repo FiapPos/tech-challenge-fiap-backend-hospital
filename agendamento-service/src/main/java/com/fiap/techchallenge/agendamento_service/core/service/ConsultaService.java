@@ -26,6 +26,7 @@ public class ConsultaService {
     private final KafkaProducer kafkaProducer;
     private final FilaEsperaService filaEsperaService;
     private final ValidacaoEntidadesService validacaoEntidadesService;
+    private final SusAgendamentoBotService susAgendamentoBotService;
 
     @Transactional
     public Consulta criarConsultaPendente(DadosAgendamento dto) {
@@ -111,11 +112,13 @@ public class ConsultaService {
                 .orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + dto.getAgendamentoId()));
 
         consulta.setStatus(CANCELADA);
-        dto.setStatusAgendamento(CANCELADA);
         repository.save(consulta);
 
         log.info("Consulta {} cancelada. Iniciando redirecionamento para fila de espera.", dto.getAgendamentoId());
-        kafkaProducer.enviarEventosParaNotificacao(dto);
+        DadosAgendamento evento = new DadosAgendamento(consulta);
+        evento.setSagaId(dto.getSagaId());
+        kafkaProducer.enviarEventosParaNotificacao(evento);
+        susAgendamentoBotService.enviaCancelamento(consulta);
 
         try {
             DadosAgendamento consultaParaRedirecionamento = DadosAgendamento.builder()
@@ -125,14 +128,23 @@ public class ConsultaService {
                     .especialidadeId(consulta.getEspecialidadeId())
                     .hospitalId(consulta.getHospitalId())
                     .dataHoraAgendamento(consulta.getDataHora())
-                    .nomeMedico(dto.getNomeMedico())
-                    .nomeHospital(dto.getNomeHospital())
-                    .especializacao(dto.getEspecializacao())
+                    .nomeMedico(consulta.getNomeMedico())
+                    .nomeHospital(consulta.getNomeHospital())
+                    .especializacao(consulta.getEspecializacao())
                     .build();
 
-            filaEsperaService.processarRedirecionamento(consultaParaRedirecionamento);
+            filaEsperaService
+                    .processarRedirecionamento(consultaParaRedirecionamento)
+                    .ifPresent(
+                            filaEspera -> susAgendamentoBotService
+                                    .enviarSolicitacaoConfirmacaoParaPacienteNaFilaDeEspera(
+                                            filaEspera.getPacienteId(),
+                                            filaEspera.getId(),
+                                            consulta
+                                    )
+                    );
         } catch (Exception e) {
-            log.error("Erro ao processar redirecionamento para fila de espera: {}", e.getMessage());
+            log.error("Erro ao processar redirecionamento para fila de espera", e);
         }
     }
 
@@ -142,10 +154,12 @@ public class ConsultaService {
                 .orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + dto.getAgendamentoId()));
 
         consulta.setStatus(CRIADA);
-        dto.setStatusAgendamento(CRIADA);
         repository.save(consulta);
 
-        kafkaProducer.enviarEventosParaNotificacao(dto);
+        DadosAgendamento evento = new DadosAgendamento(consulta);
+        evento.setSagaId(dto.getSagaId());
+        kafkaProducer.enviarEventosParaNotificacao(evento);
+        susAgendamentoBotService.enviarConfirmacao(consulta);
     }
 
     public DadosAgendamento atualizarConsulta(Long id, DadosAgendamento dto) {
@@ -157,11 +171,13 @@ public class ConsultaService {
         }
 
         consulta.atualiza(dto);
-        dto.setStatusAgendamento(ATUALIZADA);
         repository.save(consulta);
 
-        kafkaProducer.enviarEventosParaNotificacao(dto);
-        return dto;
+        DadosAgendamento evento = new DadosAgendamento(consulta);
+        evento.setSagaId(dto.getSagaId());
+        kafkaProducer.enviarEventosParaNotificacao(evento);
+        susAgendamentoBotService.enviaAtualizacao(consulta);
+        return evento;
     }
 
     public Consulta buscaConsulta(Long id) {

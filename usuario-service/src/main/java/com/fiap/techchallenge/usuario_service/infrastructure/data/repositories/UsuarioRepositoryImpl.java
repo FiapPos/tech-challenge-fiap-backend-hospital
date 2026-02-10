@@ -123,4 +123,10 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
         return jpaRepository.findByIdAndPerfil_NomePerfilAndEspecialidadeId(id, perfil, especialidadeId)
                 .map(UsuarioEntity::toDomain);
     }
+
+    @Override
+    public Optional<Usuario> findByChatId(Long chatId) {
+        return jpaRepository.findByChatId(chatId)
+                .map(UsuarioEntity::toDomain);
+    }
 }

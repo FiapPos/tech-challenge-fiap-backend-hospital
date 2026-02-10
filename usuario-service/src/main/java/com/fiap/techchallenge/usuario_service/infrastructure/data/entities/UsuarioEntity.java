@@ -77,6 +77,9 @@ public class UsuarioEntity {
     @Column(name = "pcd")
     private Boolean pcd = false; // Pessoa com Deficiência
 
+    @Column(name = "chat_id")
+    private Long chatId;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<EnderecoEntity> enderecos = new ArrayList<>();
 
@@ -121,7 +124,8 @@ public class UsuarioEntity {
                 especialidadesList,
                 this.idoso,
                 this.gestante,
-                this.pcd);
+                this.pcd,
+                this.chatId);
     }
 
     public static UsuarioEntity fromDomain(Usuario usuario) {
@@ -141,6 +145,7 @@ public class UsuarioEntity {
         entity.setIdoso(usuario.getIdoso());
         entity.setGestante(usuario.getGestante());
         entity.setPcd(usuario.getPcd());
+        entity.setChatId(usuario.getChatId());
 
         if (usuario.getPerfilId() != null) {
             entity.setPerfilId(usuario.getPerfilId());

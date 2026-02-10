@@ -53,8 +53,6 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
             @Param("dataHoraFim") LocalDateTime dataHoraFim,
             @Param("status") EStatusAgendamento status);
 
-    List<Consulta> findByPacienteIdAndStatus(Long pacienteId, EStatusAgendamento status);
-
     List<Consulta> findByMedicoIdAndStatus(Long medicoId, EStatusAgendamento status);
 
     @Query("SELECT c FROM Consulta c WHERE c.hospitalId = :hospitalId " +
@@ -92,4 +90,25 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
             @Param("dataInicio") LocalDateTime dataInicio,
             @Param("dataFim") LocalDateTime dataFim,
             @Param("statusCancelada") EStatusAgendamento statusCancelada);
+
+    @Query("""
+        SELECT c
+        FROM Consulta c
+        WHERE c.pacienteId = :pacienteId
+        AND c.status IN (:status)
+        AND c.dataHora >= :agora
+    """)
+    List<Consulta> findAllFuturasConsultasByPacienteIdAndStatus(
+            @Param("pacienteId") Long pacienteId,
+            @Param("status") List<EStatusAgendamento> status,
+            @Param("agora") LocalDateTime agora
+    );
+
+
+    @Query("SELECT c FROM Consulta c WHERE c.status = :status AND c.dataHora <= :proximas24h AND c.dataHora >= :proximas24hMenos4Minutos")
+    List<Consulta> buscarConsultasNasProximas24Horas(
+            @Param("status") EStatusAgendamento status,
+            @Param("proximas24hMenos4Minutos") LocalDateTime proximas24hMenos4Minutos,
+            @Param("proximas24h") LocalDateTime proximas24h
+    );
 }

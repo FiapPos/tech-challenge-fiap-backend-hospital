@@ -31,6 +31,13 @@ public class AtualizarUsuarioComando {
         return usuarioRepository.save(usuario);
     }
 
+
+    public void adicionaChatId(Long id, Long chatId) {
+        Usuario usuario = validarUsuarioExistente.execute(id);
+        usuario.setChatId(chatId);
+        usuarioRepository.save(usuario);
+    }
+
     private void validarDto(AtualizarUsuarioComandoDto dto) {
         if (!isPeloMenosUmCampoPreenchido(dto)) {
             throw new BadRequestException("atualizar.usuario.nenhum.campo");

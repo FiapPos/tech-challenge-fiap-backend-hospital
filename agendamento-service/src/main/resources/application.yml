@@ -53,3 +53,7 @@ services:
   hospital:
     url: ${HOSPITAL_SERVICE_URL:http://hospital-service:3000}
 
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN}
+

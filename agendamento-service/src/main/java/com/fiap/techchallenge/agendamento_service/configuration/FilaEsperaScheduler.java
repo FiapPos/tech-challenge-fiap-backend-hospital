@@ -15,16 +15,20 @@ public class FilaEsperaScheduler {
 
     private final FilaEsperaService filaEsperaService;
 
-    @Scheduled(cron = "0 */5 * * * *")
-    public void alocarPacientesDaFila() {
-        log.info("Iniciando alocação automática de pacientes da fila de espera");
-        try {
-            int alocados = filaEsperaService.alocarProximosDaFila();
-            log.info("Alocação automática concluída - pacientes alocados: {}", alocados);
-        } catch (Exception e) {
-            log.error("Erro ao alocar pacientes da fila: {}", e.getMessage());
-        }
-    }
+    /**
+     * Descomente para alocar as pessoas da fila de forma automática
+     * conforme disponibilidade
+     */
+//    @Scheduled(cron = "0 */5 * * * *")
+//    public void alocarPacientesDaFila() {
+//        log.info("Iniciando alocação automática de pacientes da fila de espera");
+//        try {
+//            int alocados = filaEsperaService.alocarProximosDaFila();
+//            log.info("Alocação automática concluída - pacientes alocados: {}", alocados);
+//        } catch (Exception e) {
+//            log.error("Erro ao alocar pacientes da fila: {}", e.getMessage());
+//        }
+//    }
 
     @Scheduled(cron = "0 0 * * * *")
     public void verificarPropostasExpiradas() {

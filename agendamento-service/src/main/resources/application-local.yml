@@ -1,0 +1,23 @@
+spring:
+  kafka:
+    # Rodando via docker-compose (KAFKA_ADVERTISED_LISTENERS usa localhost:9092 no EXTERNAL)
+    bootstrap-servers: ${KAFKA_BROKER:localhost:9092}
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    # agendamento-db no docker-compose expõe 5434:5432
+    url: ${DB_URI:jdbc:postgresql://localhost:5434/agendamentos}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+# URLs dos microserviços para validação (quando o agendamento-service roda local)
+services:
+  usuario:
+    url: ${USUARIO_SERVICE_URL:http://localhost:3001}
+  hospital:
+    url: ${HOSPITAL_SERVICE_URL:http://localhost:3006}
+
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN}
+
