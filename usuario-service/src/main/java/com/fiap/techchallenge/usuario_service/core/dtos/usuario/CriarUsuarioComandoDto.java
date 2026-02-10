@@ -41,4 +41,9 @@ public class CriarUsuarioComandoDto {
     private String telefone;
 
     private List<Long> especialidadeIds;
+
+    // Campos de prioridade para redirecionamento de consultas
+    private Boolean idoso = false;
+    private Boolean gestante = false;
+    private Boolean pcd = false; // Pessoa com Deficiência
 }

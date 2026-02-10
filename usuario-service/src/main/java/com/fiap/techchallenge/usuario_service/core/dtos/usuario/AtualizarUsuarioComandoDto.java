@@ -20,4 +20,9 @@ public class AtualizarUsuarioComandoDto {
     private String cpf;
 
     private LocalDate dataNascimento;
+
+    // Campos de prioridade para redirecionamento de consultas
+    private Boolean idoso;
+    private Boolean gestante;
+    private Boolean pcd; // Pessoa com Deficiência
 }

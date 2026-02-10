@@ -6,42 +6,103 @@ import com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento;
 import com.fiap.techchallenge.agendamento_service.core.producer.KafkaProducer;
 import com.fiap.techchallenge.agendamento_service.core.repository.ConsultaRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
+import static com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento.*;
+import static com.fiap.techchallenge.agendamento_service.core.repository.ConsultaRepository.DURACAO_CONSULTA_MINUTOS;
+
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class ConsultaService {
 
-    private ConsultaRepository repository;
-    private KafkaProducer kafkaProducer;
-
-    public ConsultaService(ConsultaRepository repository, KafkaProducer kafkaProducer) {
-        this.repository = repository;
-        this.kafkaProducer = kafkaProducer;
-    }
+    private final ConsultaRepository repository;
+    private final KafkaProducer kafkaProducer;
+    private final FilaEsperaService filaEsperaService;
+    private final ValidacaoEntidadesService validacaoEntidadesService;
 
     @Transactional
     public Consulta criarConsultaPendente(DadosAgendamento dto) {
+        validacaoEntidadesService.validarPaciente(dto.getPacienteId());
+        validacaoEntidadesService.validarMedico(dto.getMedicoId());
+        validacaoEntidadesService.validarHospital(dto.getHospitalId());
+        validacaoEntidadesService.validarEspecialidade(dto.getEspecialidadeId());
+        validarConflitoHorario(dto);
+
         Consulta consulta = new Consulta();
         consulta.setPacienteId(dto.getPacienteId());
         consulta.setMedicoId(dto.getMedicoId());
         consulta.setEspecialidadeId(dto.getEspecialidadeId());
         consulta.setHospitalId(dto.getHospitalId());
         consulta.setDataHora(dto.getDataHoraAgendamento());
-        consulta.setStatus(EStatusAgendamento.PENDENTE); // Status inicial definido pela Saga
+        consulta.setStatus(EStatusAgendamento.PENDENTE);
+        consulta.setNomePaciente(dto.getNomePaciente());
+        consulta.setNomeMedico(dto.getNomeMedico());
+        consulta.setNomeHospital(dto.getNomeHospital());
+        consulta.setEnderecoHospital(dto.getEnderecoHospital());
+        consulta.setEspecializacao(dto.getEspecializacao());
+        consulta.setObservacoes(dto.getObservacoes());
 
         Consulta consultaSalva = repository.save(consulta);
 
-        // Atualiza o DTO com o ID gerado e envia evento para criar histórico imediatamente
         dto.setAgendamentoId(consultaSalva.getId());
         dto.setStatusAgendamento(consultaSalva.getStatus());
-
-        // Publica evento de criação no Kafka para registrar no histórico
         kafkaProducer.enviarEventosParaHistorico(dto);
 
+        log.info("Consulta criada - ID: {}, paciente: {}, horário: {}",
+                consultaSalva.getId(), dto.getPacienteId(), dto.getDataHoraAgendamento());
+
         return consultaSalva;
+    }
+
+    private void validarConflitoHorario(DadosAgendamento dto) {
+        List<EStatusAgendamento> statusExcluidos = List.of(CANCELADA);
+        LocalDateTime dataHora = dto.getDataHoraAgendamento();
+        LocalDateTime dataHoraInicio = dataHora.minusMinutes(DURACAO_CONSULTA_MINUTOS);
+        LocalDateTime dataHoraFim = dataHora.plusMinutes(DURACAO_CONSULTA_MINUTOS);
+
+        List<Consulta> conflitoPaciente = repository.findConflitoPaciente(
+                dto.getPacienteId(), dataHoraInicio, dataHoraFim, statusExcluidos);
+
+        if (!conflitoPaciente.isEmpty()) {
+            log.warn("Conflito: Paciente {} já possui consulta no intervalo de {} min do horário {}",
+                    dto.getPacienteId(), DURACAO_CONSULTA_MINUTOS, dto.getDataHoraAgendamento());
+            throw new IllegalStateException(
+                    String.format("Paciente já possui consulta agendada no intervalo de %d minutos deste horário",
+                            DURACAO_CONSULTA_MINUTOS));
+        }
+
+        List<Consulta> conflitoMedico = repository.findConflitoMedico(
+                dto.getMedicoId(), dataHoraInicio, dataHoraFim, statusExcluidos);
+
+        if (!conflitoMedico.isEmpty()) {
+            log.warn("Conflito: Médico {} já possui consulta no intervalo de {} min do horário {}",
+                    dto.getMedicoId(), DURACAO_CONSULTA_MINUTOS, dto.getDataHoraAgendamento());
+            throw new IllegalStateException(
+                    String.format("Médico já possui consulta agendada no intervalo de %d minutos deste horário",
+                            DURACAO_CONSULTA_MINUTOS));
+        }
+
+        log.info("Validação de conflito OK - paciente: {}, médico: {}, horário: {}",
+                dto.getPacienteId(), dto.getMedicoId(), dto.getDataHoraAgendamento());
+    }
+
+    public boolean isHorarioDisponivel(Long medicoId, Long pacienteId, LocalDateTime dataHora) {
+        LocalDateTime dataHoraInicio = dataHora.minusMinutes(DURACAO_CONSULTA_MINUTOS);
+        LocalDateTime dataHoraFim = dataHora.plusMinutes(DURACAO_CONSULTA_MINUTOS);
+
+        boolean medicoOcupado = repository.existsByMedicoIdAndDataHoraBetweenAndStatusNot(
+                medicoId, dataHoraInicio, dataHoraFim, CANCELADA);
+        boolean pacienteOcupado = repository.existsByPacienteIdAndDataHoraBetweenAndStatusNot(
+                pacienteId, dataHoraInicio, dataHoraFim, CANCELADA);
+
+        return !medicoOcupado && !pacienteOcupado;
     }
 
     @Transactional
@@ -53,7 +114,26 @@ public class ConsultaService {
         dto.setStatusAgendamento(CANCELADA);
         repository.save(consulta);
 
+        log.info("Consulta {} cancelada. Iniciando redirecionamento para fila de espera.", dto.getAgendamentoId());
         kafkaProducer.enviarEventosParaNotificacao(dto);
+
+        try {
+            DadosAgendamento consultaParaRedirecionamento = DadosAgendamento.builder()
+                    .agendamentoId(consulta.getId())
+                    .pacienteId(consulta.getPacienteId())
+                    .medicoId(consulta.getMedicoId())
+                    .especialidadeId(consulta.getEspecialidadeId())
+                    .hospitalId(consulta.getHospitalId())
+                    .dataHoraAgendamento(consulta.getDataHora())
+                    .nomeMedico(dto.getNomeMedico())
+                    .nomeHospital(dto.getNomeHospital())
+                    .especializacao(dto.getEspecializacao())
+                    .build();
+
+            filaEsperaService.processarRedirecionamento(consultaParaRedirecionamento);
+        } catch (Exception e) {
+            log.error("Erro ao processar redirecionamento para fila de espera: {}", e.getMessage());
+        }
     }
 
     @Transactional
@@ -69,7 +149,13 @@ public class ConsultaService {
     }
 
     public DadosAgendamento atualizarConsulta(Long id, DadosAgendamento dto) {
-        Consulta consulta = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
+        Consulta consulta = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
+
+        if (dto.getDataHoraAgendamento() != null && !dto.getDataHoraAgendamento().equals(consulta.getDataHora())) {
+            validarConflitoHorario(dto);
+        }
+
         consulta.atualiza(dto);
         dto.setStatusAgendamento(ATUALIZADA);
         repository.save(consulta);
@@ -79,6 +165,27 @@ public class ConsultaService {
     }
 
     public Consulta buscaConsulta(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
+    }
+
+    public List<Consulta> listarConsultasPorHospital(Long hospitalId) {
+        log.info("Buscando consultas ativas do hospital {}", hospitalId);
+        return repository.findByHospitalIdAtivas(hospitalId, CANCELADA);
+    }
+
+    public List<Consulta> listarConsultasPorHospitalEData(Long hospitalId, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        log.info("Buscando consultas do hospital {} entre {} e {}", hospitalId, dataInicio, dataFim);
+        return repository.findByHospitalIdAndData(hospitalId, dataInicio, dataFim, CANCELADA);
+    }
+
+    public List<Consulta> listarConsultasPorHospitalEEspecialidade(Long hospitalId, Long especialidadeId) {
+        log.info("Buscando consultas do hospital {} para especialidade {}", hospitalId, especialidadeId);
+        return repository.findByHospitalIdAndEspecialidadeId(hospitalId, especialidadeId, CANCELADA);
+    }
+
+    public List<Consulta> listarConsultasPorMedicoEData(Long medicoId, LocalDateTime dataInicio, LocalDateTime dataFim) {
+        log.info("Buscando consultas do médico {} entre {} e {}", medicoId, dataInicio, dataFim);
+        return repository.findByMedicoIdAndData(medicoId, dataInicio, dataFim, CANCELADA);
     }
 }

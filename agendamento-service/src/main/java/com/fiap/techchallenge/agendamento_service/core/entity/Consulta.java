@@ -1,4 +1,5 @@
 package com.fiap.techchallenge.agendamento_service.core.entity;
+
 import com.fiap.techchallenge.agendamento_service.core.dto.DadosAgendamento;
 import com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento;
 import jakarta.persistence.*;
@@ -32,8 +33,16 @@ public class Consulta {
     @Column(nullable = false)
     private LocalDateTime dataHora;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EStatusAgendamento status;
+
+    private String nomePaciente;
+    private String nomeMedico;
+    private String nomeHospital;
+    private String enderecoHospital;
+    private String especializacao;
+    private String observacoes;
 
     @Column(nullable = false)
     private LocalDateTime criadoEm;
@@ -54,8 +63,13 @@ public class Consulta {
         this.medicoId = dto.getMedicoId();
         this.especialidadeId = dto.getEspecialidadeId();
         this.hospitalId = dto.getHospitalId();
-        this.dataHora = LocalDateTime.now();
+        this.dataHora = dto.getDataHoraAgendamento() != null ? dto.getDataHoraAgendamento() : this.dataHora;
+        this.nomePaciente = dto.getNomePaciente();
+        this.nomeMedico = dto.getNomeMedico();
+        this.nomeHospital = dto.getNomeHospital();
+        this.enderecoHospital = dto.getEnderecoHospital();
+        this.especializacao = dto.getEspecializacao();
+        this.observacoes = dto.getObservacoes();
         this.status = EStatusAgendamento.ATUALIZADA;
-        this.atualizadoEm = LocalDateTime.now();
     }
 }

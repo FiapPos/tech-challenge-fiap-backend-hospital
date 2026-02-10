@@ -6,6 +6,8 @@ import com.fiap.techchallenge.usuario_service.core.domain.entities.Usuario;
 import com.fiap.techchallenge.usuario_service.core.enums.Perfil;
 import com.fiap.techchallenge.usuario_service.core.exceptions.BadRequestException;
 import com.fiap.techchallenge.usuario_service.core.exceptions.CredenciaisInvalidasException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AutenticaLoginComando {
 
+    private static final Logger log = LoggerFactory.getLogger(AutenticaLoginComando.class);
     private final AuthenticationManager authenticationManager;
 
     public AutenticaLoginComando(AuthenticationManager authenticationManager) {
@@ -21,9 +24,11 @@ public class AutenticaLoginComando {
     }
 
     public Usuario login(CredenciaisUsuarioDto credentials) throws Exception {
+        log.info("Tentativa de login para usuário: {}", credentials.login());
         try {
             Authentication authentication = autenticarCredenciais(credentials);
             Usuario usuario = extrairUsuario(authentication);
+            log.info("Usuário autenticado com sucesso: {} (id={})", usuario.getLogin(), usuario.getId());
             // If perfil was provided in the request, validate it. Otherwise accept the
             // user's existing profiles.
             if (credentials.perfil() != null) {
@@ -31,6 +36,8 @@ public class AutenticaLoginComando {
             }
             return usuario;
         } catch (Exception e) {
+            log.error("Falha na autenticação para usuário {}: {} - {}",
+                credentials.login(), e.getClass().getSimpleName(), e.getMessage());
             tratarExcecao(e);
             return null;
         }

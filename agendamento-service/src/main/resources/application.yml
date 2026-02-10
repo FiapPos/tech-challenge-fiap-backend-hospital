@@ -14,6 +14,7 @@ spring:
       notificacao-sucesso:  notificacao-sucesso
       consultas: consultas
       historico-sucesso: historico-sucesso
+      proposta-vaga: proposta-vaga
     consumer:
       group-id: agendamento-group
       auto-offset-reset: latest
@@ -34,12 +35,21 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
 
 logging:
   level:
     org.apache.kafka: INFO
     org.hibernate: DEBUG
+
+# URLs dos microserviços para validação
+services:
+  usuario:
+    url: ${USUARIO_SERVICE_URL:http://usuario-service:3000}
+  hospital:
+    url: ${HOSPITAL_SERVICE_URL:http://hospital-service:3000}
+

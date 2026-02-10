@@ -39,15 +39,22 @@ public class DadosAgendamento implements Serializable {
     private LocalDateTime atualizadoEm;
     private String observacoes;
 
-    public DadosAgendamento(Consulta consultaAtualizada) {
-        this.agendamentoId = consultaAtualizada.getId();
-        this.pacienteId = consultaAtualizada.getPacienteId();
-        this.hospitalId = consultaAtualizada.getHospitalId();
-        this.especialidadeId = consultaAtualizada.getEspecialidadeId();
-        this.medicoId = consultaAtualizada.getMedicoId();
-        this.criadoEm = consultaAtualizada.getCriadoEm();
-        this.dataHoraAgendamento = consultaAtualizada.getDataHora();
-        this.statusAgendamento = consultaAtualizada.getStatus();
+    public DadosAgendamento(Consulta consulta) {
+        this.agendamentoId = consulta.getId();
+        this.pacienteId = consulta.getPacienteId();
+        this.hospitalId = consulta.getHospitalId();
+        this.especialidadeId = consulta.getEspecialidadeId();
+        this.medicoId = consulta.getMedicoId();
+        this.nomePaciente = consulta.getNomePaciente();
+        this.nomeMedico = consulta.getNomeMedico();
+        this.nomeHospital = consulta.getNomeHospital();
+        this.enderecoHospital = consulta.getEnderecoHospital();
+        this.especializacao = consulta.getEspecializacao();
+        this.observacoes = consulta.getObservacoes();
+        this.criadoEm = consulta.getCriadoEm();
+        this.atualizadoEm = consulta.getAtualizadoEm();
+        this.dataHoraAgendamento = consulta.getDataHora();
+        this.statusAgendamento = consulta.getStatus();
     }
 
 
