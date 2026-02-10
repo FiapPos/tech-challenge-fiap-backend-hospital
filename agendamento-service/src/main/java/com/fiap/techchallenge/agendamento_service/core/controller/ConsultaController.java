@@ -118,8 +118,8 @@ public class ConsultaController {
 /**
  * Endpoint para teste de fluxo completo.
  */
-/*    @GetMapping("/teste")
-    public ResponseEntity<String> testeSonia() {
+    @GetMapping("/teste")
+    public ResponseEntity<String> teste() {
 
         LocalDateTime agora = LocalDateTime.now();
         LocalDateTime amanhaMesmaHora = agora.plusHours(24);
@@ -131,5 +131,5 @@ public class ConsultaController {
         ).forEach(susAgendamentoBotService::enviarSolicitacaoConfirmacaoParaPaciente);
 
         return ResponseEntity.ok("Notificações enviadas com sucesso");
-    }*/
+    }
 }

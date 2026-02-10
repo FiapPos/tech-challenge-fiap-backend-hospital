@@ -4,14 +4,21 @@ Sistema de gerenciamento hospitalar desenvolvido com arquitetura de microserviç
 
 ## Links úteis
 - Github: https://github.com/FiapPos/tech-challenge-fiap-backend-hospital
-- Collection do Postman: [Appointment Service API.postman_collection.json](appointment-service/Appointment%20Service%20API.postman_collection.json)
-- Documentação para testes: [README-POSTMAN.md](appointment-service/README-POSTMAN.md)
+- Collection do Postman: [Prioridade Consultas - Agendamento Service.postman_collection.json](agendamento-service/postman/Prioridade%20Consultas%20-%20Agendamento%20Service.postman_collection.json) e [Prioridade-Consultas.postman_environment.json](agendamento-service/postman/Prioridade-Consultas.postman_environment.json)
+- Simulação de fluxo completo de notificação e redirecionamento entre dois usuários distintos: https://drive.google.com/file/d/1R95HxQT4EiCdeuIBXSGy-Ys0IjMCwddJ/view?usp=sharing
 
 ## Equipe
-- [Gustavo Lima Aliba](https://github.com/GustavoLimaAl)
-- [Julio Cesar Salerno da Silva](https://github.com/jcsalerno)
-- [Sonia Alves Ribeiro](https://github.com/hopesoh)
-- [Stephanie Ingrid Menezes](https://github.com/steingcam)
+- [Gustavo Lima - RM363714](https://github.com/GustavoLimaAl)
+- [Isabella Cruz - RM363205](https://github.com/isabellacoliveira)
+- [Karolyne de Carvalho- RM363153](https://github.com/KarolyneFerreira)
+- [Sonia Ribeiro - RM364992](https://github.com/hopesoh)
+- [Stephanie Menezes - RM361828](https://github.com/steingcam)
+
+## Execução
+```
+export TELEGRAM_BOT_TOKEN="SEU_TOKEN_AQUI"
+docker-compose up --build
+```
 
 ## 🏗️ **ARQUITETURA**
 
