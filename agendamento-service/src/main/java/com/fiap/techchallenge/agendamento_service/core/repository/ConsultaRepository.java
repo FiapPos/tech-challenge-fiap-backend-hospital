@@ -103,4 +103,12 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
             @Param("status") List<EStatusAgendamento> status,
             @Param("agora") LocalDateTime agora
     );
+
+
+    @Query("SELECT c FROM Consulta c WHERE c.status = :status AND c.dataHora <= :proximas24h AND c.dataHora >= :proximas24hMenos4Minutos")
+    List<Consulta> buscarConsultasNasProximas24Horas(
+            @Param("status") EStatusAgendamento status,
+            @Param("proximas24hMenos4Minutos") LocalDateTime proximas24hMenos4Minutos,
+            @Param("proximas24h") LocalDateTime proximas24h
+    );
 }

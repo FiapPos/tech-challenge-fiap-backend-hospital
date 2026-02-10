@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento.CANCELADA;
+import static com.fiap.techchallenge.agendamento_service.core.enums.EStatusAgendamento.CRIADA;
+
 @Data
 @NoArgsConstructor
 @Entity
@@ -91,5 +94,13 @@ public class Consulta {
         return getDataHora() != null
                 ? getDataHora().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
                 : null;
+    }
+
+    public boolean isCriada() {
+        return CRIADA.equals(getStatus());
+    }
+
+    public boolean isCancelada() {
+        return CANCELADA.equals(getStatus());
     }
 }

@@ -1,9 +1,13 @@
 package com.fiap.techchallenge.agendamento_service.core.service;
 
 import com.fiap.techchallenge.agendamento_service.core.client.UsuarioServiceClient;
+import com.fiap.techchallenge.agendamento_service.core.dto.FilaEsperaDTO;
 import com.fiap.techchallenge.agendamento_service.core.dto.UsuarioDTO;
 import com.fiap.techchallenge.agendamento_service.core.entity.Consulta;
+import com.fiap.techchallenge.agendamento_service.core.enums.EStatusFilaEspera;
 import com.fiap.techchallenge.agendamento_service.core.repository.ConsultaRepository;
+import com.fiap.techchallenge.agendamento_service.core.repository.FilaEsperaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.BotSession;
@@ -32,14 +36,16 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
     private final UsuarioServiceClient service;
     private final FilaEsperaService filaEsperaService;
     private final ConsultaRepository consultaRepository;
+    private final FilaEsperaRepository filaEsperaRepository;
 
     public SusAgendamentoBotService(UsuarioServiceClient service,
                                     FilaEsperaService filaEsperaService,
-                                    ConsultaRepository consultaRepository) {
+                                    ConsultaRepository consultaRepository, FilaEsperaRepository filaEsperaRepository) {
         this.service = service;
         this.filaEsperaService = filaEsperaService;
         this.consultaRepository = consultaRepository;
         telegramClient = new OkHttpTelegramClient(getBotToken());
+        this.filaEsperaRepository = filaEsperaRepository;
     }
 
     @Override
@@ -72,16 +78,61 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
         String callbackData = update.getCallbackQuery().getData();
         long chatId = update.getCallbackQuery().getMessage().getChatId();
 
-        if (callbackData.startsWith("CONFIRMAR_")) {
-            Long id = Long.parseLong(callbackData.replace("CONFIRMAR_", ""));
+        if (callbackData.startsWith("CONSULTA_CONFIRMAR_")) {
+            Long id = Long.parseLong(callbackData.replace("CONSULTA_CONFIRMAR_", ""));
+            confirmarConsulta(id, chatId);
+        }
+        else if (callbackData.startsWith("CONSULTA_CANCELAR_")) {
+            Long id = Long.parseLong(callbackData.replace("CONSULTA_CANCELAR_", ""));
+            recusarConsulta(id, chatId);
+        }
+        else if (callbackData.startsWith("FILA_CONFIRMAR_")) {
+            Long id = Long.parseLong(callbackData.replace("FILA_CONFIRMAR_", ""));
             filaEsperaService.aceitarProposta(id);
             enviarMensagem(chatId, "Obrigado! Sua presença foi confirmada no sistema. Nos vemos lá! 👋");
         }
-        else if (callbackData.startsWith("CANCELAR_")) {
-            Long id = Long.parseLong(callbackData.replace("CANCELAR_", ""));
+        else if (callbackData.startsWith("FILA_CANCELAR_")) {
+            Long id = Long.parseLong(callbackData.replace("FILA_CANCELAR_", ""));
             filaEsperaService.recusarProposta(id);
             enviarMensagem(chatId, "Entendido. Sua consulta foi cancelada e a vaga foi liberada para outro paciente. 🤝");
         }
+    }
+
+    private void confirmarConsulta(Long id, long chatId) {
+        Consulta consulta = consultaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
+        if (consulta.isCriada()) enviarMensagem(chatId, "Essa consulta não está mais disponível para ações.");
+
+        consulta.setStatus(CRIADA);
+        consultaRepository.save(consulta);
+        enviarMensagem(chatId, "Obrigado! Sua presença foi confirmada no sistema. Nos vemos lá! 👋");
+    }
+
+    private void recusarConsulta(Long id, long chatId) {
+        Consulta consulta = consultaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Consulta não encontrada com ID: " + id));
+        if (consulta.isCancelada()) enviarMensagem(chatId, "Essa consulta não está mais disponível para ações.");
+
+        consulta.setStatus(CANCELADA);
+        consultaRepository.save(consulta);
+
+        filaEsperaRepository.findProximoPacientePrioritario(
+                        EStatusFilaEspera.AGUARDANDO,
+                        consulta.getEspecialidadeId(),
+                        consulta.getHospitalId(),
+                        consulta.getDataHora())
+                .map(paciente -> {
+                    paciente.setStatus(EStatusFilaEspera.NOTIFICADO);
+                    paciente.setNotificadoEm(LocalDateTime.now());
+                    filaEsperaRepository.save(paciente);
+                    return new FilaEsperaDTO(paciente);
+                })
+                .ifPresent(
+                        filaEspera -> enviarSolicitacaoConfirmacaoParaPacienteNaFilaDeEspera(
+                                filaEspera.getPacienteId(), filaEspera.getId(), consulta
+                        )
+                );
+        enviarMensagem(chatId, "Entendido. Sua consulta foi cancelada e a vaga foi liberada para outro paciente. 🤝");
     }
 
     private void enviaAcaoInicial(String message_text, long chat_id) {
@@ -103,7 +154,8 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
 
         if (pacienteId == null) {
             enviarMensagem(chat_id,
-                    "Não encontrei seu cadastro vinculado a este chat. Escaneie o QR Code para ativar os lembretes.");
+                    "Não encontrei seu cadastro vinculado a este chat. Escaneie o QR Code para ativar os lembretes."
+            );
             return;
         }
 
@@ -129,17 +181,43 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
         long chatId = paciente.getChatId();
         if (chatId == 0L) return;
 
-        enviarSolicitacaoConfirmacaoParaFilaDeEspera(chatId, filaEsperaId, consulta);
+        enviaMensagemComBotoes(
+                "FILA_CONFIRMAR_",
+                filaEsperaId,
+                "FILA_CANCELAR_",
+                chatId,
+                "🔔 *VOCÊ TEM UMA NOVA CONSULTA! *\n\n" + consulta.getTemplateDeMensagem() + ". \n\nVocê confirma sua presença?"
+        );
     }
 
-    private void enviarSolicitacaoConfirmacaoParaFilaDeEspera(long chatId, Long filaEsperaId, Consulta consulta) {
+    public void enviarSolicitacaoConfirmacaoParaPaciente(Consulta consulta) {
+        UsuarioDTO paciente = service.buscarUsuarioPorId(consulta.getPacienteId(), "PACIENTE");
+        if (paciente == null) return;
+
+        long chatId = paciente.getChatId();
+        if (chatId == 0L) return;
+
+        enviaMensagemComBotoes(
+                "CONSULTA_CONFIRMAR_",
+                consulta.getId(),
+                "CONSULTA_CANCELAR_",
+                chatId,
+                "🔔 *VOCÊ TEM UMA CONSULTA! *\n\n" + consulta.getTemplateDeMensagem() + ". \n\nVocê confirma sua presença?"
+        );
+    }
+
+    private void enviaMensagemComBotoes(String callbackConfirmacao,
+                                        Long callbackDataId,
+                                        String callbackCancelamento,
+                                        long chatId,
+                                        String mensagem) {
         InlineKeyboardButton botaoSim = InlineKeyboardButton.builder()
                 .text("✅ Confirmar Presença")
-                .callbackData("CONFIRMAR_" + filaEsperaId)
+                .callbackData(callbackConfirmacao + callbackDataId)
                 .build();
         InlineKeyboardButton botaoNao = InlineKeyboardButton.builder()
                 .text("❌ Não poderei ir")
-                .callbackData("CANCELAR_" + filaEsperaId)
+                .callbackData(callbackCancelamento + callbackDataId)
                 .build();
 
         InlineKeyboardRow row = new InlineKeyboardRow(botaoSim, botaoNao);
@@ -149,8 +227,8 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
 
         SendMessage message = SendMessage.builder()
                 .chatId(chatId)
-                .text("🔔 *VOCÊ TEM UMA NOVA CONSULTA! *\n\n" + consulta.getTemplateDeMensagem() + ". \n\nVocê confirma sua presença?")
-                .parseMode("Markdown") // Permite negrito
+                .text(mensagem)
+                .parseMode("Markdown")
                 .replyMarkup(markup)
                 .build();
 
@@ -163,17 +241,17 @@ public class SusAgendamentoBotService implements SpringLongPollingBot, LongPolli
 
     public void enviarConfirmacao(Consulta consulta) {
         UsuarioDTO paciente = service.buscarUsuarioPorId(consulta.getPacienteId(), "PACIENTE");
-        enviarMensagem(paciente.getChatId(), "🔔 *LEMBRETE DE CONSULTA*\n\n" + consulta.getTemplateDeMensagem() + " foi confirmada.");
+        enviarMensagem(paciente.getChatId(), "✅ *CONFIRMAÇÃO DE CONSULTA*\n\n" + consulta.getTemplateDeMensagem() + " foi confirmada.");
     }
 
     public void enviaAtualizacao(Consulta consulta) {
         UsuarioDTO paciente = service.buscarUsuarioPorId(consulta.getPacienteId(), "PACIENTE");
-        enviarMensagem(paciente.getChatId(), "🔔 *LEMBRETE DE CONSULTA*\n\n" + consulta.getTemplateDeMensagem() + " foi atualizada.");
+        enviarMensagem(paciente.getChatId(), "🔔 *ATUALIZAÇÃO DE CONSULTA*\n\n" + consulta.getTemplateDeMensagem() + " foi atualizada.");
     }
 
     public void enviaCancelamento(Consulta consulta) {
         UsuarioDTO paciente = service.buscarUsuarioPorId(consulta.getPacienteId(), "PACIENTE");
-        enviarMensagem(paciente.getChatId(), "🔔 *LEMBRETE DE CONSULTA*\n\n" + consulta.getTemplateDeMensagem() + " foi cancelada.");
+        enviarMensagem(paciente.getChatId(), "❌ *CANCELAMENTO DE CONSULTA*\n\n" + consulta.getTemplateDeMensagem() + " foi cancelada.");
     }
 
     private void enviarMensagem(long chatId, String texto) {
