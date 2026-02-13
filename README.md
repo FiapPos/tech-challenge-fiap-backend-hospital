@@ -24,22 +24,87 @@ docker-compose up --build
 
 ## 🏗️ **ARQUITETURA**
 
-### Microserviços:
-- **usuario-service** - Gerenciamento de usuários, autenticação e autorização
-- **agendamento-service** - Agendamento de consultas
-- **appointment-service** - Gestão de consultas
-- **hospital-service** - Gerenciamento de hospitais
-- **historico-service** - Histórico médico
-- **notificacao-service** - Notificações
-- **orchestrator-service** - Orquestração de transações
+Este backend foi construído em **arquitetura de microserviços**, com comunicação **síncrona (HTTP/REST + GraphQL)** e **assíncrona (Kafka)**. O fluxo de agendamento usa **Saga Pattern (orquestrada)** para garantir consistência entre serviços.
 
-### Tecnologias:
-- **Backend:** Java 17, Spring Boot 3.5.5, Spring Security
-- **Database:** PostgreSQL 17.6
-- **ORM:** JPA/Hibernate 6.6.26
-- **Messaging:** Apache Kafka
-- **Authentication:** JWT
-- **Containerization:** Docker
+### Visão geral (alto nível)
+
+- **Entrada única (BFF/API Gateway)**: `appointment-service`
+- **Orquestração de transações distribuídas (Saga Orchestrator)**: `orchestrator-service`
+- **Serviços de domínio**: `usuario-service`, `agendamento-service`, `hospital-service`, `historico-service`, `notificacao-service`
+- **Banco por serviço** (quando aplicável): PostgreSQL (containers dedicados no `docker-compose.yml`)
+- **Mensageria**: Kafka (com Zookeeper + Redpanda Console)
+
+### Microserviços e responsabilidades
+
+- **`appointment-service` (API Gateway / BFF)**
+  - Ponto único de entrada para clientes externos
+  - **Autenticação/Autorização (JWT)** e roteamento para serviços internos
+  - Proxy **REST** (ex.: auth/agendamentos) e **GraphQL** (histórico)
+
+- **`orchestrator-service` (Saga Orchestrator)**
+  - Centraliza a lógica de **Saga** (criação/edição/cancelamento de agendamentos)
+  - Comunicação síncrona via **OpenFeign** com serviços de domínio
+  - Publica/consome eventos via **Kafka**
+  - **Stateless** (não persiste dados)
+
+- **`usuario-service`**
+  - Cadastro e ciclo de vida de usuários, perfis, especialidades, endereços
+  - Endpoint de **login** e emissão/validação de **JWT**
+  - Persistência: PostgreSQL + migrations (Flyway)
+
+- **`agendamento-service`**
+  - Registro/atualização/confirmação/cancelamento de consultas + **fila de espera**
+  - Integração com **Kafka** (ex.: `notificacao-sucesso`, `historico-sucesso`, `consultas`)
+  - Possui schedulers (ex.: confirmação de consulta via Telegram)
+  - Persistência: PostgreSQL
+
+- **`hospital-service`**
+  - CRUD de hospitais
+  - Persistência: PostgreSQL
+
+- **`historico-service`**
+  - Histórico médico via **API GraphQL** (`/graphql`) + GraphiQL (`/graphiql`)
+  - Consome eventos Kafka para manter histórico atualizado
+  - Persistência: PostgreSQL
+
+- **`notificacao-service`**
+  - Consumer Kafka responsável por enviar notificações (criação/edição/cancelamento)
+  - Implementa **Strategy Pattern** para tipos de notificação
+  - **Stateless** (não persiste dados)
+
+### Comunicação entre serviços
+
+- **Síncrona (HTTP)**
+  - `appointment-service` → (REST) `usuario-service` / `orchestrator-service`
+  - `orchestrator-service` → (Feign/REST) `usuario-service`, `agendamento-service`, `hospital-service`
+  - `appointment-service` → (GraphQL) `historico-service`
+
+- **Assíncrona (Kafka)**
+  - Serviços publicam eventos de consulta/agendamento
+  - `historico-service` e `notificacao-service` reagem a eventos para registrar histórico e notificar pacientes
+
+### Fluxo principal (Saga de Agendamento – orquestrada)
+
+1. Cliente chama o **API Gateway** (`appointment-service`)
+2. Gateway valida **JWT** e encaminha para o **orchestrator-service**
+3. Orquestrador valida entidades (usuário/médico/especialidade/hospital)
+4. Orquestrador cria/atualiza/cancela agendamento no `agendamento-service`
+5. Eventos são publicados no **Kafka** para histórico/notificação
+6. `historico-service` atualiza histórico e `notificacao-service` dispara notificações
+
+### Tecnologias (stack do repositório)
+
+- **Java**: 21
+- **Framework**: Spring Boot 3.5.5 (+ Spring Cloud 2025.0.0)
+- **Persistência**: Spring Data JPA / Hibernate + PostgreSQL (Compose usa `postgres:16-alpine`)
+- **Mensageria**: Apache Kafka (Compose usa imagens Confluent 7.6.0) + Redpanda Console
+- **Segurança**: JWT (Spring Security)
+
+> Observação: portas e URLs de acesso estão documentadas no `README.md` raiz (host vs. interno Docker).
+
+![arquitetura.png](arquitetura.png)
+
+![flowchart.png](flowchart.png)
 
 ### Portas
 #### 🌐 ACESSANDO DE FORA DO DOCKER (Navegador, Postman, curl)
