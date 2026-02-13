@@ -104,6 +104,8 @@ Este backend foi construído em **arquitetura de microserviços**, com comunica�
 
 ![arquitetura.png](arquitetura.png)
 
+![flowchart.png](flowchart.png)
+
 ### Portas
 #### 🌐 ACESSANDO DE FORA DO DOCKER (Navegador, Postman, curl)
 ```
